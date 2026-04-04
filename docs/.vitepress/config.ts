@@ -7,6 +7,7 @@ export default defineConfig({
   lang: 'en-US',
   base: '/',
   cleanUrls: true,
+  appearance: 'dark',
 
   themeConfig: {
     siteTitle: 'Botstrap',

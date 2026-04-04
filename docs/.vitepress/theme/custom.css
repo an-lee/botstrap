@@ -1,0 +1,163 @@
+/**
+ * Omakub-inspired palette (Tokyo Night–like), aligned with botstrap docs.
+ * RGB references: night 26,27,38 — storm 36,40,59 — terminal panel 65,72,104
+ */
+:root {
+  --bt-font-mono: ui-monospace, 'Cascadia Code', 'Cascadia Mono', Menlo, Monaco,
+    Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --bt-night: rgb(26, 27, 38);
+  --bt-storm: rgb(36, 40, 59);
+  --bt-terminal-panel: rgb(41, 48, 72);
+  --bt-terminal-border: rgb(65, 72, 104);
+  --bt-terminal-cyan: rgb(125, 207, 255);
+  --bt-terminal-blue: rgb(122, 162, 247);
+  --bt-terminal-green: rgb(158, 206, 106);
+  --bt-terminal-white: rgb(192, 202, 245);
+  --bt-terminal-white-muted: rgb(150, 160, 200);
+  --bt-terminal-tab-bg: rgb(36, 40, 59);
+  --bt-terminal-tab-hover: rgb(48, 54, 78);
+}
+
+.dark {
+  --vp-c-bg: var(--bt-night);
+  --vp-c-bg-alt: var(--bt-storm);
+  --vp-c-bg-elv: var(--bt-storm);
+  --vp-c-bg-soft: var(--bt-terminal-panel);
+
+  --vp-c-border: var(--bt-terminal-border);
+  --vp-c-divider: rgba(65, 72, 104, 0.6);
+  --vp-c-gutter: rgba(0, 0, 0, 0.35);
+
+  --vp-c-text-1: var(--bt-terminal-white);
+  --vp-c-text-2: var(--bt-terminal-white-muted);
+  --vp-c-text-3: rgb(110, 120, 160);
+
+  --vp-c-brand-1: var(--bt-terminal-cyan);
+  --vp-c-brand-2: var(--bt-terminal-blue);
+  --vp-c-brand-3: var(--bt-terminal-green);
+  --vp-c-brand-soft: rgba(125, 207, 255, 0.12);
+
+  --vp-button-brand-bg: var(--bt-terminal-blue);
+  --vp-button-brand-border: var(--bt-terminal-blue);
+  --vp-button-brand-text: var(--bt-night);
+  --vp-button-brand-hover-bg: var(--bt-terminal-cyan);
+  --vp-button-brand-hover-border: var(--bt-terminal-cyan);
+  --vp-button-brand-hover-text: var(--bt-night);
+
+  --vp-button-alt-bg: var(--bt-terminal-tab-bg);
+  --vp-button-alt-border: var(--bt-terminal-border);
+  --vp-button-alt-hover-bg: var(--bt-terminal-tab-hover);
+  --vp-button-alt-hover-border: var(--bt-terminal-cyan);
+
+  --vp-home-hero-name-color: var(--bt-terminal-green);
+  --vp-home-hero-name-background: transparent;
+}
+
+/* Home hero: monospace, Omakub-like spacing */
+.VPHome .VPHero .heading {
+  font-family: var(--bt-font-mono);
+}
+
+.VPHome .VPHero .name {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.VPHome .VPHero .text {
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--bt-terminal-white);
+}
+
+.VPHome .VPHero .tagline {
+  font-family: var(--bt-font-mono);
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  line-height: 1.55;
+  color: var(--bt-terminal-white-muted);
+  max-width: 42rem;
+}
+
+.VPHome .VPHero .actions {
+  margin-top: 1.25rem;
+}
+
+.VPHome .VPHero .container {
+  max-width: 52rem;
+}
+
+.VPHome .VPHero:not(.has-image) .main {
+  text-align: center;
+}
+
+.VPHome .VPHero:not(.has-image) .actions {
+  justify-content: center;
+}
+
+@media (min-width: 960px) {
+  .VPHome .VPHero .container {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .VPHome .VPHero .main {
+    width: 100%;
+    max-width: 52rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .VPHome .VPHero .tagline {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .VPHome .VPHero .actions {
+    justify-content: center;
+  }
+}
+
+/* Feature cards: terminal-adjacent panels */
+.dark .VPHome .VPFeature {
+  border-color: var(--bt-terminal-border);
+  background-color: rgba(36, 40, 59, 0.65);
+}
+
+.dark .VPHome .VPFeature.link:hover {
+  border-color: var(--bt-terminal-cyan);
+  background-color: rgba(41, 48, 72, 0.9);
+}
+
+.VPHome .VPFeature .title {
+  font-family: var(--bt-font-mono);
+  font-size: 1.05rem;
+  color: var(--bt-terminal-cyan);
+}
+
+.VPHome .VPFeature .details {
+  color: var(--bt-terminal-white-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.VPHome .VPFeatures .container {
+  max-width: 1152px;
+}
+
+/* Home markdown (tip / local install note) */
+.VPHome .vp-doc {
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.VPHome .vp-doc p,
+.VPHome .vp-doc .custom-block {
+  font-family: var(--bt-font-mono);
+  font-size: 0.875rem;
+}

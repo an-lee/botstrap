@@ -7,7 +7,7 @@ hero:
   tagline: One entry point on macOS, Linux, and Windows — YAML registry, optional TUI, configs, and verification.
   actions:
     - theme: brand
-      text: Read the architecture
+      text: Read the docs
       link: /ARCHITECTURE
     - theme: alt
       text: GitHub
@@ -15,36 +15,23 @@ hero:
 
 features:
   - title: Registry-driven
-    details: Core and optional tools are defined in YAML registries instead of hardcoded install lists in the orchestrator.
+    details: Core and optional tools live in YAML registries instead of hardcoded install lists.
+    link: /REGISTRY_SPEC
+    linkText: Open
   - title: Phased install
-    details: Prerequisites, non-interactive core, interactive gum TUI for optional tools, configuration, then verification.
+    details: Prerequisites, core install, optional gum TUI, configuration, then verification.
+    link: /ARCHITECTURE
+    linkText: Open
   - title: Cross-platform
-    details: Same logical flow via boot.sh / boot.ps1, install scripts, and shared registry concepts across Unix and Windows.
+    details: Same flow via boot.sh / boot.ps1 and shared registry concepts on Unix and Windows.
+    link: /CROSS_PLATFORM
+    linkText: Open
   - title: AI-friendly layout
-    details: Predictable PATH, non-interactive CLIs by default, and structured agent scaffolding under configs/.
+    details: Predictable PATH, non-interactive CLIs by default, and agent scaffolding under configs/.
+    link: /AI_AGENT_FRIENDLINESS
+    linkText: Open
 ---
 
-## Quick install
-
-**macOS / Linux**
-
-```bash
-curl -fsSL https://botstrap.org/install | bash
-```
-
-**Windows (PowerShell)**
-
-```powershell
-irm https://botstrap.org/install.ps1 | iex
-```
-
-For a local checkout, set `BOTSTRAP_ROOT` and run `./install.sh` (see the [repository README](https://github.com/an-lee/botstrap)).
-
-## Documentation
-
-- [Architecture](/ARCHITECTURE) — structure and boot sequence
-- [Registry specification](/REGISTRY_SPEC) — YAML tool definitions
-- [Tool selection](/TOOL_SELECTION) — how optional tools are chosen
-- [Cross-platform notes](/CROSS_PLATFORM)
-- [AI agent friendliness](/AI_AGENT_FRIENDLINESS)
-- [Contributing](/CONTRIBUTING)
+::: tip Local install
+From a git checkout, set `BOTSTRAP_ROOT` and run `./install.sh`. See the [repository README](https://github.com/an-lee/botstrap) for details. [Contributing](/CONTRIBUTING) covers how to help with the project.
+:::
