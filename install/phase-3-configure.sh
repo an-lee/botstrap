@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# Phase 3: dotfiles and templates from configs/ based on BOTSTRAP_* env vars.
+set -euo pipefail
+
+: "${BOTSTRAP_ROOT:?BOTSTRAP_ROOT must be set}"
+# shellcheck source=lib/detect.sh
+source "${BOTSTRAP_ROOT}/lib/detect.sh"
+# shellcheck source=lib/log.sh
+source "${BOTSTRAP_ROOT}/lib/log.sh"
+# shellcheck source=lib/pkg.sh
+source "${BOTSTRAP_ROOT}/lib/pkg.sh"
+
+botstrap_detect
+
+mkdir -p "${HOME}/.config"
+mkdir -p "${HOME}/.config/git"
+
+if [[ -f "${BOTSTRAP_ROOT}/configs/git/gitconfig" && ! -f "${HOME}/.gitconfig" ]]; then
+  cp -f "${BOTSTRAP_ROOT}/configs/git/gitconfig" "${HOME}/.gitconfig"
+fi
+
+botstrap_pkg_install_optional_item "editor" "${BOTSTRAP_EDITOR:-none}" "${BOTSTRAP_ROOT}/registry/optional.yaml" || true
+botstrap_pkg_install_optional_csv "languages" "${BOTSTRAP_LANGUAGES:-}" "${BOTSTRAP_ROOT}/registry/optional.yaml"
+botstrap_pkg_install_optional_csv "databases" "${BOTSTRAP_DATABASES:-}" "${BOTSTRAP_ROOT}/registry/optional.yaml"
+botstrap_pkg_install_optional_csv "ai_tools" "${BOTSTRAP_AI_TOOLS:-}" "${BOTSTRAP_ROOT}/registry/optional.yaml"
+botstrap_pkg_install_optional_item "theme" "${BOTSTRAP_THEME:-catppuccin}" "${BOTSTRAP_ROOT}/registry/optional.yaml" || true
+botstrap_pkg_install_optional_csv "optional_apps" "${BOTSTRAP_OPTIONAL_APPS:-}" "${BOTSTRAP_ROOT}/registry/optional.yaml"
+
+if [[ -f "${BOTSTRAP_ROOT}/configs/shell/prompt.toml" ]]; then
+  cp -f "${BOTSTRAP_ROOT}/configs/shell/prompt.toml" "${HOME}/.config/starship.toml"
+fi
+
+if [[ -f "${BOTSTRAP_ROOT}/configs/git/gitignore_global" ]]; then
+  cp -f "${BOTSTRAP_ROOT}/configs/git/gitignore_global" "${HOME}/.gitignore_global"
+  git config --global core.excludesfile "${HOME}/.gitignore_global" 2>/dev/null || true
+fi
+
+if [[ -n "${BOTSTRAP_GIT_NAME:-}" ]]; then
+  git config --global user.name "${BOTSTRAP_GIT_NAME}" 2>/dev/null || true
+fi
+if [[ -n "${BOTSTRAP_GIT_EMAIL:-}" ]]; then
+  git config --global user.email "${BOTSTRAP_GIT_EMAIL}" 2>/dev/null || true
+fi
+
+_append_block() {
+  local file="$1"
+  local marker="$2"
+  local content="$3"
+  [[ -f "${file}" ]] || touch "${file}"
+  if grep -q "${marker}" "${file}" 2>/dev/null; then
+    return 0
+  fi
+  {
+    printf '\n# %s\n' "${marker}"
+    cat "${content}"
+    printf '\n'
+  } >>"${file}"
+}
+
+if [[ -f "${BOTSTRAP_ROOT}/configs/shell/aliases" ]]; then
+  [[ -f "${HOME}/.zshrc" ]] || touch "${HOME}/.zshrc"
+  _append_block "${HOME}/.zshrc" "botstrap aliases" "${BOTSTRAP_ROOT}/configs/shell/aliases"
+  [[ -f "${HOME}/.bashrc" ]] || touch "${HOME}/.bashrc"
+  _append_block "${HOME}/.bashrc" "botstrap aliases" "${BOTSTRAP_ROOT}/configs/shell/aliases"
+fi
+
+if [[ -f "${BOTSTRAP_ROOT}/configs/shell/functions" ]]; then
+  [[ -f "${HOME}/.zshrc" ]] || touch "${HOME}/.zshrc"
+  _append_block "${HOME}/.zshrc" "botstrap functions" "${BOTSTRAP_ROOT}/configs/shell/functions"
+  [[ -f "${HOME}/.bashrc" ]] || touch "${HOME}/.bashrc"
+  _append_block "${HOME}/.bashrc" "botstrap functions" "${BOTSTRAP_ROOT}/configs/shell/functions"
+fi
+
+case "${BOTSTRAP_EDITOR:-none}" in
+  cursor)
+    mkdir -p "${HOME}/.cursor"
+    if [[ -f "${BOTSTRAP_ROOT}/configs/editor/cursor-settings.json" ]]; then
+      cp -f "${BOTSTRAP_ROOT}/configs/editor/cursor-settings.json" "${HOME}/.cursor/settings.json"
+    fi
+    ;;
+  vscode)
+    mkdir -p "${HOME}/.config/Code/User"
+    if [[ -f "${BOTSTRAP_ROOT}/configs/editor/vscode.json" ]]; then
+      cp -f "${BOTSTRAP_ROOT}/configs/editor/vscode.json" "${HOME}/.config/Code/User/settings.json"
+    fi
+    ;;
+  neovim)
+    mkdir -p "${HOME}/.config/nvim"
+    if [[ -f "${BOTSTRAP_ROOT}/configs/editor/neovim/init.lua" ]]; then
+      cp -f "${BOTSTRAP_ROOT}/configs/editor/neovim/init.lua" "${HOME}/.config/nvim/init.lua"
+    fi
+    ;;
+  *) ;;
+esac
+
+mkdir -p "${HOME}/.config/botstrap"
+printf '%s\n' "theme=${BOTSTRAP_THEME:-catppuccin}" >"${HOME}/.config/botstrap/theme.env"
+printf '%s\n' "editor=${BOTSTRAP_EDITOR:-none}" >"${HOME}/.config/botstrap/editor.env"
+
+mkdir -p "${HOME}/.config/botstrap/agent"
+cp -f "${BOTSTRAP_ROOT}/configs/agent/AGENTS.md" "${HOME}/.config/botstrap/agent/AGENTS.md.sample"
+cp -f "${BOTSTRAP_ROOT}/configs/agent/cursorrules" "${HOME}/.config/botstrap/agent/cursorrules.sample"
+cp -f "${BOTSTRAP_ROOT}/configs/agent/claude-config.json" "${HOME}/.config/botstrap/agent/claude-config.json.sample"
+
+botstrap_log_info "Phase 3 complete (theme=${BOTSTRAP_THEME:-unset})."

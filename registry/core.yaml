@@ -1,0 +1,288 @@
+schema_version: 1
+tools:
+  - name: git
+    description: "Distributed version control"
+    category: git
+    install:
+      darwin: brew install git
+      linux-apt: sudo apt-get update && sudo apt-get install -y git
+      linux-dnf: sudo dnf install -y git
+      linux-pacman: sudo pacman -Sy --needed --noconfirm git
+      windows: winget install --id Git.Git -e --accept-package-agreements --accept-source-agreements
+    verify: git --version
+
+  - name: curl
+    description: "HTTP client"
+    category: network
+    install:
+      darwin: brew install curl
+      linux-apt: sudo apt-get install -y curl
+      linux-dnf: sudo dnf install -y curl
+      linux-pacman: sudo pacman -Sy --needed --noconfirm curl
+      windows: winget install --id cURL.cURL -e --accept-package-agreements --accept-source-agreements
+    verify: curl --version
+
+  - name: gum
+    description: "Charmbracelet TUI primitives"
+    category: tui
+    install:
+      darwin: brew install gum
+      linux: |
+        GUM_VER=0.14.5
+        ARCH=$(uname -m)
+        DEB_ARCH=amd64
+        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then DEB_ARCH=arm64; fi
+        TMP=$(mktemp -d)
+        curl -fsSL "https://github.com/charmbracelet/gum/releases/download/v${GUM_VER}/gum_${GUM_VER}_Linux_${DEB_ARCH}.tar.gz" | tar -xz -C "$TMP"
+        sudo install -m 0755 "$TMP/gum" /usr/local/bin/gum
+        rm -rf "$TMP"
+      windows: winget install --id charmbracelet.gum -e --accept-package-agreements --accept-source-agreements
+    verify: gum --version
+
+  - name: jq
+    description: "JSON processor"
+    category: data
+    install:
+      darwin: brew install jq
+      linux-apt: sudo apt-get install -y jq
+      linux-dnf: sudo dnf install -y jq
+      linux-pacman: sudo pacman -Sy --needed --noconfirm jq
+      windows: winget install --id jqlang.jq -e --accept-package-agreements --accept-source-agreements
+    verify: jq --version
+
+  - name: yq
+    description: "YAML processor (mikefarah/yq)"
+    category: data
+    install:
+      darwin: brew install yq
+      linux: |
+        YQ_VER=v4.44.3
+        ARCH=$(uname -m)
+        ASSET=yq_linux_amd64
+        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then ASSET=yq_linux_arm64; fi
+        sudo curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VER}/${ASSET}" -o /usr/local/bin/yq
+        sudo chmod +x /usr/local/bin/yq
+      windows: winget install --id MikeFarah.yq -e --accept-package-agreements --accept-source-agreements
+    verify: yq --version
+
+  - name: zsh
+    description: "Z shell (Linux default shell setup)"
+    category: shell
+    install:
+      darwin: "echo zsh present on macOS"
+      linux-apt: sudo apt-get install -y zsh
+      linux-dnf: sudo dnf install -y zsh
+      linux-pacman: sudo pacman -Sy --needed --noconfirm zsh
+      windows: winget install --id zsh.zsh -e --accept-package-agreements --accept-source-agreements
+    verify: zsh --version
+
+  - name: starship
+    description: "Cross-shell prompt"
+    category: shell
+    install:
+      darwin: brew install starship
+      linux: curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+      windows: winget install --id Starship.Starship -e --accept-package-agreements --accept-source-agreements
+    verify: starship --version
+
+  - name: zoxide
+    description: "Smarter cd command"
+    category: shell
+    install:
+      darwin: brew install zoxide
+      linux-apt: sudo apt-get install -y zoxide
+      linux-dnf: sudo dnf install -y zoxide
+      linux-pacman: sudo pacman -Sy --needed --noconfirm zoxide
+      windows: winget install --id ajeetdsouza.zoxide -e --accept-package-agreements --accept-source-agreements
+    verify: zoxide --version
+
+  - name: fzf
+    description: "Fuzzy finder"
+    category: shell
+    install:
+      darwin: brew install fzf
+      linux-apt: sudo apt-get install -y fzf
+      linux-dnf: sudo dnf install -y fzf
+      linux-pacman: sudo pacman -Sy --needed --noconfirm fzf
+      windows: winget install --id junegunn.fzf -e --accept-package-agreements --accept-source-agreements
+    verify: fzf --version
+
+  - name: bat
+    description: "cat with syntax highlighting"
+    category: shell
+    install:
+      darwin: brew install bat
+      linux-apt: sudo apt-get install -y bat
+      linux-dnf: sudo dnf install -y bat
+      linux-pacman: sudo pacman -Sy --needed --noconfirm bat
+      windows: winget install --id sharkdp.bat -e --accept-package-agreements --accept-source-agreements
+    verify: bash -c "bat --version 2>/dev/null || batcat --version"
+
+  - name: eza
+    description: "Modern ls"
+    category: shell
+    install:
+      darwin: brew install eza
+      linux-apt: sudo apt-get install -y eza || sudo apt-get install -y exa
+      linux-dnf: sudo dnf install -y eza
+      linux-pacman: sudo pacman -Sy --needed --noconfirm eza
+      windows: winget install --id eza-community.eza -e --accept-package-agreements --accept-source-agreements
+    verify: bash -c "eza --version 2>/dev/null || exa --version"
+
+  - name: ripgrep
+    description: "Fast line-oriented search"
+    category: shell
+    install:
+      darwin: brew install ripgrep
+      linux-apt: sudo apt-get install -y ripgrep
+      linux-dnf: sudo dnf install -y ripgrep
+      linux-pacman: sudo pacman -Sy --needed --noconfirm ripgrep
+      windows: winget install --id BurntSushi.ripgrep.MSVC -e --accept-package-agreements --accept-source-agreements
+    verify: rg --version
+
+  - name: fd
+    description: "User-friendly find"
+    category: shell
+    install:
+      darwin: brew install fd
+      linux-apt: sudo apt-get install -y fd-find
+      linux-dnf: sudo dnf install -y fd-find
+      linux-pacman: sudo pacman -Sy --needed --noconfirm fd
+      windows: winget install --id sharkdp.fd -e --accept-package-agreements --accept-source-agreements
+    verify: bash -c "fd --version 2>/dev/null || fdfind --version"
+
+  - name: mise
+    description: "Polyglot runtime version manager"
+    category: version-manager
+    install:
+      darwin: brew install mise
+      linux: curl -fsSL https://mise.run | sh
+      windows: winget install --id jdx.mise -e --accept-package-agreements --accept-source-agreements
+    verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise --version'
+    post_install: |
+      export PATH="$HOME/.local/bin:$PATH"
+      if command -v mise >/dev/null 2>&1; then
+        mise use --global node@lts || true
+        mise use --global python@latest || true
+      fi
+
+  - name: docker
+    description: "Container engine (includes Compose V2 where available)"
+    category: container
+    install:
+      darwin: brew install --cask docker
+      linux-apt: sudo apt-get update && sudo apt-get install -y docker.io
+      linux-dnf: sudo dnf install -y docker docker-compose
+      linux-pacman: sudo pacman -Sy --needed --noconfirm docker docker-compose
+      windows: winget install --id Docker.DockerDesktop -e --accept-package-agreements --accept-source-agreements
+    verify: docker --version
+
+  - name: gh
+    description: "GitHub CLI"
+    category: git
+    install:
+      darwin: brew install gh
+      linux-apt: sudo apt-get install -y gh || (curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null && sudo apt-get update && sudo apt-get install -y gh)
+      linux-dnf: sudo dnf install -y 'dnf-command(config-manager)' && sudo dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && sudo dnf install -y gh
+      linux-pacman: sudo pacman -Sy --needed --noconfirm github-cli
+      windows: winget install --id GitHub.cli -e --accept-package-agreements --accept-source-agreements
+    verify: gh --version
+
+  - name: lazygit
+    description: "Terminal UI for git"
+    category: git
+    install:
+      darwin: brew install lazygit
+      linux-apt: sudo add-apt-repository -y ppa:lazygit-team/release 2>/dev/null || true; sudo apt-get update && sudo apt-get install -y lazygit
+      linux-dnf: sudo dnf copr enable -y atim/lazygit 2>/dev/null || true; sudo dnf install -y lazygit
+      linux-pacman: sudo pacman -Sy --needed --noconfirm lazygit
+      windows: winget install --id JesseDuffield.lazygit -e --accept-package-agreements --accept-source-agreements
+    verify: lazygit --version
+
+  - name: git-delta
+    description: "Syntax-highlighting pager for git"
+    category: git
+    install:
+      darwin: brew install git-delta
+      linux-apt: sudo apt-get install -y git-delta
+      linux-dnf: sudo dnf install -y git-delta
+      linux-pacman: sudo pacman -Sy --needed --noconfirm git-delta
+      windows: winget install --id dandavison.delta -e --accept-package-agreements --accept-source-agreements
+    verify: delta --version
+
+  - name: curlie
+    description: "Human-friendly HTTP CLI (curlie on macOS/Windows; httpie on Linux distros)"
+    category: network
+    install:
+      darwin: brew install curlie
+      linux-apt: sudo apt-get install -y httpie
+      linux-dnf: sudo dnf install -y httpie
+      linux-pacman: sudo pacman -Sy --needed --noconfirm httpie
+      windows: winget install --id JakubRoztocil.HTTPie -e --accept-package-agreements --accept-source-agreements
+    verify: bash -c "curlie --version 2>/dev/null || http --version"
+
+  - name: zellij
+    description: "Terminal workspace / multiplexer"
+    category: terminal
+    install:
+      darwin: brew install zellij
+      linux-apt: sudo apt-get install -y zellij
+      linux-dnf: sudo dnf install -y zellij
+      linux-pacman: sudo pacman -Sy --needed --noconfirm zellij
+      windows: winget install --id Zellij.Zellij -e --accept-package-agreements --accept-source-agreements
+    verify: zellij --version
+
+  - name: btop
+    description: "Resource monitor"
+    category: system
+    install:
+      darwin: brew install btop
+      linux-apt: sudo apt-get install -y btop
+      linux-dnf: sudo dnf install -y btop
+      linux-pacman: sudo pacman -Sy --needed --noconfirm btop
+      windows: winget install --id aristocratos.btop4win -e --accept-package-agreements --accept-source-agreements
+    verify: btop --version
+
+  - name: fastfetch
+    description: "System information tool"
+    category: system
+    install:
+      darwin: brew install fastfetch
+      linux-apt: sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch 2>/dev/null || true; sudo apt-get update && sudo apt-get install -y fastfetch
+      linux-dnf: sudo dnf install -y fastfetch
+      linux-pacman: sudo pacman -Sy --needed --noconfirm fastfetch
+      windows: winget install --id fastfetch-cli.fastfetch -e --accept-package-agreements --accept-source-agreements
+    verify: fastfetch --version
+
+  - name: age
+    description: "Modern encryption tool"
+    category: security
+    install:
+      darwin: brew install age
+      linux-apt: sudo apt-get install -y age
+      linux-dnf: sudo dnf install -y age
+      linux-pacman: sudo pacman -Sy --needed --noconfirm age
+      windows: winget install --id FiloSottile.age -e --accept-package-agreements --accept-source-agreements
+    verify: age --version
+
+  - name: sops
+    description: "Secrets editing for structured files"
+    category: security
+    install:
+      darwin: brew install sops
+      linux-apt: sudo apt-get install -y sops || (curl -fsSL "https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64" -o /tmp/sops && sudo install -m 0755 /tmp/sops /usr/local/bin/sops)
+      linux-dnf: sudo dnf install -y sops
+      linux-pacman: sudo pacman -Sy --needed --noconfirm sops
+      windows: winget install --id Mozilla.SOPS -e --accept-package-agreements --accept-source-agreements
+    verify: sops --version
+
+  - name: fira-code-nerd-font
+    description: "Nerd Font variant of Fira Code for glyphs in terminal and editors"
+    category: fonts
+    install:
+      darwin: brew tap homebrew/cask-fonts && brew install --cask font-fira-code-nerd-font
+      linux-apt: sudo apt-get install -y fonts-firacode || true
+      linux-dnf: sudo dnf install -y fira-code-fonts || true
+      linux-pacman: sudo pacman -Sy --needed --noconfirm ttf-firacode-nerd || true
+      windows: winget install --id NerdFonts.FiraCodeNF -e --accept-package-agreements --accept-source-agreements
+    verify: bash -c "command -v fc-list >/dev/null || exit 0; fc-list | grep -qi fira"

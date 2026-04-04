@@ -1,0 +1,4 @@
+# Botstrap shell aliases (bash/zsh compatible)
+alias ll='eza -la --icons=auto 2>/dev/null || ls -la'
+alias la='eza -a --icons=auto 2>/dev/null || ls -a'
+alias lt='eza --tree --icons=auto 2>/dev/null || ls -R'

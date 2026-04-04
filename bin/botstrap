@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Thin CLI for local Botstrap checkout (update / doctor stubs).
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VERSION="$(cat "${ROOT}/version" 2>/dev/null || echo unknown)"
+
+usage() {
+  echo "Usage: botstrap {update|reconfigure|doctor|version}"
+}
+
+case "${1:-}" in
+  update)
+    git -C "${ROOT}" pull --ff-only
+    echo "Updated Botstrap at ${ROOT} to $(git -C "${ROOT}" rev-parse --short HEAD 2>/dev/null || echo unknown)."
+    ;;
+  reconfigure)
+    export BOTSTRAP_ROOT="${ROOT}"
+    # shellcheck source=lib/detect.sh
+    source "${ROOT}/lib/detect.sh"
+    # shellcheck source=lib/log.sh
+    source "${ROOT}/lib/log.sh"
+    botstrap_detect
+    # shellcheck disable=SC1091
+    source "${ROOT}/install/phase-2-tui.sh"
+    # shellcheck disable=SC1091
+    source "${ROOT}/install/phase-3-configure.sh"
+    ;;
+  doctor)
+    export BOTSTRAP_ROOT="${ROOT}"
+    # shellcheck source=lib/detect.sh
+    source "${ROOT}/lib/detect.sh"
+    # shellcheck source=lib/log.sh
+    source "${ROOT}/lib/log.sh"
+    # shellcheck source=lib/pkg.sh
+    source "${ROOT}/lib/pkg.sh"
+    botstrap_detect
+    bash "${ROOT}/install/phase-4-verify.sh"
+    ;;
+  version)
+    echo "botstrap ${VERSION}"
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac

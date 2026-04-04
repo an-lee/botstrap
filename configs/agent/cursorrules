@@ -1,0 +1,6 @@
+# Cursor rules (template)
+# Copy to .cursorrules or migrate to .cursor/rules/*.mdc as needed.
+
+- Prefer small, reviewable diffs.
+- Use English for code and comments.
+- Run tests and linters the project documents before finishing a task.

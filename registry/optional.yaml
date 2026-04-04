@@ -1,0 +1,222 @@
+schema_version: 1
+groups:
+  - name: Editor
+    id: editor
+    select: single
+    items:
+      - name: cursor
+        description: "AI-first code editor"
+        install:
+          darwin: brew install --cask cursor
+          linux: curl -fsSL https://cursor.sh/install | bash
+          windows: winget install --id Anysphere.Cursor -e --accept-package-agreements --accept-source-agreements
+        verify: bash -c "command -v cursor >/dev/null || command -v cursor-agent >/dev/null"
+      - name: vscode
+        description: "Visual Studio Code"
+        install:
+          darwin: brew install --cask visual-studio-code
+          linux-apt: sudo apt-get install -y code || sudo snap install code --classic
+          linux-dnf: sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc && sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo' && sudo dnf install -y code
+          linux-pacman: sudo pacman -Sy --needed --noconfirm code
+          windows: winget install --id Microsoft.VisualStudioCode -e --accept-package-agreements --accept-source-agreements
+        verify: code --version
+      - name: neovim
+        description: "Neovim editor"
+        install:
+          darwin: brew install neovim
+          linux-apt: sudo apt-get install -y neovim
+          linux-dnf: sudo dnf install -y neovim
+          linux-pacman: sudo pacman -Sy --needed --noconfirm neovim
+          windows: winget install --id Neovim.Neovim -e --accept-package-agreements --accept-source-agreements
+        verify: nvim --version
+      - name: zed
+        description: "Zed code editor"
+        install:
+          darwin: brew install --cask zed
+          linux: curl -fsSL https://zed.dev/install.sh | sh
+          windows: winget install --id ZedIndustries.Zed -e --accept-package-agreements --accept-source-agreements
+        verify: bash -c "command -v zed >/dev/null && zed --version"
+
+  - name: Programming Languages
+    id: languages
+    select: multiple
+    items:
+      - name: node
+        description: "Node.js via mise (LTS)"
+        requires: [mise]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global node@lts'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; node --version'
+      - name: python
+        description: "Python via mise (latest stable)"
+        requires: [mise]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global python@latest'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; python3 --version'
+      - name: ruby
+        description: "Ruby via mise"
+        requires: [mise]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global ruby@latest'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; ruby --version'
+      - name: go
+        description: "Go via mise"
+        requires: [mise]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global go@latest'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; go version'
+      - name: rust
+        description: "Rust via mise (rust stable)"
+        requires: [mise]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global rust@stable'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; rustc --version'
+      - name: java
+        description: "Java via mise (Temurin LTS)"
+        requires: [mise]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global java@temurin-21'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; java --version'
+      - name: elixir
+        description: "Elixir via mise"
+        requires: [mise]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global elixir@latest'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; elixir --version'
+      - name: php
+        description: "PHP via mise"
+        requires: [mise]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global php@latest'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; php --version'
+
+  - name: Databases
+    id: databases
+    select: multiple
+    items:
+      - name: postgresql
+        description: "PostgreSQL in Docker (official image)"
+        requires: [docker]
+        install:
+          all: docker pull postgres:16-alpine
+        verify: docker image inspect postgres:16-alpine >/dev/null
+      - name: mysql
+        description: "MySQL in Docker"
+        requires: [docker]
+        install:
+          all: docker pull mysql:8
+        verify: docker image inspect mysql:8 >/dev/null
+      - name: redis
+        description: "Redis in Docker"
+        requires: [docker]
+        install:
+          all: docker pull redis:7-alpine
+        verify: docker image inspect redis:7-alpine >/dev/null
+      - name: sqlite
+        description: "SQLite is file-based; ensure sqlite3 CLI"
+        install:
+          darwin: brew install sqlite
+          linux-apt: sudo apt-get install -y sqlite3
+          linux-dnf: sudo dnf install -y sqlite
+          linux-pacman: sudo pacman -Sy --needed --noconfirm sqlite
+          windows: winget install --id SQLite.SQLite -e --accept-package-agreements --accept-source-agreements
+        verify: sqlite3 --version
+
+  - name: AI Agent Tools
+    id: ai_tools
+    select: multiple
+    items:
+      - name: claude-code
+        description: "Anthropic Claude coding agent CLI"
+        requires: [node]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g @anthropic-ai/claude-code'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; claude --version'
+      - name: openclaw
+        description: "Open source AI coding assistant CLI"
+        requires: [node]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g openclaw'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; command -v openclaw >/dev/null'
+      - name: codex
+        description: "OpenAI Codex CLI agent"
+        requires: [node]
+        install:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g @openai/codex'
+        verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; codex --version'
+      - name: gemini
+        description: "Google Gemini CLI (install per current Google distribution)"
+        requires: [node]
+        install:
+          all: echo "Install the Gemini CLI using the official Google instructions for your OS."
+        verify: bash -c "command -v gemini >/dev/null"
+      - name: ollama
+        description: "Run local LLMs"
+        install:
+          darwin: brew install ollama
+          linux: curl -fsSL https://ollama.com/install.sh | sh
+          windows: winget install --id Ollama.Ollama -e --accept-package-agreements --accept-source-agreements
+        verify: ollama --version
+
+  - name: Theme
+    id: theme
+    select: single
+    items:
+      - name: catppuccin
+        description: "Catppuccin palette for terminal and editors"
+        install:
+          all: echo "Theme assets live under themes/catppuccin; Phase 3 applies selection."
+        verify: bash -c "exit 0"
+      - name: tokyo-night
+        description: "Tokyo Night"
+        install:
+          all: echo "Theme assets live under themes/tokyo-night; Phase 3 applies selection."
+        verify: bash -c "exit 0"
+      - name: gruvbox
+        description: "Gruvbox"
+        install:
+          all: echo "Theme assets live under themes/gruvbox; Phase 3 applies selection."
+        verify: bash -c "exit 0"
+      - name: nord
+        description: "Nord"
+        install:
+          all: echo "Nord theme; extend themes/ when assets are added."
+        verify: bash -c "exit 0"
+      - name: rose-pine
+        description: "Rosé Pine"
+        install:
+          all: echo "Rosé Pine theme; extend themes/ when assets are added."
+        verify: bash -c "exit 0"
+
+  - name: Optional Apps
+    id: optional_apps
+    select: multiple
+    items:
+      - name: 1password-cli
+        description: "1Password CLI"
+        install:
+          darwin: brew install --cask 1password-cli
+          linux: curl -fsSL https://cache.agilebits.com/dist/1P/op2/pkg/latest/op_linux_amd64_v2.zip -o /tmp/op.zip && sudo unzip -o /tmp/op.zip -d /usr/local/bin/
+          windows: winget install --id AgileBits.1Password.CLI -e --accept-package-agreements --accept-source-agreements
+        verify: op --version
+      - name: tailscale
+        description: "Tailscale VPN"
+        install:
+          darwin: brew install tailscale
+          linux: curl -fsSL https://tailscale.com/install.sh | sh
+          windows: winget install --id Tailscale.Tailscale -e --accept-package-agreements --accept-source-agreements
+        verify: tailscale version
+      - name: ngrok
+        description: "ngrok tunnel CLI"
+        install:
+          darwin: brew install ngrok/ngrok/ngrok
+          linux-apt: curl -fsSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com bookworm main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt-get update && sudo apt-get install -y ngrok
+          windows: winget install --id Ngrok.Ngrok -e --accept-package-agreements --accept-source-agreements
+        verify: ngrok version
+      - name: postman
+        description: "Postman API client"
+        install:
+          darwin: brew install --cask postman
+          linux: snap install postman || echo "Install Postman manually on Linux."
+          windows: winget install --id Postman.Postman -e --accept-package-agreements --accept-source-agreements
+        verify: bash -c "postman --version 2>/dev/null || exit 0"

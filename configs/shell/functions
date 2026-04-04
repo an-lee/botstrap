@@ -1,0 +1,3 @@
+# Botstrap shell helpers
+# mise: hook into your shell per https://mise.jdx.dev — e.g. eval "$(mise activate bash)"
+# zoxide: eval "$(zoxide init bash)" or zoxide init zsh

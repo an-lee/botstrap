@@ -1,0 +1,1 @@
+# Optional hooks for jq. Default install comes from registry/core.yaml.
