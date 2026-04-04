@@ -19,7 +19,7 @@ Thank you for helping improve Botstrap. This project aims to stay **transparent*
    # Optional: dry-run or step through install/phase-0-prerequisites.sh etc.
    ```
 
-3. Ensure **bash 4+**, **git**, and **curl** are available. **yq** is required once Phase 1 has run or if you test `lib/pkg.sh` against the registry.
+3. Ensure **bash 4+**; **git** and **curl** are required for many tests but Phase 0 can install them on supported macOS/Linux. **yq** is required once Phase 1 has run or if you test `lib/pkg.sh` against the registry.
 
 ## Adding a tool
 

@@ -23,6 +23,7 @@ Any other first argument prints usage and exits with code 1.
 |----------|---------|---------|
 | `BOTSTRAP_HOME` | `boot.sh`, `boot.ps1` | Directory to clone or use as the Botstrap Git checkout (default: `$HOME/.botstrap` / `%USERPROFILE%\.botstrap`). |
 | `BOTSTRAP_REPO` | `boot.sh`, `boot.ps1` | Git remote URL for clone (default: `https://github.com/botstrap/botstrap.git`). |
+| `BOTSTRAP_BOOT_PREREQS_URL` | `boot.sh` | Optional raw HTTPS URL to **`install/boot-prereqs-git.sh`** when **`BOTSTRAP_REPO`** is not GitHub-hosted and git is missing (so boot can still source the prerequisite installer). |
 | `BOTSTRAP_ROOT` | `install.sh`, phases, `bin/botstrap` | Absolute path to the Botstrap checkout containing `registry/`, `install/`, etc. Set automatically by `install.sh`; required when sourcing phases manually. |
 
 ## Phase 2 selection variables (Unix)

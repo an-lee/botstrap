@@ -20,7 +20,7 @@ The site may serve scripts by URL or `User-Agent`; explicit `.sh` / `.ps1` URLs 
 
 **Boot scripts** (`boot.sh`, `boot.ps1`) do **not** run install phases themselves. They:
 
-1. Require **Git** (exit with instructions if missing).
+1. **Ensure Git** is available: Unix boot sources **`install/boot-prereqs-git.sh`** (from the same tree or fetched from raw GitHub when `BOTSTRAP_REPO` is GitHub-shaped) and runs **`botstrap_ensure_git_curl`**; Windows boot uses **winget** when possible. If git cannot be installed, exit with instructions (see [Getting started](./GETTING_STARTED.md)).
 2. Clone **`BOTSTRAP_REPO`** into **`BOTSTRAP_HOME`** when that path is not already a Git checkout. Defaults: repo `https://github.com/botstrap/botstrap.git`, home `~/.botstrap` (Unix) or `%USERPROFILE%\.botstrap` (Windows).
 3. **Exec** `install.sh` (Unix) or `install.ps1` (Windows) from that checkout.
 
@@ -31,6 +31,7 @@ The site may serve scripts by URL or `User-Agent`; explicit `.sh` / `.ps1` URLs 
 ```
 botstrap/
   boot.sh / boot.ps1          # curl / irm entry (clone + handoff)
+  install/boot-prereqs-git.*  # Shared git (and Unix curl) bootstrap for boot + Phase 0
   install.sh / install.ps1    # Orchestrators
   bin/botstrap                # Thin CLI (update / reconfigure / doctor / version)
   lib/                        # Shared primitives (detect, log, pkg)
@@ -62,7 +63,7 @@ flowchart TD
 
 | Phase | Script | Purpose |
 |-------|--------|---------|
-| 0 | `install/phase-0-prerequisites.sh` / `.ps1` | **git**, **curl**, **jq**, **yq**, **gum** (and equivalents) so registry parsing, TUI, and installs can run. **yq** is required for Phase 1 and Phase 4 on Unix. |
+| 0 | `install/phase-0-prerequisites.sh` / `.ps1` | **git**, **curl**, **jq**, **yq**, **gum** (and equivalents) so registry parsing, TUI, and installs can run. Unix git/curl install logic lives in **`install/boot-prereqs-git.sh`** (sourced here and by boot when needed). **yq** is required for Phase 1 and Phase 4 on Unix. |
 | 0b | `install/phase-0b-os-tune.ps1` | **Windows only:** developer-oriented OS settings from `configs/os/windows.yaml` via `install/modules/os-tune-windows.ps1`. |
 | 1 | `install/phase-1-core.sh` / `.ps1` | Non-interactive install of every tool in `registry/core.yaml` via `lib/pkg` + registry (per-tool `install/modules/*` when needed). |
 | 2 | `install/phase-2-tui.sh` / `.ps1` | Interactive **gum** flows on macOS/Linux when gum is available; otherwise safe defaults and no prompts. Native Windows: limited; full parity recommended via **WSL** + `install.sh`. |

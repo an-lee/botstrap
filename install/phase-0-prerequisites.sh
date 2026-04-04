@@ -10,46 +10,8 @@ source "${BOTSTRAP_ROOT}/lib/log.sh"
 
 botstrap_detect
 
-botstrap_ensure_git_curl() {
-  if command -v git &>/dev/null && command -v curl &>/dev/null; then
-    return 0
-  fi
-  case "${BOTSTRAP_OS}" in
-    darwin)
-      if ! command -v brew &>/dev/null; then
-        botstrap_log_info "Installing Homebrew (non-interactive standard install)"
-        NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        # shellcheck disable=SC1091
-        [[ -f /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
-        # shellcheck disable=SC1091
-        [[ -f /usr/local/bin/brew ]] && eval "$(/usr/local/bin/brew shellenv)"
-      fi
-      brew install git curl
-      ;;
-    linux)
-      case "${BOTSTRAP_PKG}" in
-        apt)
-          sudo apt-get update
-          sudo apt-get install -y git curl ca-certificates
-          ;;
-        dnf)
-          sudo dnf install -y git curl
-          ;;
-        pacman)
-          sudo pacman -Sy --noconfirm git curl
-          ;;
-        *)
-          botstrap_log_err "Unsupported Linux package manager: ${BOTSTRAP_PKG}"
-          return 1
-          ;;
-      esac
-      ;;
-    *)
-      botstrap_log_err "Phase 0: install git and curl manually for OS=${BOTSTRAP_OS}"
-      return 1
-      ;;
-  esac
-}
+# shellcheck source=install/boot-prereqs-git.sh
+source "${BOTSTRAP_ROOT}/install/boot-prereqs-git.sh"
 
 botstrap_install_yq() {
   command -v yq &>/dev/null && return 0

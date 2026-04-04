@@ -22,13 +22,13 @@ This page explains **what Botstrap does end to end**, in plain language. For ins
 - **macOS / Linux:** the site serves `boot.sh` (or you use the documented `curl … | bash` flow).
 - **Windows:** `boot.ps1` via PowerShell.
 
-The boot script requires **Git** already (or tells you to install it). It clones the Botstrap repository into **`BOTSTRAP_HOME`** (default `~/.botstrap` on Unix, `%USERPROFILE%\.botstrap` on Windows), unless that directory is already a Git checkout. You can override the remote with **`BOTSTRAP_REPO`**. The default remote in `boot.sh` / `boot.ps1` is `https://github.com/botstrap/botstrap.git`.
+The boot script **needs Git to clone** but attempts to **install git** first when it is missing (Unix: via `install/boot-prereqs-git.sh` and your package manager; Windows: **winget** when available). If installation is not possible—for example, a non-GitHub **`BOTSTRAP_REPO`** without **`BOTSTRAP_BOOT_PREREQS_URL`**—it tells you to install Git manually. It clones the Botstrap repository into **`BOTSTRAP_HOME`** (default `~/.botstrap` on Unix, `%USERPROFILE%\.botstrap` on Windows), unless that directory is already a Git checkout. You can override the remote with **`BOTSTRAP_REPO`**. The default remote in `boot.sh` / `boot.ps1` is `https://github.com/botstrap/botstrap.git`.
 
 Then the boot script runs **`install.sh`** (Unix) or **`install.ps1`** (Windows) from that clone.
 
 ### 2. Phase 0: prerequisites
 
-Ensures the rest of the pipeline can run: **git**, **curl**, **jq**, **yq**, and **gum** (Unix script installs or downloads them where possible). Without **yq**, later phases cannot read the registry. If **gum** cannot be installed, Phase 2 falls back to **non-interactive defaults** on Unix; on Windows, Phase 2 is limited—see [Getting started](./GETTING_STARTED.md).
+Ensures the rest of the pipeline can run: **git**, **curl**, **jq**, **yq**, and **gum** (Unix: `install/boot-prereqs-git.sh` plus this phase install or download them where possible). Without **yq**, later phases cannot read the registry. If **gum** cannot be installed, Phase 2 falls back to **non-interactive defaults** on Unix; on Windows, Phase 2 is limited—see [Getting started](./GETTING_STARTED.md).
 
 ### 3. Phase 0b (Windows only)
 

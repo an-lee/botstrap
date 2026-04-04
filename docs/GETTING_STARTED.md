@@ -6,7 +6,10 @@ This guide covers **how to run Botstrap**, **prerequisites**, **local developmen
 
 ### Before the one-liner (boot)
 
-- **Git** must be installed. `boot.sh` and `boot.ps1` exit with an error if `git` is missing.
+- **Git** is required to clone the repo, but boot tries to install it when missing:
+  - **macOS / Linux (`boot.sh`):** loads `install/boot-prereqs-git.sh` from a **local checkout** (if you run `boot.sh` from disk) or fetches it over **HTTPS** when `BOTSTRAP_REPO` is a **GitHub** `https://github.com/...` or `git@github.com:...` URL (needs **curl** for that fetch). It then runs the same git/curl install logic as Phase 0 (Homebrew, apt, dnf, or pacman; **sudo** where needed). For **non-GitHub** remotes, set **`BOTSTRAP_BOOT_PREREQS_URL`** to the raw URL of `install/boot-prereqs-git.sh`, or install **git** yourself first.
+  - **Windows (`boot.ps1`):** if **winget** is available, installs **Git.Git**; otherwise install Git for Windows manually.
+- If git still cannot be installed, boot exits with instructions.
 - **Network access** to clone the repository and to download packages or release binaries during Phase 0 and Phase 1.
 
 ### After clone (Unix orchestrator)
@@ -18,7 +21,7 @@ This guide covers **how to run Botstrap**, **prerequisites**, **local developmen
 ### Windows
 
 - **PowerShell** (scripts use `#requires -Version 5.1`; PowerShell 7+ is recommended for testing).
-- **Git for Windows**.
+- **Git for Windows** (boot and Phase 0 try **winget** first when git is missing).
 - For the **same** interactive TUI and optional-tool flow as macOS/Linux, use **WSL** and run **`install.sh`** inside the clone. Native **`install.ps1`** may be incomplete; the script prints a reminder at the end. See [Cross-platform notes](./CROSS_PLATFORM.md).
 
 ## Install from the web (recommended)

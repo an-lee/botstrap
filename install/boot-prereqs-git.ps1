@@ -1,10 +1,6 @@
 #requires -Version 5.1
-<#
-.SYNOPSIS
-  Botstrap Windows boot entry (irm | iex). Clones the repo and runs install.ps1.
-  Git install via winget mirrors install/boot-prereqs-git.ps1 (keep in sync).
-#>
-$ErrorActionPreference = "Stop"
+# Shared Git bootstrap for Windows (phase-0-prerequisites.ps1). boot.ps1 inlines the
+# same functions so irm | iex works without a script path; keep both copies aligned.
 
 function Update-BotstrapPathFromRegistry {
     $machine = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
@@ -34,20 +30,3 @@ function Install-BotstrapGitIfNeeded {
         }
     }
 }
-
-$BotstrapHome = if ($env:BOTSTRAP_HOME) { $env:BOTSTRAP_HOME } else { Join-Path $env:USERPROFILE ".botstrap" }
-$BotstrapRepo = if ($env:BOTSTRAP_REPO) { $env:BOTSTRAP_REPO } else { "https://github.com/botstrap/botstrap.git" }
-
-Install-BotstrapGitIfNeeded
-
-if (-not (Test-BotstrapGitAvailable)) {
-    Write-Host "[botstrap] Git is required. Install Git for Windows or ensure winget can install Git.Git, then re-run." -ForegroundColor Red
-    exit 1
-}
-
-if (-not (Test-Path (Join-Path $BotstrapHome ".git"))) {
-    Write-Host "[botstrap] Cloning $BotstrapRepo -> $BotstrapHome"
-    git clone $BotstrapRepo $BotstrapHome
-}
-
-& (Join-Path $BotstrapHome "install.ps1")
