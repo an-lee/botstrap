@@ -51,6 +51,12 @@ botstrap_boot_load_prereqs_git_script() {
 }
 
 if ! command -v git &>/dev/null; then
+  # Prompt once on Linux before any sudo in boot-prereqs-git (credentials persist for install.sh).
+  if [[ "$(uname -s)" == "Linux" ]]; then
+    echo "[botstrap] Administrator privileges are required to install git." >&2
+    echo "[botstrap] You will only be asked for your password once." >&2
+    sudo -v
+  fi
   if botstrap_boot_load_prereqs_git_script; then
     botstrap_ensure_git_curl
   else

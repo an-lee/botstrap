@@ -42,9 +42,9 @@ features:
 4. **Phase 1** — Non-interactive install of every tool in `registry/core.yaml`.
 5. **Phase 2** — Gum TUI choices (safe defaults when gum is missing or in CI; same behavior on Windows PowerShell).
 6. **Phase 3** — Copy `configs/` templates and install optional registry selections.
-7. **Phase 4** — Verify core tools and print a summary.
+7. **Phase 4** — Verify core tools and print a summary (optional selections on Windows depend on environment; see [After install](/AFTER_INSTALL)).
 
-Read the full narrative in [Introduction](/INTRODUCTION). For commands, variables, and files touched on disk, see [Reference](/REFERENCE) and [Configuration](/CONFIGURATION).
+Read the full narrative in [Introduction](/INTRODUCTION). After setup, use [After install](/AFTER_INSTALL) for the installed stack and [Defaults & customization](/DEFAULTS_AND_CUSTOMIZATION) for defaults and changes. For commands, variables, and template paths, see [Reference](/REFERENCE) and [Configuration file map](/CONFIGURATION).
 
 ::: tip Local install
 From a git checkout, set `BOTSTRAP_ROOT` and run `./install.sh`. See the [repository README](https://github.com/an-lee/botstrap) for details. [Contributing](/CONTRIBUTING) covers how to help with the project.

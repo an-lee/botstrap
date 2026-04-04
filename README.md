@@ -62,8 +62,10 @@ After **Phase 3** on macOS/Linux, open a **new** shell (or `source ~/.zshrc` / `
 - **Site:** [botstrap.dev](https://botstrap.dev) — browsable docs (VitePress)
 - [Introduction](docs/INTRODUCTION.md) — what Botstrap does, end to end
 - [Getting started](docs/GETTING_STARTED.md) — install, local dev, non-interactive runs
+- [After install](docs/AFTER_INSTALL.md) — installed stack and how to use it
+- [Defaults & customization](docs/DEFAULTS_AND_CUSTOMIZATION.md) — default config and how to change it
 - [Reference](docs/REFERENCE.md) — CLI, environment variables, artifacts
-- [Configuration](docs/CONFIGURATION.md) — `configs/` templates and where they land
+- [Configuration file map](docs/CONFIGURATION.md) — `configs/` templates and where they land
 - [Architecture](docs/ARCHITECTURE.md)
 - [Registry specification](docs/REGISTRY_SPEC.md)
 - [Tool selection](docs/TOOL_SELECTION.md)

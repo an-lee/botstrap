@@ -105,5 +105,7 @@ Details: [Reference](./REFERENCE.md).
 ## Next steps
 
 - [Introduction](./INTRODUCTION.md) — full end-to-end narrative.
-- [Configuration](./CONFIGURATION.md) — what files land in your home directory.
+- [After install](./AFTER_INSTALL.md) — what was installed and how to use it.
+- [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md) — default config and how to change it.
+- [Configuration file map](./CONFIGURATION.md) — `configs/` templates → paths in your home directory.
 - [Registry specification](./REGISTRY_SPEC.md) — adding or changing tools.

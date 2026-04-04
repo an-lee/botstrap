@@ -1,8 +1,8 @@
-# Configuration
+# Configuration file map
 
-Botstrap ships templates under **`configs/`** in the repository. **Phase 3** (`install/phase-3-configure.sh` on Unix; `install/phase-3-configure.ps1` on Windows) copies or merges them according to TUI selections and fixed rules. This page maps **repository paths** to **destination paths** on your machine.
+This page maps **repository paths** under **`configs/`** to **destination paths** on your machine. **Phase 3** (`install/phase-3-configure.sh` on Unix; `install/phase-3-configure.ps1` on Windows) copies or merges them according to TUI selections and fixed rules.
 
-For environment variables that drive Phase 3, see [Reference](./REFERENCE.md). For Windows-only OS policy tuning (not under `configs/` in the same way), see [Cross-platform notes](./CROSS_PLATFORM.md) (`configs/os/windows.yaml`).
+For **defaults**, **automation env vars**, and **how to customize** (reconfigure, fork, rc file markers), see [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md). For **what is installed** and **how to use** core and optional tools, see [After install](./AFTER_INSTALL.md). For environment variables that drive Phase 3, see [Reference](./REFERENCE.md). For Windows-only OS policy tuning, see [Cross-platform notes](./CROSS_PLATFORM.md) (`configs/os/windows.yaml`).
 
 ## `configs/git/`
 
@@ -64,5 +64,7 @@ Selections from Phase 2 trigger installs from **`registry/optional.yaml`** durin
 
 ## Related
 
+- [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md) — defaults and customization paths.
+- [After install](./AFTER_INSTALL.md) — installed stack and usage.
 - [Introduction](./INTRODUCTION.md) — where Phase 3 fits in the install story.
 - [Getting started](./GETTING_STARTED.md) — running the installer.

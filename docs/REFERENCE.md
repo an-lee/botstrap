@@ -1,6 +1,6 @@
 # Reference
 
-Operational facts: **CLI**, **environment variables**, and **artifacts** Botstrap creates or expects. Behavior described here matches the shell and PowerShell sources in the repository.
+Operational facts: **CLI**, **environment variables**, and **artifacts** Botstrap creates or expects. Behavior described here matches the shell and PowerShell sources in the repository. For a post-install inventory and **`botstrap doctor`** behavior (core vs optional verification), see [After install](./AFTER_INSTALL.md). For defaults and customization workflows, see [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md).
 
 ## `bin/botstrap` CLI
 
@@ -79,12 +79,12 @@ There is **no** **`~/.config/botstrap/env.sh`** on native Windows; the profile b
 
 ## Phase 4 verification
 
-- Reads every **`name`** in **`registry/core.yaml`** with **yq**.
-- Runs each tool’s **`verify`** command via **`botstrap_pkg_verify`**.
-- Warns per failure, prints total failure count, prints **`version`** file contents, and suggests re-running Phase 2 + Phase 3 manually if needed.
-- Exits **1** if **`yq`** is missing or if **any** verify fails (so **`botstrap doctor`** and the end of **`install.sh`** reflect failure).
+- **Unix (`install/phase-4-verify.sh`):** Reads every **`name`** in **`registry/core.yaml`** with **yq**, runs each **`verify`** via **`botstrap_pkg_verify`**, warns per failure, prints counts and **`version`**, suggests re-running Phase 2 + 3. Exits **1** if **`yq`** is missing or any core verify fails. **Optional** TUI selections are **not** verified here.
+- **Windows (`install/phase-4-verify.ps1`):** Verifies **core** the same way, then verifies **optional** groups when **`BOTSTRAP_*`** variables are set (see [After install](./AFTER_INSTALL.md)).
 
 ## Related
 
-- [Configuration](./CONFIGURATION.md) — full template tree under `configs/`.
+- [After install](./AFTER_INSTALL.md) — installed stack, `doctor`, persisted selections.
+- [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md) — defaults and how to change config.
+- [Configuration file map](./CONFIGURATION.md) — template tree under `configs/` → home paths.
 - [Architecture](./ARCHITECTURE.md) — phase scripts and `lib/` overview.

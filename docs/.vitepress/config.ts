@@ -49,38 +49,55 @@ export default withMermaid(
       logo: { src: '/logo-mark.svg', alt: 'Botstrap' },
       nav: [
         { text: 'Home', link: '/' },
-        { text: 'Introduction', link: '/INTRODUCTION' },
-        { text: 'Getting started', link: '/GETTING_STARTED' },
-        { text: 'Architecture', link: '/ARCHITECTURE' },
         {
-          text: 'More',
-          items: [
-            { text: 'Reference', link: '/REFERENCE' },
-            { text: 'Configuration', link: '/CONFIGURATION' },
-            { text: 'Registry specification', link: '/REGISTRY_SPEC' },
-            { text: 'Tool selection', link: '/TOOL_SELECTION' },
-            { text: 'Cross-platform', link: '/CROSS_PLATFORM' },
-            { text: 'AI agent friendliness', link: '/AI_AGENT_FRIENDLINESS' },
-            { text: 'Contributing', link: '/CONTRIBUTING' },
-          ],
-        },
-      ],
-
-      sidebar: [
-        {
-          text: 'Documentation',
+          text: 'Guides',
           items: [
             { text: 'Introduction', link: '/INTRODUCTION' },
             { text: 'Getting started', link: '/GETTING_STARTED' },
+            { text: 'After install', link: '/AFTER_INSTALL' },
+            { text: 'Defaults & customization', link: '/DEFAULTS_AND_CUSTOMIZATION' },
+          ],
+        },
+        {
+          text: 'Reference',
+          items: [
             { text: 'Architecture', link: '/ARCHITECTURE' },
             { text: 'Reference', link: '/REFERENCE' },
-            { text: 'Configuration', link: '/CONFIGURATION' },
+            { text: 'Configuration file map', link: '/CONFIGURATION' },
             { text: 'Registry specification', link: '/REGISTRY_SPEC' },
             { text: 'Tool selection', link: '/TOOL_SELECTION' },
             { text: 'Cross-platform notes', link: '/CROSS_PLATFORM' },
             { text: 'AI agent friendliness', link: '/AI_AGENT_FRIENDLINESS' },
-            { text: 'Contributing', link: '/CONTRIBUTING' },
           ],
+        },
+        { text: 'Contributing', link: '/CONTRIBUTING' },
+      ],
+
+      sidebar: [
+        {
+          text: 'Guides',
+          items: [
+            { text: 'Introduction', link: '/INTRODUCTION' },
+            { text: 'Getting started', link: '/GETTING_STARTED' },
+            { text: 'After install', link: '/AFTER_INSTALL' },
+            { text: 'Defaults & customization', link: '/DEFAULTS_AND_CUSTOMIZATION' },
+          ],
+        },
+        {
+          text: 'Reference',
+          items: [
+            { text: 'Architecture', link: '/ARCHITECTURE' },
+            { text: 'Reference', link: '/REFERENCE' },
+            { text: 'Configuration file map', link: '/CONFIGURATION' },
+            { text: 'Registry specification', link: '/REGISTRY_SPEC' },
+            { text: 'Tool selection', link: '/TOOL_SELECTION' },
+            { text: 'Cross-platform notes', link: '/CROSS_PLATFORM' },
+            { text: 'AI agent friendliness', link: '/AI_AGENT_FRIENDLINESS' },
+          ],
+        },
+        {
+          text: 'Project',
+          items: [{ text: 'Contributing', link: '/CONTRIBUTING' }],
         },
       ],
 

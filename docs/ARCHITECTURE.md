@@ -67,8 +67,8 @@ flowchart TD
 | 0b | `install/phase-0b-os-tune.ps1` | **Windows only:** developer-oriented OS settings from `configs/os/windows.yaml` via `install/modules/os-tune-windows.ps1`. |
 | 1 | `install/phase-1-core.sh` / `.ps1` | Non-interactive install of every tool in `registry/core.yaml` via `lib/pkg` + registry (per-tool `install/modules/*` when needed). |
 | 2 | `install/phase-2-tui.sh` / `.ps1` | Interactive **gum** flows when gum is available; otherwise safe defaults and no prompts (Unix and Windows). |
-| 3 | `install/phase-3-configure.sh` / `.ps1` | Dotfiles and templates from `configs/`; installs **optional** registry selections. See [Configuration](./CONFIGURATION.md). |
-| 4 | `install/phase-4-verify.sh` / `.ps1` | Run `verify` commands for core tools; print summary. |
+| 3 | `install/phase-3-configure.sh` / `.ps1` | Dotfiles and templates from `configs/`; installs **optional** registry selections. See [Configuration file map](./CONFIGURATION.md) and [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md). |
+| 4 | `install/phase-4-verify.sh` / `.ps1` | **Unix:** verify **core** only. **Windows:** verify core and optional rows when `BOTSTRAP_*` are set. See [Reference](./REFERENCE.md#phase-4-verification). |
 
 Optional per-tool scripts under `install/modules/` hold logic that is too complex for inline YAML (extra guards, post-steps). Simple tools can be YAML-only.
 
@@ -121,7 +121,9 @@ There is **no** `uninstall` subcommand in the current implementation.
 - [Introduction](./INTRODUCTION.md) — What Botstrap does, end to end.
 - [Getting started](./GETTING_STARTED.md) — One-liners, local dev, non-interactive behavior.
 - [Reference](./REFERENCE.md) — CLI, env vars, artifacts.
-- [Configuration](./CONFIGURATION.md) — `configs/` → destination paths.
+- [After install](./AFTER_INSTALL.md) — installed stack and usage.
+- [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md) — defaults and customization.
+- [Configuration file map](./CONFIGURATION.md) — `configs/` → destination paths.
 - [Registry specification](./REGISTRY_SPEC.md) — YAML schema.
 - [Tool selection](./TOOL_SELECTION.md) — Why each core and optional tool is included.
 - [Cross-platform notes](./CROSS_PLATFORM.md) — OS and package-manager strategy.

@@ -48,7 +48,7 @@ On **native Windows**, Phase 2 matches Unix when **gum** is installed: full TUI 
 
 ### 6. Phase 3: configure
 
-Applies **`configs/`** templates and installs **optional** registry entries selected in Phase 2 (editors, languages, databases, etc.—see [Configuration](./CONFIGURATION.md)). This phase may copy files to `~/.config`, append blocks to **`~/.zshrc`** and **`~/.bashrc`**, set global Git name/email, and place **sample** agent files under `~/.config/botstrap/agent/`.
+Applies **`configs/`** templates and installs **optional** registry entries selected in Phase 2 (editors, languages, databases, etc.—see [Configuration file map](./CONFIGURATION.md)). This phase may copy files to `~/.config`, append blocks to **`~/.zshrc`** and **`~/.bashrc`**, set global Git name/email, and place **sample** agent files under `~/.config/botstrap/agent/`.
 
 ### 7. Phase 4: verify
 
@@ -65,8 +65,10 @@ The thin CLI **`bin/botstrap`** in the repo is meant for a **local checkout**; i
 | Topic | Document |
 |--------|----------|
 | Install and trust | [Getting started](./GETTING_STARTED.md) |
+| Installed stack and usage | [After install](./AFTER_INSTALL.md) |
+| Defaults and customization | [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md) |
 | CLI, env vars, artifacts | [Reference](./REFERENCE.md) |
-| Template → home paths | [Configuration](./CONFIGURATION.md) |
+| Template → home paths | [Configuration file map](./CONFIGURATION.md) |
 | Phases, `lib/`, diagrams | [Architecture](./ARCHITECTURE.md) |
 | YAML schema | [Registry specification](./REGISTRY_SPEC.md) |
 | Why each tool exists | [Tool selection](./TOOL_SELECTION.md) |
