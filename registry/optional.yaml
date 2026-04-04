@@ -11,6 +11,7 @@ groups:
           linux: curl -fsSL https://cursor.sh/install | bash
           windows: winget install --id Anysphere.Cursor -e --accept-package-agreements --accept-source-agreements
         verify: bash -c "command -v cursor >/dev/null || command -v cursor-agent >/dev/null"
+        verify_windows: 'if (-not (Get-Command cursor -ErrorAction SilentlyContinue) -and -not (Get-Command cursor-agent -ErrorAction SilentlyContinue)) { throw "cursor not found" }'
       - name: vscode
         description: "Visual Studio Code"
         install:
@@ -36,6 +37,7 @@ groups:
           linux: curl -fsSL https://zed.dev/install.sh | sh
           windows: winget install --id ZedIndustries.Zed -e --accept-package-agreements --accept-source-agreements
         verify: bash -c "command -v zed >/dev/null && zed --version"
+        verify_windows: 'if (-not (Get-Command zed -ErrorAction SilentlyContinue)) { throw "zed not found" }; & zed --version'
 
   - name: Programming Languages
     id: languages
@@ -46,49 +48,65 @@ groups:
         requires: [mise]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global node@lts'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global node@lts'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; node --version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; node --version'
       - name: python
         description: "Python via mise (latest stable)"
         requires: [mise]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global python@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global python@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; python3 --version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; python --version'
       - name: ruby
         description: "Ruby via mise"
         requires: [mise]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global ruby@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global ruby@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; ruby --version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; ruby --version'
       - name: go
         description: "Go via mise"
         requires: [mise]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global go@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global go@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; go version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; go version'
       - name: rust
         description: "Rust via mise (rust stable)"
         requires: [mise]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global rust@stable'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global rust@stable'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; rustc --version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; rustc --version'
       - name: java
         description: "Java via mise (Temurin LTS)"
         requires: [mise]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global java@temurin-21'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global java@temurin-21'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; java --version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; java --version'
       - name: elixir
         description: "Elixir via mise"
         requires: [mise]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global elixir@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global elixir@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; elixir --version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; elixir --version'
       - name: php
         description: "PHP via mise"
         requires: [mise]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global php@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global php@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; php --version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; php --version'
 
   - name: Databases
     id: databases
@@ -100,18 +118,21 @@ groups:
         install:
           all: docker pull postgres:16-alpine
         verify: docker image inspect postgres:16-alpine >/dev/null
+        verify_windows: 'docker image inspect postgres:16-alpine 2>&1 | Out-Null; if (-not $?) { throw "image not found" }'
       - name: mysql
         description: "MySQL in Docker"
         requires: [docker]
         install:
           all: docker pull mysql:8
         verify: docker image inspect mysql:8 >/dev/null
+        verify_windows: 'docker image inspect mysql:8 2>&1 | Out-Null; if (-not $?) { throw "image not found" }'
       - name: redis
         description: "Redis in Docker"
         requires: [docker]
         install:
           all: docker pull redis:7-alpine
         verify: docker image inspect redis:7-alpine >/dev/null
+        verify_windows: 'docker image inspect redis:7-alpine 2>&1 | Out-Null; if (-not $?) { throw "image not found" }'
       - name: sqlite
         description: "SQLite is file-based; ensure sqlite3 CLI"
         install:
@@ -131,25 +152,33 @@ groups:
         requires: [node]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g @anthropic-ai/claude-code'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; npm install -g @anthropic-ai/claude-code'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; claude --version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; claude --version'
       - name: openclaw
         description: "Open source AI coding assistant CLI"
         requires: [node]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g openclaw'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; npm install -g openclaw'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; command -v openclaw >/dev/null'
+        verify_windows: 'if (-not (Get-Command openclaw -ErrorAction SilentlyContinue)) { throw "openclaw not found" }'
       - name: codex
         description: "OpenAI Codex CLI agent"
         requires: [node]
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g @openai/codex'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; npm install -g @openai/codex'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; codex --version'
+        verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; codex --version'
       - name: gemini
         description: "Google Gemini CLI (install per current Google distribution)"
         requires: [node]
         install:
           all: echo "Install the Gemini CLI using the official Google instructions for your OS."
+          windows: 'Write-Host "Install the Gemini CLI using the official Google instructions for your OS."'
         verify: bash -c "command -v gemini >/dev/null"
+        verify_windows: 'if (-not (Get-Command gemini -ErrorAction SilentlyContinue)) { throw "gemini not found" }'
       - name: ollama
         description: "Run local LLMs"
         install:
@@ -166,27 +195,37 @@ groups:
         description: "Catppuccin palette for terminal and editors"
         install:
           all: echo "Theme assets live under themes/catppuccin; Phase 3 applies selection."
+          windows: 'Write-Host "Theme assets live under themes/catppuccin; Phase 3 applies selection."'
         verify: bash -c "exit 0"
+        verify_windows: '$true'
       - name: tokyo-night
         description: "Tokyo Night"
         install:
           all: echo "Theme assets live under themes/tokyo-night; Phase 3 applies selection."
+          windows: 'Write-Host "Theme assets live under themes/tokyo-night; Phase 3 applies selection."'
         verify: bash -c "exit 0"
+        verify_windows: '$true'
       - name: gruvbox
         description: "Gruvbox"
         install:
           all: echo "Theme assets live under themes/gruvbox; Phase 3 applies selection."
+          windows: 'Write-Host "Theme assets live under themes/gruvbox; Phase 3 applies selection."'
         verify: bash -c "exit 0"
+        verify_windows: '$true'
       - name: nord
         description: "Nord"
         install:
           all: echo "Nord theme; extend themes/ when assets are added."
+          windows: 'Write-Host "Nord theme; extend themes/ when assets are added."'
         verify: bash -c "exit 0"
+        verify_windows: '$true'
       - name: rose-pine
         description: "Rosé Pine"
         install:
           all: echo "Rosé Pine theme; extend themes/ when assets are added."
+          windows: 'Write-Host "Rosé Pine theme; extend themes/ when assets are added."'
         verify: bash -c "exit 0"
+        verify_windows: '$true'
 
   - name: Optional Apps
     id: optional_apps
@@ -220,3 +259,4 @@ groups:
           linux: snap install postman || echo "Install Postman manually on Linux."
           windows: winget install --id Postman.Postman -e --accept-package-agreements --accept-source-agreements
         verify: bash -c "postman --version 2>/dev/null || exit 0"
+        verify_windows: 'if (Get-Command postman -ErrorAction SilentlyContinue) { & postman --version }'

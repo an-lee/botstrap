@@ -73,7 +73,6 @@ tools:
       linux-apt: sudo apt-get install -y zsh
       linux-dnf: sudo dnf install -y zsh
       linux-pacman: sudo pacman -Sy --needed --noconfirm zsh
-      windows: winget install --id zsh.zsh -e --accept-package-agreements --accept-source-agreements
     verify: zsh --version
 
   - name: starship
@@ -117,6 +116,7 @@ tools:
       linux-pacman: sudo pacman -Sy --needed --noconfirm bat
       windows: winget install --id sharkdp.bat -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "bat --version 2>/dev/null || batcat --version"
+    verify_windows: bat --version
 
   - name: eza
     description: "Modern ls"
@@ -128,6 +128,7 @@ tools:
       linux-pacman: sudo pacman -Sy --needed --noconfirm eza
       windows: winget install --id eza-community.eza -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "eza --version 2>/dev/null || exa --version"
+    verify_windows: eza --version
 
   - name: ripgrep
     description: "Fast line-oriented search"
@@ -150,6 +151,7 @@ tools:
       linux-pacman: sudo pacman -Sy --needed --noconfirm fd
       windows: winget install --id sharkdp.fd -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "fd --version 2>/dev/null || fdfind --version"
+    verify_windows: fd --version
 
   - name: mise
     description: "Polyglot runtime version manager"
@@ -159,12 +161,19 @@ tools:
       linux: curl -fsSL https://mise.run | sh
       windows: winget install --id jdx.mise -e --accept-package-agreements --accept-source-agreements
     verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise --version'
+    verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; & mise --version'
     post_install: |
       export PATH="$HOME/.local/bin:$PATH"
       if command -v mise >/dev/null 2>&1; then
         mise use --global node@lts || true
         mise use --global python@latest || true
       fi
+    post_install_windows: |
+      $env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"
+      if (Get-Command mise -ErrorAction SilentlyContinue) {
+        & mise use --global node@lts 2>$null
+        & mise use --global python@latest 2>$null
+      }
 
   - name: docker
     description: "Container engine (includes Compose V2 where available)"
@@ -220,6 +229,7 @@ tools:
       linux-pacman: sudo pacman -Sy --needed --noconfirm httpie
       windows: winget install --id JakubRoztocil.HTTPie -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "curlie --version 2>/dev/null || http --version"
+    verify_windows: http --version
 
   - name: zellij
     description: "Terminal workspace / multiplexer"
@@ -229,7 +239,6 @@ tools:
       linux-apt: sudo apt-get install -y zellij
       linux-dnf: sudo dnf install -y zellij
       linux-pacman: sudo pacman -Sy --needed --noconfirm zellij
-      windows: winget install --id Zellij.Zellij -e --accept-package-agreements --accept-source-agreements
     verify: zellij --version
 
   - name: btop
@@ -286,3 +295,4 @@ tools:
       linux-pacman: sudo pacman -Sy --needed --noconfirm ttf-firacode-nerd || true
       windows: winget install --id NerdFonts.FiraCodeNF -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "command -v fc-list >/dev/null || exit 0; fc-list | grep -qi fira"
+    verify_windows: cmd /c exit 0

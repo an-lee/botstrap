@@ -22,7 +22,8 @@ This guide covers **how to run Botstrap**, **prerequisites**, **local developmen
 
 - **PowerShell** (scripts use `#requires -Version 5.1`; PowerShell 7+ is recommended for testing).
 - **Git for Windows** (boot and Phase 0 try **winget** first when git is missing).
-- For the **same** interactive TUI and optional-tool flow as macOS/Linux, use **WSL** and run **`install.sh`** inside the clone. Native **`install.ps1`** may be incomplete; the script prints a reminder at the end. See [Cross-platform notes](./CROSS_PLATFORM.md).
+- Phase 0 requires **winget** (App Installer) and installs **yq**, **jq**, and **gum** when missing. **yq** is required for Phase 1 and Phase 4 on Windows, same as Unix.
+- Native **`install.ps1`** runs the full gum TUI (when **gum** is on `PATH`), registry-driven core and optional installs, PowerShell profile hooks, and verification. See [Cross-platform notes](./CROSS_PLATFORM.md).
 
 ## Install from the web (recommended)
 
@@ -74,7 +75,7 @@ So a headless run completes without hanging on prompts, but you will not get int
 
 ### Windows Phase 2
 
-If **gum** is missing, **`phase-2-tui.ps1`** sets only **`BOTSTRAP_EDITOR`** and **`BOTSTRAP_THEME`** defaults and returns. If gum is present, the script currently **warns** that the full TUI should be run under WSL—it does not run the full macOS/Linux gum flow. Plan on **WSL + `install.sh`** for automated parity with Unix.
+If **gum** is missing, **`phase-2-tui.ps1`** exports the same safe defaults as Unix (e.g. **`BOTSTRAP_EDITOR=none`**, **`BOTSTRAP_THEME=catppuccin`**, empty optional lists) and returns so Phase 3 and Phase 4 still run. If **gum** is present, the script runs the same interactive prompts as **`phase-2-tui.sh`** (editor, languages, databases, AI tools, theme, optional apps).
 
 ## After install: `bin/botstrap`
 

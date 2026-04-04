@@ -12,7 +12,7 @@ This page explains **what Botstrap does end to end**, in plain language. For ins
 ## What Botstrap is not
 
 - **Not a full dotfile manager** like Chezmoi or Nix Home Manager. It appends marked blocks to shell rc files and copies selected templates; it does not manage arbitrary symlink farms unless you extend it.
-- **Not identical on every OS.** Package commands and paths differ. Native **Windows** support is **partial** compared to macOS/Linux; the maintainers recommend **WSL + `install.sh`** for the same experience as Unix. See [Cross-platform notes](./CROSS_PLATFORM.md).
+- **Not identical on every OS.** Package commands and paths differ. Native **Windows** uses **winget** and **`lib/pkg.ps1`** with the same registry files; **WSL + `install.sh`** is optional if you prefer a Linux-only terminal. See [Cross-platform notes](./CROSS_PLATFORM.md).
 - **Not a silent guarantee** that every `registry/core.yaml` tool exists in every package manager. Failed installs are logged and Phase 4 reports verification failures; you may need manual fixes on exotic distros.
 
 ## The story of one install
@@ -44,7 +44,7 @@ On **macOS/Linux**, if **gum** is available, an interactive flow asks for Git id
 
 If **gum** is missing on Unix, the script exports **safe defaults** and skips the interactive UI so automated runs do not hang.
 
-On **native Windows**, Phase 2 is minimal: without gum, only default editor/theme are set; with gum, you still get a warning to use WSL for the full TUI. Prefer WSL for parity.
+On **native Windows**, Phase 2 matches Unix when **gum** is installed: full TUI for editor, languages, databases, AI tools, theme, and optional apps; without gum, the same non-interactive defaults apply.
 
 ### 6. Phase 3: configure
 

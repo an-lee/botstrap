@@ -30,4 +30,4 @@ foreach ($rel in $phases) {
     }
 }
 
-Write-BotstrapInfo "Botstrap install phases finished (Windows path may be partial; prefer WSL + install.sh for parity)."
+Write-BotstrapInfo 'Botstrap install phases finished.'

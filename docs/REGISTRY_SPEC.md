@@ -31,8 +31,10 @@ Each **tool** object:
 | `description` | string | yes | Short human-readable summary. |
 | `category` | string | yes | Logical grouping (e.g. `shell`, `git`, `container`, `security`). |
 | `install` | map | yes | Platform-keyed install commands (see keys below). |
-| `verify` | string | recommended | Single shell command that exits 0 when the tool works (e.g. `mise --version`). |
-| `post_install` | string | no | Shell script run after install on Unix (optional on Windows in future). |
+| `verify` | string | recommended | Single shell command that exits 0 when the tool works (e.g. `mise --version`). Often `bash -c` on Unix. |
+| `verify_windows` | string | no | PowerShell snippet for Windows verification when `verify` is bash-only or needs a different PATH (e.g. `mise`). If absent, the Windows package layer may normalize `verify` (e.g. strip `bash -c`) or fall back to `Get-Command`. |
+| `post_install` | string | no | Bash script run after install on Unix (`lib/pkg.sh`). |
+| `post_install_windows` | string | no | PowerShell script run after install on Windows (`lib/pkg.ps1`). If absent on Windows, `post_install` is not run (Unix bash). |
 | `configure` | string | no | Human-oriented note or machine path mapping, e.g. `configs/shell/prompt.toml -> ~/.config/starship.toml` (Phase 3 interprets this). |
 
 ### `install` map keys (core)
@@ -46,8 +48,8 @@ The package layer picks the **first matching** key for the current environment. 
 | `linux-dnf` | Fedora / RHEL / derivatives (`dnf`). |
 | `linux-pacman` | Arch Linux (`pacman`). |
 | `linux` | Generic Linux when distro-specific key is absent (often `curl \| sh` installers). |
-| `windows` | Windows (`winget` or PowerShell). |
-| `all` | Cross-platform when the same command works everywhere (e.g. `npm install -g ...` after Node is available). |
+| `windows` | Windows (`winget` or PowerShell). Omit this key for a tool to skip native Windows install (e.g. Linux-only shells). |
+| `all` | Cross-platform when the same command works everywhere (e.g. `npm install -g ...` after Node is available). On Windows, prefer a dedicated `windows` entry when the `all` snippet is bash-only. |
 
 **Note**: If both `linux-apt` and `linux` exist, the implementation should prefer the distro-specific key.
 
@@ -82,8 +84,10 @@ Each **item** object:
 | `description` | string | yes | Shown in the TUI. |
 | `install` | map | yes | Same platform keys as core `install`. |
 | `verify` | string | no | Post-install check when selected. |
+| `verify_windows` | string | no | Like core `verify_windows`. |
 | `requires` | list of strings | no | Names of other tools that must be installed first (e.g. `node` for npm-based CLIs). |
 | `post_install` | string | no | Like core. |
+| `post_install_windows` | string | no | Like core `post_install_windows`. |
 | `configure` | string | no | Like core. |
 
 ### Environment variables
