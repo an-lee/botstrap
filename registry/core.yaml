@@ -253,11 +253,13 @@ tools:
       linux-apt: sudo apt-get install -y zellij
       linux-dnf: sudo dnf install -y zellij
       linux-pacman: sudo pacman -Sy --needed --noconfirm zellij
+      windows: irm https://zellij.dev/launch.ps1 | iex
     update:
       darwin: brew upgrade zellij
       linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y zellij
       linux-dnf: sudo dnf upgrade -y zellij
       linux-pacman: sudo pacman -Sy --needed --noconfirm zellij
+      windows: irm https://zellij.dev/launch.ps1 | iex
     verify: zellij --version
 
   - name: btop
