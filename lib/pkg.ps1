@@ -180,6 +180,22 @@ function Install-BotstrapPackageFromRegistry {
     Refresh-BotstrapPath
     Add-BotstrapMiseBinsToPath
 
+    # Skip if tool already satisfies its verify command (matches lib/pkg.sh botstrap_pkg_install)
+    $verifySnippet = Get-BotstrapCoreVerifySnippet -ToolName $ToolName -RegistryPath $RegistryPath
+    if (-not [string]::IsNullOrWhiteSpace($verifySnippet)) {
+        try {
+            $ErrorActionPreference = 'Continue'
+            Invoke-BotstrapPowerShellSnippet -Snippet $verifySnippet
+            if ($? -and ($null -eq $LASTEXITCODE -or $LASTEXITCODE -eq 0)) {
+                Write-BotstrapInfo "Skipping '${ToolName}' (already installed)"
+                return $true
+            }
+        }
+        catch {
+            # Verify failed; proceed to install.
+        }
+    }
+
     $snippet = ''
     $usedKey = ''
     foreach ($key in (Get-BotstrapPkgResolveKeys)) {
