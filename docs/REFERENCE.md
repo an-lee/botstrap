@@ -4,14 +4,16 @@ Operational facts: **CLI**, **environment variables**, and **artifacts** Botstra
 
 ## `bin/botstrap` CLI
 
-The script lives at **`bin/botstrap`** (Bash). It resolves the repository root as the parent of **`bin/`** and does **not** read `BOTSTRAP_HOME` unless you set **`BOTSTRAP_ROOT`** for subprocesses yourself.
+**Unix / Git Bash:** **`bin/botstrap`** (Bash) resolves the repository root as the parent of **`bin/`** and does **not** read `BOTSTRAP_HOME` unless you set **`BOTSTRAP_ROOT`** for subprocesses yourself.
+
+**Native Windows PowerShell:** **`bin/botstrap.ps1`** exposes the same subcommands and runs **`install/phase-2-tui.ps1`**, **`install/phase-3-configure.ps1`**, and **`install/phase-4-verify.ps1`** for **`reconfigure`** / **`doctor`**. It does **not** invoke Bash.
 
 | Command | Behavior |
 |---------|----------|
 | `botstrap version` | Prints `botstrap <semver>` from the **`version`** file at repo root, or `unknown` if missing. |
 | `botstrap update` | Runs **`git pull --ff-only`** in the repo root. Does **not** re-run install phases or migration scripts. |
-| `botstrap reconfigure` | Sets **`BOTSTRAP_ROOT`** to the repo root, runs **`lib/detect`**, then sources **`install/phase-2-tui.sh`** and **`install/phase-3-configure.sh`** only. |
-| `botstrap doctor` | Prints a short **status** header (`BOTSTRAP_ROOT`, semver, optional git head, whether **`~/.config/botstrap/env.sh`** exists), then runs **`install/phase-4-verify.sh`** (core registry verification). Exits **0** if every verify passes, **1** if **`yq`** is missing or any verify fails. |
+| `botstrap reconfigure` | **Bash:** sets **`BOTSTRAP_ROOT`**, runs **`lib/detect`**, then sources **`install/phase-2-tui.sh`** and **`install/phase-3-configure.sh`** only. **PowerShell:** sets **`BOTSTRAP_ROOT`**, dot-sources **`install/phase-2-tui.ps1`** and **`install/phase-3-configure.ps1`**. |
+| `botstrap doctor` | **Bash:** prints a short **status** header (`BOTSTRAP_ROOT`, semver, optional git head, whether **`~/.config/botstrap/env.sh`** exists), then runs **`install/phase-4-verify.sh`**. **PowerShell:** similar header (profile **`# botstrap PATH`** hook instead of **`env.sh`**), then dot-sources **`install/phase-4-verify.ps1`**. Exits **0** if every verify passes, **1** if **`yq`** is missing or any verify fails. |
 
 Any other first argument prints usage and exits with code 1.
 
@@ -64,6 +66,16 @@ Unless otherwise noted, paths are under **`$HOME`**.
 | Editor configs | **cursor:** `~/.cursor/settings.json` from `configs/editor/cursor-settings.json`. **vscode:** `~/.config/Code/User/settings.json` from `configs/editor/vscode.json`. **neovim:** `~/.config/nvim/init.lua` from `configs/editor/neovim/init.lua`. |
 | `~/.config/botstrap/theme.env`, `editor.env` | Small key=value files for theme and editor. |
 | `~/.config/botstrap/agent/*.sample` | Copies of `configs/agent/AGENTS.md`, `cursorrules`, `claude-config.json` as **`.sample`** files (not live agent config unless you copy them). |
+
+## Artifacts and side effects (Windows Phase 3)
+
+Paths use **`%USERPROFILE%`** where relevant.
+
+| Action | Condition |
+|--------|-----------|
+| PowerShell **profile** (`$PROFILE`, or **`Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`** if **`$PROFILE`** is empty) | Appended **once** (marker-guarded) with **`# botstrap PATH`**: sets **`$env:BOTSTRAP_ROOT`** to the checkout, prepends **`$BOTSTRAP_ROOT\bin`** to **`$env:PATH`**, and defines **`function Global:botstrap`** that invokes **`bin\botstrap.ps1`**. Also appends **`# botstrap starship`**, **`# botstrap zoxide`**, and **`# botstrap aliases`** blocks when missing. |
+
+There is **no** **`~/.config/botstrap/env.sh`** on native Windows; the profile block is the shell hook for the **`botstrap`** command.
 
 ## Phase 4 verification
 

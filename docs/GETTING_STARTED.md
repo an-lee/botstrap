@@ -92,7 +92,7 @@ From the clone (e.g. `~/.botstrap`) you can always use:
 ./bin/botstrap doctor    # status lines + Phase 4 core verification (exits 1 on verify failures)
 ```
 
-On **native Windows** (PowerShell install), the Bash CLI is not added to your user `PATH` automatically; use **Git Bash** / **WSL** and `install.sh` for the same hook, or invoke `bin/botstrap` with Bash explicitly.
+On **native Windows** (PowerShell install), Phase 3 appends a **`# botstrap PATH`** block to your PowerShell **profile** (same marker pattern as starship/zoxide): it sets **`$env:BOTSTRAP_ROOT`**, prepends **`bin\`** to **`$env:PATH`**, and defines a **`botstrap`** function that runs **`bin/botstrap.ps1`**. Open a **new** PowerShell session (or **`. $PROFILE`**) to use **`botstrap`** from anywhere. **Git Bash** / **WSL** with **`install.sh`** still use the Bash **`bin/botstrap`** and **`~/.config/botstrap/env.sh`** hook.
 
 Details: [Reference](./REFERENCE.md).
 

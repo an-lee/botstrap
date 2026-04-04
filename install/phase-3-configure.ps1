@@ -151,6 +151,14 @@ if (-not (Get-Command BotstrapLl -ErrorAction SilentlyContinue)) {
 Set-Alias -Name ll -Value BotstrapLl -Scope Global -Force -ErrorAction SilentlyContinue
 '@
 
+$botstrapBin = Join-Path $root 'bin'
+$botstrapPathBlock = @"
+`$env:BOTSTRAP_ROOT = '$root'
+`$env:PATH = "$botstrapBin;`$env:PATH"
+function Global:botstrap { & (Join-Path `$env:BOTSTRAP_ROOT 'bin\botstrap.ps1') @args }
+"@
+
+Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap PATH' -Block $botstrapPathBlock
 Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap starship' -Block $starshipBlock
 Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap zoxide' -Block $zoxideBlock
 Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap aliases' -Block $aliasesBlock
