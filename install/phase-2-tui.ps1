@@ -57,13 +57,30 @@ if (-not $gitNameDefault) { $gitNameDefault = '' }
 $gitEmailDefault = $env:GIT_AUTHOR_EMAIL
 if (-not $gitEmailDefault) { $gitEmailDefault = '' }
 
+$gitNamePlaceholder = 'Git user name'
+if (-not $env:GIT_AUTHOR_NAME) {
+    $prevEa = $ErrorActionPreference
+    $ErrorActionPreference = 'SilentlyContinue'
+    $gn = & git config --global --get user.name 2>$null
+    $ErrorActionPreference = $prevEa
+    if ($gn) { $gitNamePlaceholder = "$gn" }
+}
+$gitEmailPlaceholder = 'Git email'
+if (-not $env:GIT_AUTHOR_EMAIL) {
+    $prevEa = $ErrorActionPreference
+    $ErrorActionPreference = 'SilentlyContinue'
+    $ge = & git config --global --get user.email 2>$null
+    $ErrorActionPreference = $prevEa
+    if ($ge) { $gitEmailPlaceholder = "$ge" }
+}
+
 if (-not $env:BOTSTRAP_GIT_NAME) {
     $nameArgs = if ($gitNameDefault) { @('--value', $gitNameDefault) } else { @() }
-    $env:BOTSTRAP_GIT_NAME = & gum input --placeholder 'Git user name' @nameArgs
+    $env:BOTSTRAP_GIT_NAME = & gum input --placeholder $gitNamePlaceholder @nameArgs
 }
 if (-not $env:BOTSTRAP_GIT_EMAIL) {
     $emailArgs = if ($gitEmailDefault) { @('--value', $gitEmailDefault) } else { @() }
-    $env:BOTSTRAP_GIT_EMAIL = & gum input --placeholder 'Git email' @emailArgs
+    $env:BOTSTRAP_GIT_EMAIL = & gum input --placeholder $gitEmailPlaceholder @emailArgs
 }
 
 $ErrorActionPreference = 'Stop'

@@ -46,17 +46,28 @@ fi
 
 gum style --border rounded --padding "1 2" --foreground 212 "Botstrap" "" "Cross-platform developer bootstrap."
 
+_git_name_placeholder='Git user name'
+if [[ -z "${GIT_AUTHOR_NAME:-}" ]]; then
+  _git_global_name="$(git config --global --get user.name 2>/dev/null || true)"
+  [[ -n "${_git_global_name}" ]] && _git_name_placeholder="${_git_global_name}"
+fi
+_git_email_placeholder='Git email'
+if [[ -z "${GIT_AUTHOR_EMAIL:-}" ]]; then
+  _git_global_email="$(git config --global --get user.email 2>/dev/null || true)"
+  [[ -n "${_git_global_email}" ]] && _git_email_placeholder="${_git_global_email}"
+fi
+
 _git_name_args=()
 if [[ -n "${GIT_AUTHOR_NAME:-}" ]]; then
   _git_name_args=(--value "${GIT_AUTHOR_NAME}")
 fi
-export BOTSTRAP_GIT_NAME="${BOTSTRAP_GIT_NAME:-$(gum input --placeholder 'Git user name' "${_git_name_args[@]}")}"
+export BOTSTRAP_GIT_NAME="${BOTSTRAP_GIT_NAME:-$(gum input --placeholder "${_git_name_placeholder}" "${_git_name_args[@]}")}"
 
 _git_email_args=()
 if [[ -n "${GIT_AUTHOR_EMAIL:-}" ]]; then
   _git_email_args=(--value "${GIT_AUTHOR_EMAIL}")
 fi
-export BOTSTRAP_GIT_EMAIL="${BOTSTRAP_GIT_EMAIL:-$(gum input --placeholder 'Git email' "${_git_email_args[@]}")}"
+export BOTSTRAP_GIT_EMAIL="${BOTSTRAP_GIT_EMAIL:-$(gum input --placeholder "${_git_email_placeholder}" "${_git_email_args[@]}")}"
 
 _core_yaml="${BOTSTRAP_ROOT}/registry/core.yaml"
 mapfile -t _core_tool_names < <(yq -r '.tools[].name' "${_core_yaml}")
