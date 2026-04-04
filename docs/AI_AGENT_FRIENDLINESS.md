@@ -43,6 +43,38 @@ Phase 2 lets users opt into **Claude Code**, **OpenClaw**, **Codex CLI**, **Gemi
 - Piping unaudited remote scripts without reading them first (same as for humans).
 - Assuming GUI-only installers; Botstrap should prefer winget/brew/apt where possible.
 
+## Automated documentation maintenance
+
+Botstrap uses a **GitHub Copilot agentic workflow** to keep project documentation up to date automatically.
+
+### `daily-doc-updater` workflow
+
+Defined in `.github/workflows/daily-doc-updater.md`, this workflow runs on a daily schedule and:
+
+1. Scans merged pull requests and significant commits from the last 24 hours.
+2. Analyzes changes for new features, removed features, modified behavior, and breaking changes.
+3. Reviews existing documentation in `docs/` and `README.md` for gaps.
+4. Updates the appropriate documentation file(s) to reflect new functionality.
+5. Opens a pull request (with labels `documentation` and `automation`) for human review before merging.
+
+The workflow is powered by [GitHub Copilot agentic workflows](https://github.github.com/gh-aw/introduction/overview/) (`gh aw`). The compiled GitHub Actions workflow is stored in `daily-doc-updater.lock.yml` (auto-generated — do not edit directly). Regenerate with:
+
+```bash
+gh aw compile
+```
+
+### Agentics maintenance
+
+`agentics-maintenance.yml` runs every 6 hours to close expired agentic pull requests and issues (based on the `expires: 2d` setting in the `daily-doc-updater` safe-outputs configuration). It also supports manual `workflow_dispatch` operations (`disable`, `enable`, `update`, `upgrade`, `safe_outputs`, `create_labels`).
+
+### Lock files
+
+`.gitattributes` marks `*.lock.yml` workflow files as linguist-generated so they are excluded from language stats and treated as generated files for diffs:
+
+```gitattributes
+.github/workflows/*.lock.yml linguist-generated=true merge=ours
+```
+
 ## Extending for agents
 
 When adding a tool:
