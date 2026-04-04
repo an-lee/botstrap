@@ -10,10 +10,13 @@ cd "${BOTSTRAP_ROOT}"
 source "${BOTSTRAP_ROOT}/lib/detect.sh"
 # shellcheck source=lib/log.sh
 source "${BOTSTRAP_ROOT}/lib/log.sh"
+# shellcheck source=lib/sudo.sh
+source "${BOTSTRAP_ROOT}/lib/sudo.sh"
 # shellcheck source=lib/pkg.sh
 source "${BOTSTRAP_ROOT}/lib/pkg.sh"
 
 botstrap_detect
+botstrap_sudo_init
 botstrap_log_info "Detected OS=${BOTSTRAP_OS} distro=${BOTSTRAP_DISTRO} pkg=${BOTSTRAP_PKG} arch=${BOTSTRAP_UNAME_M}"
 
 botstrap_log_phase 1 5 "Prerequisites - git, curl, jq, yq, gum"
