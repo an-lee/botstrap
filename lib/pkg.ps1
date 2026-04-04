@@ -142,10 +142,14 @@ function Normalize-BotstrapVerifyForWindows {
     }
     $v = $VerifyCmd.Trim()
     if ($v -match '^bash\s+-c\s+"([^"]*)"$') {
-        return $Matches[1]
+        $v = $Matches[1]
     }
-    if ($v -match "^bash\s+-c\s+'([^']*)'$") {
-        return $Matches[1]
+    elseif ($v -match "^bash\s+-c\s+'([^']*)'$") {
+        $v = $Matches[1]
+    }
+    # Invoke-WebRequest shadows curl in PowerShell; use the real binary for verify snippets.
+    if ($v -match '^(\s*)curl(\s+)') {
+        $v = $v -replace '^(\s*)curl(\s+)', '$1curl.exe$2'
     }
     return $v
 }
@@ -718,7 +722,7 @@ function Get-BotstrapCoreToolNamesForVerify {
                 [void]$result.Add($n)
             }
         }
-        return ,$result.ToArray()
+        return $result.ToArray()
     }
     $cf = Join-Path $env:USERPROFILE '.config\botstrap\core-tools.env'
     if (Test-Path -LiteralPath $cf) {
@@ -731,8 +735,8 @@ function Get-BotstrapCoreToolNamesForVerify {
                     [void]$result.Add($n)
                 }
             }
-            return ,$result.ToArray()
+            return $result.ToArray()
         }
     }
-    return ,$ordered
+    return $ordered
 }
