@@ -10,6 +10,10 @@ groups:
           darwin: brew install --cask cursor
           linux: curl -fsSL https://cursor.sh/install | bash
           windows: winget install --id Anysphere.Cursor -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade --cask cursor
+          linux: curl -fsSL https://cursor.sh/install | bash
+          windows: winget upgrade --id Anysphere.Cursor -e --accept-package-agreements --accept-source-agreements
         verify: bash -c "command -v cursor >/dev/null || command -v cursor-agent >/dev/null"
         verify_windows: 'if (-not (Get-Command cursor -ErrorAction SilentlyContinue) -and -not (Get-Command cursor-agent -ErrorAction SilentlyContinue)) { throw "cursor not found" }'
       - name: vscode
@@ -20,6 +24,12 @@ groups:
           linux-dnf: sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc && sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo' && sudo dnf install -y code
           linux-pacman: sudo pacman -Sy --needed --noconfirm code
           windows: winget install --id Microsoft.VisualStudioCode -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade --cask visual-studio-code
+          linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y code
+          linux-dnf: sudo dnf upgrade -y code
+          linux-pacman: sudo pacman -Sy --needed --noconfirm code
+          windows: winget upgrade --id Microsoft.VisualStudioCode -e --accept-package-agreements --accept-source-agreements
         verify: code --version
       - name: neovim
         description: "Neovim editor"
@@ -29,6 +39,12 @@ groups:
           linux-dnf: sudo dnf install -y neovim
           linux-pacman: sudo pacman -Sy --needed --noconfirm neovim
           windows: winget install --id Neovim.Neovim -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade neovim
+          linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y neovim
+          linux-dnf: sudo dnf upgrade -y neovim
+          linux-pacman: sudo pacman -Sy --needed --noconfirm neovim
+          windows: winget upgrade --id Neovim.Neovim -e --accept-package-agreements --accept-source-agreements
         verify: nvim --version
       - name: zed
         description: "Zed code editor"
@@ -36,6 +52,10 @@ groups:
           darwin: brew install --cask zed
           linux: curl -fsSL https://zed.dev/install.sh | sh
           windows: winget install --id ZedIndustries.Zed -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade --cask zed
+          linux: curl -fsSL https://zed.dev/install.sh | sh
+          windows: winget upgrade --id ZedIndustries.Zed -e --accept-package-agreements --accept-source-agreements
         verify: bash -c "command -v zed >/dev/null && zed --version"
         verify_windows: 'if (-not (Get-Command zed -ErrorAction SilentlyContinue)) { throw "zed not found" }; & zed --version'
 
@@ -49,6 +69,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global node@lts'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global node@lts'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise upgrade node; mise use --global node@lts'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise upgrade node; mise use --global node@lts'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; node --version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; node --version'
       - name: python
@@ -57,6 +80,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global python@latest'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global python@latest'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise upgrade python; mise use --global python@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise upgrade python; mise use --global python@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; python3 --version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; python --version'
       - name: ruby
@@ -65,6 +91,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global ruby@latest'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global ruby@latest'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise upgrade ruby; mise use --global ruby@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise upgrade ruby; mise use --global ruby@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; ruby --version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; ruby --version'
       - name: go
@@ -73,6 +102,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global go@latest'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global go@latest'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise upgrade go; mise use --global go@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise upgrade go; mise use --global go@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; go version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; go version'
       - name: rust
@@ -81,6 +113,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global rust@stable'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global rust@stable'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise upgrade rust; mise use --global rust@stable'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise upgrade rust; mise use --global rust@stable'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; rustc --version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; rustc --version'
       - name: java
@@ -89,6 +124,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global java@temurin-21'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global java@temurin-21'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise upgrade java; mise use --global java@temurin-21'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise upgrade java; mise use --global java@temurin-21'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; java --version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; java --version'
       - name: elixir
@@ -97,6 +135,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global elixir@latest'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global elixir@latest'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise upgrade elixir; mise use --global elixir@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise upgrade elixir; mise use --global elixir@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; elixir --version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; elixir --version'
       - name: php
@@ -105,6 +146,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise use --global php@latest'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise use --global php@latest'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise upgrade php; mise use --global php@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; mise upgrade php; mise use --global php@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; php --version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; php --version'
 
@@ -117,6 +161,8 @@ groups:
         requires: [docker]
         install:
           all: docker pull postgres:16-alpine
+        update:
+          all: docker pull postgres:16-alpine
         verify: docker image inspect postgres:16-alpine >/dev/null
         verify_windows: 'docker image inspect postgres:16-alpine 2>&1 | Out-Null; if (-not $?) { throw "image not found" }'
       - name: mysql
@@ -124,12 +170,16 @@ groups:
         requires: [docker]
         install:
           all: docker pull mysql:8
+        update:
+          all: docker pull mysql:8
         verify: docker image inspect mysql:8 >/dev/null
         verify_windows: 'docker image inspect mysql:8 2>&1 | Out-Null; if (-not $?) { throw "image not found" }'
       - name: redis
         description: "Redis in Docker"
         requires: [docker]
         install:
+          all: docker pull redis:7-alpine
+        update:
           all: docker pull redis:7-alpine
         verify: docker image inspect redis:7-alpine >/dev/null
         verify_windows: 'docker image inspect redis:7-alpine 2>&1 | Out-Null; if (-not $?) { throw "image not found" }'
@@ -141,6 +191,12 @@ groups:
           linux-dnf: sudo dnf install -y sqlite
           linux-pacman: sudo pacman -Sy --needed --noconfirm sqlite
           windows: winget install --id SQLite.SQLite -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade sqlite
+          linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y sqlite3
+          linux-dnf: sudo dnf upgrade -y sqlite
+          linux-pacman: sudo pacman -Sy --needed --noconfirm sqlite
+          windows: winget upgrade --id SQLite.SQLite -e --accept-package-agreements --accept-source-agreements
         verify: sqlite3 --version
 
   - name: AI Agent Tools
@@ -153,6 +209,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g @anthropic-ai/claude-code'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; npm install -g @anthropic-ai/claude-code'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g @anthropic-ai/claude-code@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; npm install -g @anthropic-ai/claude-code@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; claude --version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; claude --version'
       - name: openclaw
@@ -161,6 +220,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g openclaw'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; npm install -g openclaw'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g openclaw@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; npm install -g openclaw@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; command -v openclaw >/dev/null'
         verify_windows: 'if (-not (Get-Command openclaw -ErrorAction SilentlyContinue)) { throw "openclaw not found" }'
       - name: codex
@@ -169,6 +231,9 @@ groups:
         install:
           all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g @openai/codex'
           windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; npm install -g @openai/codex'
+        update:
+          all: bash -c 'export PATH="$HOME/.local/bin:$PATH"; npm install -g @openai/codex@latest'
+          windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; npm install -g @openai/codex@latest'
         verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; codex --version'
         verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; codex --version'
       - name: gemini
@@ -177,6 +242,9 @@ groups:
         install:
           all: echo "Install the Gemini CLI using the official Google instructions for your OS."
           windows: 'Write-Host "Install the Gemini CLI using the official Google instructions for your OS."'
+        update:
+          all: echo "Update the Gemini CLI using the official Google instructions for your OS."
+          windows: 'Write-Host "Update the Gemini CLI using the official Google instructions for your OS."'
         verify: bash -c "command -v gemini >/dev/null"
         verify_windows: 'if (-not (Get-Command gemini -ErrorAction SilentlyContinue)) { throw "gemini not found" }'
       - name: ollama
@@ -185,6 +253,10 @@ groups:
           darwin: brew install ollama
           linux: curl -fsSL https://ollama.com/install.sh | sh
           windows: winget install --id Ollama.Ollama -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade ollama
+          linux: curl -fsSL https://ollama.com/install.sh | sh
+          windows: winget upgrade --id Ollama.Ollama -e --accept-package-agreements --accept-source-agreements
         verify: ollama --version
 
   - name: Theme
@@ -196,6 +268,9 @@ groups:
         install:
           all: echo "Theme assets live under themes/catppuccin; Phase 3 applies selection."
           windows: 'Write-Host "Theme assets live under themes/catppuccin; Phase 3 applies selection."'
+        update:
+          all: echo "Theme catppuccin; re-run botstrap reconfigure to refresh assets from the repo."
+          windows: 'Write-Host "Theme catppuccin; re-run botstrap reconfigure to refresh assets from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
       - name: tokyo-night
@@ -203,6 +278,9 @@ groups:
         install:
           all: echo "Theme assets live under themes/tokyo-night; Phase 3 applies selection."
           windows: 'Write-Host "Theme assets live under themes/tokyo-night; Phase 3 applies selection."'
+        update:
+          all: echo "Theme tokyo-night; re-run botstrap reconfigure to refresh assets from the repo."
+          windows: 'Write-Host "Theme tokyo-night; re-run botstrap reconfigure to refresh assets from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
       - name: gruvbox
@@ -210,6 +288,9 @@ groups:
         install:
           all: echo "Theme assets live under themes/gruvbox; Phase 3 applies selection."
           windows: 'Write-Host "Theme assets live under themes/gruvbox; Phase 3 applies selection."'
+        update:
+          all: echo "Theme gruvbox; re-run botstrap reconfigure to refresh assets from the repo."
+          windows: 'Write-Host "Theme gruvbox; re-run botstrap reconfigure to refresh assets from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
       - name: nord
@@ -217,6 +298,9 @@ groups:
         install:
           all: echo "Nord theme; extend themes/ when assets are added."
           windows: 'Write-Host "Nord theme; extend themes/ when assets are added."'
+        update:
+          all: echo "Theme nord; re-run botstrap reconfigure to refresh assets from the repo."
+          windows: 'Write-Host "Theme nord; re-run botstrap reconfigure to refresh assets from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
       - name: rose-pine
@@ -224,6 +308,9 @@ groups:
         install:
           all: echo "Rosé Pine theme; extend themes/ when assets are added."
           windows: 'Write-Host "Rosé Pine theme; extend themes/ when assets are added."'
+        update:
+          all: echo "Theme rose-pine; re-run botstrap reconfigure to refresh assets from the repo."
+          windows: 'Write-Host "Theme rose-pine; re-run botstrap reconfigure to refresh assets from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
 
@@ -237,6 +324,10 @@ groups:
           darwin: brew install --cask 1password-cli
           linux: curl -fsSL https://cache.agilebits.com/dist/1P/op2/pkg/latest/op_linux_amd64_v2.zip -o /tmp/op.zip && sudo unzip -o /tmp/op.zip -d /usr/local/bin/
           windows: winget install --id AgileBits.1Password.CLI -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade --cask 1password-cli
+          linux: curl -fsSL https://cache.agilebits.com/dist/1P/op2/pkg/latest/op_linux_amd64_v2.zip -o /tmp/op.zip && sudo unzip -o /tmp/op.zip -d /usr/local/bin/
+          windows: winget upgrade --id AgileBits.1Password.CLI -e --accept-package-agreements --accept-source-agreements
         verify: op --version
       - name: tailscale
         description: "Tailscale VPN"
@@ -244,6 +335,10 @@ groups:
           darwin: brew install tailscale
           linux: curl -fsSL https://tailscale.com/install.sh | sh
           windows: winget install --id Tailscale.Tailscale -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade tailscale
+          linux: curl -fsSL https://tailscale.com/install.sh | sh
+          windows: winget upgrade --id Tailscale.Tailscale -e --accept-package-agreements --accept-source-agreements
         verify: tailscale version
       - name: ngrok
         description: "ngrok tunnel CLI"
@@ -251,6 +346,10 @@ groups:
           darwin: brew install ngrok/ngrok/ngrok
           linux-apt: curl -fsSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com bookworm main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt-get update && sudo apt-get install -y ngrok
           windows: winget install --id Ngrok.Ngrok -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade ngrok
+          linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y ngrok
+          windows: winget upgrade --id Ngrok.Ngrok -e --accept-package-agreements --accept-source-agreements
         verify: ngrok version
       - name: postman
         description: "Postman API client"
@@ -258,5 +357,9 @@ groups:
           darwin: brew install --cask postman
           linux: snap install postman || echo "Install Postman manually on Linux."
           windows: winget install --id Postman.Postman -e --accept-package-agreements --accept-source-agreements
+        update:
+          darwin: brew upgrade --cask postman
+          linux: snap refresh postman || echo "Refresh Postman manually on Linux."
+          windows: winget upgrade --id Postman.Postman -e --accept-package-agreements --accept-source-agreements
         verify: bash -c "postman --version 2>/dev/null || exit 0"
         verify_windows: 'if (Get-Command postman -ErrorAction SilentlyContinue) { & postman --version }'

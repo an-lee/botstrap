@@ -17,7 +17,7 @@ Botstrap defines installable tools in YAML. There are three files:
 
 ## `registry/prerequisites.yaml` schema
 
-Same as **`registry/core.yaml`** below: top-level **`schema_version`**, **`tools`** list, and the same fields on each tool (**`name`**, **`description`**, **`category`**, **`install`**, **`verify`**, optional **`verify_windows`**, **`post_install`**, **`post_install_windows`**, **`configure`**). Only **`prerequisites.yaml`** and **`core.yaml`** use this shape; **`optional.yaml`** uses **`groups`**.
+Same as **`registry/core.yaml`** below: top-level **`schema_version`**, **`tools`** list, and the same fields on each tool (**`name`**, **`description`**, **`category`**, **`install`**, optional **`update`**, **`verify`**, optional **`verify_windows`**, **`post_install`**, **`post_install_windows`**, **`configure`**). Only **`prerequisites.yaml`** and **`core.yaml`** use this shape; **`optional.yaml`** uses **`groups`**.
 
 ## `registry/core.yaml` schema
 
@@ -36,6 +36,7 @@ Each **tool** object:
 | `description` | string | yes | Short human-readable summary. |
 | `category` | string | yes | Logical grouping (e.g. `shell`, `git`, `container`, `security`). |
 | `install` | map | yes | Platform-keyed install commands (see keys below). |
+| `update` | map | no | Platform-keyed **upgrade** commands (same keys as `install`). Used by `botstrap update --tools` / `install/update-tools.*` only when **`verify` passes** (tool is present). If absent for the resolved platform key, the updater logs and skips that tool. Do not silently fall back to `install`. |
 | `verify` | string | recommended | Single shell command that exits 0 when the tool works (e.g. `mise --version`). Often `bash -c` on Unix. |
 | `verify_windows` | string | no | PowerShell snippet for Windows verification when `verify` is bash-only or needs a different PATH (e.g. `mise`). If absent, the Windows package layer may normalize `verify` (e.g. strip `bash -c`) or fall back to `Get-Command`. |
 | `post_install` | string | no | Bash script run after install on Unix (`lib/pkg.sh`). |
@@ -88,6 +89,7 @@ Each **item** object:
 | `name` | string | yes | Tool id (kebab-case). |
 | `description` | string | yes | Shown in the TUI. |
 | `install` | map | yes | Same platform keys as core `install`. |
+| `update` | map | no | Same semantics as core **`update`** (optional; same platform keys as `install`). |
 | `verify` | string | no | Post-install check when selected. |
 | `verify_windows` | string | no | Like core `verify_windows`. |
 | `requires` | list of strings | no | Names of other tools that must be installed first (e.g. `node` for npm-based CLIs). |
@@ -120,6 +122,10 @@ tools:
       darwin: brew install example-cli
       linux-apt: sudo apt-get update && sudo apt-get install -y example-cli
       windows: winget install --id Example.ExampleCLI -e --accept-package-agreements
+    update:
+      darwin: brew upgrade example-cli
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y example-cli
+      windows: winget upgrade --id Example.ExampleCLI -e --accept-package-agreements --accept-source-agreements
     verify: example-cli --version
 ```
 

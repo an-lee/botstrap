@@ -237,6 +237,193 @@ function Install-BotstrapPackageFromRegistry {
     return $true
 }
 
+function Get-BotstrapCoreUpdateSnippet {
+    param(
+        [Parameter(Mandatory)][string]$ToolName,
+        [Parameter(Mandatory)][string]$Key,
+        [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\core.yaml')
+    )
+    $expr = '.tools[] | select(.name == strenv(BOTSTRAP_YQ_TOOL)) | .update[strenv(BOTSTRAP_YQ_KEY)] // null'
+    $val = Invoke-BotstrapYqWithEnv -Env @{
+        BOTSTRAP_YQ_TOOL = $ToolName
+        BOTSTRAP_YQ_KEY  = $Key
+    } -Expression $expr -FilePath $RegistryPath
+    if ($null -eq $val) { return '' }
+    $s = [string]$val.Trim()
+    if ($s -eq '' -or $s -eq 'null') { return '' }
+    return $s
+}
+
+function Update-BotstrapCoreToolFromRegistry {
+    param(
+        [Parameter(Mandatory)][string]$ToolName,
+        [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\core.yaml')
+    )
+    if (-not $env:BOTSTRAP_ROOT) {
+        Write-BotstrapErr 'BOTSTRAP_ROOT is not set.'
+        return $false
+    }
+    if (-not (Test-Path -LiteralPath $RegistryPath)) {
+        Write-BotstrapErr "Registry not found: $RegistryPath"
+        return $false
+    }
+    Refresh-BotstrapPath
+    Add-BotstrapMiseBinsToPath
+
+    $verifySnippet = Get-BotstrapCoreVerifySnippet -ToolName $ToolName -RegistryPath $RegistryPath
+    if ([string]::IsNullOrWhiteSpace($verifySnippet)) {
+        Write-BotstrapInfo "Skipping update for '${ToolName}' (no verify command)"
+        return $true
+    }
+    try {
+        $ErrorActionPreference = 'Continue'
+        Invoke-BotstrapPowerShellSnippet -Snippet $verifySnippet
+        if (-not $?) {
+            Write-BotstrapInfo "Skipping update for '${ToolName}' (not installed or verify failed)"
+            return $true
+        }
+        if ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) {
+            Write-BotstrapInfo "Skipping update for '${ToolName}' (not installed or verify failed)"
+            return $true
+        }
+    }
+    catch {
+        Write-BotstrapInfo "Skipping update for '${ToolName}' (not installed or verify failed)"
+        return $true
+    }
+
+    $snippet = ''
+    $usedKey = ''
+    foreach ($key in (Get-BotstrapPkgResolveKeys)) {
+        $snippet = Get-BotstrapCoreUpdateSnippet -ToolName $ToolName -Key $key -RegistryPath $RegistryPath
+        if (-not [string]::IsNullOrWhiteSpace($snippet)) {
+            $usedKey = $key
+            break
+        }
+    }
+
+    if ([string]::IsNullOrWhiteSpace($snippet)) {
+        Write-BotstrapInfo "No update snippet for '${ToolName}' on this platform (see $RegistryPath)."
+        return $true
+    }
+
+    Write-BotstrapInfo "Updating ${ToolName} (registry key: ${usedKey})"
+    try {
+        $ErrorActionPreference = 'Continue'
+        Invoke-BotstrapPowerShellSnippet -Snippet $snippet
+    }
+    catch {
+        Write-BotstrapWarn "Update snippet reported an error for '${ToolName}': $($_.Exception.Message)"
+    }
+
+    Refresh-BotstrapPath
+    Add-BotstrapMiseBinsToPath
+    return $true
+}
+
+function Update-BotstrapCoreToolsFromCsv {
+    param(
+        [Parameter(Mandatory)][string]$Csv,
+        [Parameter(Mandatory)][string]$RegistryPath
+    )
+    if ([string]::IsNullOrWhiteSpace($Csv)) {
+        return
+    }
+    $ordered = @(& yq -r '.tools[].name' $RegistryPath 2>$null | ForEach-Object { "$_".Trim() } | Where-Object { $_ })
+    foreach ($name in $ordered) {
+        if (-not (Test-BotstrapCsvHasItem -Needle $name -Csv $Csv)) {
+            continue
+        }
+        [void](Update-BotstrapCoreToolFromRegistry -ToolName $name -RegistryPath $RegistryPath)
+    }
+}
+
+function Get-BotstrapOptionalUpdateSnippet {
+    param(
+        [Parameter(Mandatory)][string]$GroupId,
+        [Parameter(Mandatory)][string]$ItemName,
+        [Parameter(Mandatory)][string]$Key,
+        [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\optional.yaml')
+    )
+    $expr = '.groups[] | select(.id == strenv(BOTSTRAP_YQ_GROUP)) | .items[] | select(.name == strenv(BOTSTRAP_YQ_ITEM)) | .update[strenv(BOTSTRAP_YQ_KEY)] // null'
+    $val = Invoke-BotstrapYqWithEnv -Env @{
+        BOTSTRAP_YQ_GROUP = $GroupId
+        BOTSTRAP_YQ_ITEM  = $ItemName
+        BOTSTRAP_YQ_KEY   = $Key
+    } -Expression $expr -FilePath $RegistryPath
+    if ($null -eq $val) { return '' }
+    $s = [string]$val.Trim()
+    if ($s -eq '' -or $s -eq 'null') { return '' }
+    return $s
+}
+
+function Update-BotstrapOptionalItemFromRegistry {
+    param(
+        [Parameter(Mandatory)][string]$GroupId,
+        [Parameter(Mandatory)][string]$ItemName,
+        [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\optional.yaml')
+    )
+    if ([string]::IsNullOrWhiteSpace($ItemName) -or $ItemName -eq 'none') {
+        return $true
+    }
+    if (-not (Get-Command yq -ErrorAction SilentlyContinue)) {
+        Write-BotstrapErr 'yq is required for optional updates.'
+        return $false
+    }
+    if (-not (Test-BotstrapOptionalRequiresSatisfied -GroupId $GroupId -ItemName $ItemName -RegistryPath $RegistryPath)) {
+        return $true
+    }
+    if (-not (Test-BotstrapOptionalItemVerify -GroupId $GroupId -ItemName $ItemName -RegistryPath $RegistryPath)) {
+        Write-BotstrapInfo "Skipping optional update ${GroupId}/${ItemName} (not installed or verify failed)"
+        return $true
+    }
+
+    $snippet = ''
+    $usedKey = ''
+    foreach ($key in (Get-BotstrapPkgResolveKeys)) {
+        $snippet = Get-BotstrapOptionalUpdateSnippet -GroupId $GroupId -ItemName $ItemName -Key $key -RegistryPath $RegistryPath
+        if (-not [string]::IsNullOrWhiteSpace($snippet)) {
+            $usedKey = $key
+            break
+        }
+    }
+
+    if ([string]::IsNullOrWhiteSpace($snippet)) {
+        Write-BotstrapInfo "No optional update snippet for ${GroupId}/${ItemName} on this platform."
+        return $true
+    }
+
+    Write-BotstrapInfo "Updating optional ${GroupId}/${ItemName} (registry key: ${usedKey})"
+    try {
+        Invoke-BotstrapPowerShellSnippet -Snippet $snippet
+    }
+    catch {
+        Write-BotstrapWarn "Optional update ${GroupId}/${ItemName}: $($_.Exception.Message)"
+    }
+
+    Refresh-BotstrapPath
+    Add-BotstrapMiseBinsToPath
+    return $true
+}
+
+function Update-BotstrapOptionalItemsFromCsv {
+    param(
+        [Parameter(Mandatory)][string]$GroupId,
+        [string]$Csv,
+        [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\optional.yaml')
+    )
+    if ([string]::IsNullOrWhiteSpace($Csv)) {
+        return
+    }
+    foreach ($raw in $Csv.Split(',')) {
+        $item = $raw.Trim()
+        if ([string]::IsNullOrWhiteSpace($item) -or $item -eq 'none') {
+            continue
+        }
+        [void](Update-BotstrapOptionalItemFromRegistry -GroupId $GroupId -ItemName $item -RegistryPath $RegistryPath)
+    }
+}
+
 function Test-BotstrapPackageFromRegistry {
     param(
         [Parameter(Mandatory)][string]$ToolName,

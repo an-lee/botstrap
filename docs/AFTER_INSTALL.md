@@ -17,7 +17,8 @@ Useful commands (same semantics on Bash and PowerShell entry points):
 |---------|---------|
 | `botstrap` | No subcommand: **`gum choose`** menu when the terminal is interactive and **`gum`** is installed; otherwise usage (exit **1**). Prefer explicit subcommands in scripts and for **AI agents**. |
 | `botstrap version` | Semver from the `version` file. |
-| `botstrap update` | `git pull --ff-only` in the checkout only. |
+| `botstrap self-update` | `git pull --ff-only` in the checkout (refresh Botstrap only). |
+| `botstrap update` | Interactive: choose repo refresh, tool upgrades, or both. Non-interactive: same as **`self-update`**, with a hint to use **`--tools`** / **`--all`**. **`botstrap update --tools`** upgrades packages/images defined in registry **`update`** maps for prerequisites, your selected core tools, and persisted optional selections. |
 | `botstrap reconfigure` | Phase 2 (TUI or defaults) + Phase 3. |
 | `botstrap doctor` | Status lines + verification (see below). |
 
@@ -43,10 +44,9 @@ Interactive choices (when **gum** is available) map to groups in **[`registry/op
 **What is persisted on disk:**
 
 - **`~/.config/botstrap/core-tools.env`** — `core_tools=<comma-separated names>` from **`registry/core.yaml`** (Windows: same path under **`%USERPROFILE%\.config\botstrap\`**).
+- **`~/.config/botstrap/optional-selections.env`** — `languages=`, `databases=`, `ai_tools=`, `optional_apps=` (comma-separated where applicable) for **`botstrap update --tools`** and reconfigure TUI defaults.
 - **`~/.config/botstrap/theme.env`** — `theme=<value>` (Windows: under **`%USERPROFILE%\.config\botstrap\`**).
 - **`~/.config/botstrap/editor.env`** — `editor=<value>`.
-
-Other groups (languages, databases, AI CLIs, optional apps) are **not** written to separate state files. Infer them from installed binaries/images or run **`botstrap reconfigure`** to change them.
 
 ## How to use common pieces
 

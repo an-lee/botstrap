@@ -14,11 +14,32 @@ if ! command -v gum &>/dev/null; then
   export BOTSTRAP_GIT_EMAIL="${BOTSTRAP_GIT_EMAIL:-}"
   _all_core_csv="$(yq -r '.tools[].name' "${BOTSTRAP_ROOT}/registry/core.yaml" | paste -sd, -)"
   export BOTSTRAP_CORE_TOOLS="${BOTSTRAP_CORE_TOOLS:-${_all_core_csv}}"
+  _opt_sel="${HOME}/.config/botstrap/optional-selections.env"
+  _ed_env="${HOME}/.config/botstrap/editor.env"
+  _th_env="${HOME}/.config/botstrap/theme.env"
+  if [[ -z "${BOTSTRAP_EDITOR:-}" && -f "${_ed_env}" ]]; then
+    export BOTSTRAP_EDITOR="$(grep -m1 '^editor=' "${_ed_env}" 2>/dev/null | sed 's/^editor=//' || true)"
+  fi
   export BOTSTRAP_EDITOR="${BOTSTRAP_EDITOR:-none}"
+  if [[ -z "${BOTSTRAP_LANGUAGES:-}" && -f "${_opt_sel}" ]]; then
+    export BOTSTRAP_LANGUAGES="$(grep -m1 '^languages=' "${_opt_sel}" 2>/dev/null | sed 's/^languages=//' || true)"
+  fi
   export BOTSTRAP_LANGUAGES="${BOTSTRAP_LANGUAGES:-}"
+  if [[ -z "${BOTSTRAP_DATABASES:-}" && -f "${_opt_sel}" ]]; then
+    export BOTSTRAP_DATABASES="$(grep -m1 '^databases=' "${_opt_sel}" 2>/dev/null | sed 's/^databases=//' || true)"
+  fi
   export BOTSTRAP_DATABASES="${BOTSTRAP_DATABASES:-}"
+  if [[ -z "${BOTSTRAP_AI_TOOLS:-}" && -f "${_opt_sel}" ]]; then
+    export BOTSTRAP_AI_TOOLS="$(grep -m1 '^ai_tools=' "${_opt_sel}" 2>/dev/null | sed 's/^ai_tools=//' || true)"
+  fi
   export BOTSTRAP_AI_TOOLS="${BOTSTRAP_AI_TOOLS:-}"
+  if [[ -z "${BOTSTRAP_THEME:-}" && -f "${_th_env}" ]]; then
+    export BOTSTRAP_THEME="$(grep -m1 '^theme=' "${_th_env}" 2>/dev/null | sed 's/^theme=//' || true)"
+  fi
   export BOTSTRAP_THEME="${BOTSTRAP_THEME:-catppuccin}"
+  if [[ -z "${BOTSTRAP_OPTIONAL_APPS:-}" && -f "${_opt_sel}" ]]; then
+    export BOTSTRAP_OPTIONAL_APPS="$(grep -m1 '^optional_apps=' "${_opt_sel}" 2>/dev/null | sed 's/^optional_apps=//' || true)"
+  fi
   export BOTSTRAP_OPTIONAL_APPS="${BOTSTRAP_OPTIONAL_APPS:-}"
   exit 0
 fi
@@ -53,36 +74,94 @@ _core_lines="$(
 )"
 export BOTSTRAP_CORE_TOOLS="${_core_lines//$'\n'/,}"
 
+_opt_sel_file="${HOME}/.config/botstrap/optional-selections.env"
+_editor_env_file="${HOME}/.config/botstrap/editor.env"
+_theme_env_file="${HOME}/.config/botstrap/theme.env"
+
+_editor_gum_args=()
+if [[ -f "${_editor_env_file}" ]]; then
+  _edv="$(grep -m1 '^editor=' "${_editor_env_file}" 2>/dev/null | sed 's/^editor=//' || true)"
+  [[ -n "${_edv}" ]] && _editor_gum_args=(--selected "${_edv}")
+fi
 export BOTSTRAP_EDITOR="$(
-  gum choose --header "Primary editor" \
+  gum choose --header "Primary editor" "${_editor_gum_args[@]}" \
     cursor vscode neovim zed none
 )"
 
+_lang_gum_args=()
+if [[ -f "${_opt_sel_file}" ]]; then
+  _lcsv="$(grep -m1 '^languages=' "${_opt_sel_file}" 2>/dev/null | sed 's/^languages=//' || true)"
+  if [[ -n "${_lcsv}" ]]; then
+    IFS=',' read -ra _lp <<<"${_lcsv}"
+    for _x in "${_lp[@]}"; do
+      _x="${_x//[[:space:]]/}"
+      [[ -n "${_x}" ]] && _lang_gum_args+=(--selected "${_x}")
+    done
+  fi
+fi
 export BOTSTRAP_LANGUAGES="$(
-  gum choose --no-limit --header "Programming languages (mise)" \
+  gum choose --no-limit --header "Programming languages (mise)" "${_lang_gum_args[@]}" \
     node python ruby go rust java elixir php none || true
 )"
 export BOTSTRAP_LANGUAGES="${BOTSTRAP_LANGUAGES//$'\n'/,}"
 
+_db_gum_args=()
+if [[ -f "${_opt_sel_file}" ]]; then
+  _dcsv="$(grep -m1 '^databases=' "${_opt_sel_file}" 2>/dev/null | sed 's/^databases=//' || true)"
+  if [[ -n "${_dcsv}" ]]; then
+    IFS=',' read -ra _dp <<<"${_dcsv}"
+    for _x in "${_dp[@]}"; do
+      _x="${_x//[[:space:]]/}"
+      [[ -n "${_x}" ]] && _db_gum_args+=(--selected "${_x}")
+    done
+  fi
+fi
 export BOTSTRAP_DATABASES="$(
-  gum choose --no-limit --header "Databases (Docker)" \
+  gum choose --no-limit --header "Databases (Docker)" "${_db_gum_args[@]}" \
     postgresql mysql redis sqlite none || true
 )"
 export BOTSTRAP_DATABASES="${BOTSTRAP_DATABASES//$'\n'/,}"
 
+_ai_gum_args=()
+if [[ -f "${_opt_sel_file}" ]]; then
+  _acsv="$(grep -m1 '^ai_tools=' "${_opt_sel_file}" 2>/dev/null | sed 's/^ai_tools=//' || true)"
+  if [[ -n "${_acsv}" ]]; then
+    IFS=',' read -ra _ap <<<"${_acsv}"
+    for _x in "${_ap[@]}"; do
+      _x="${_x//[[:space:]]/}"
+      [[ -n "${_x}" ]] && _ai_gum_args+=(--selected "${_x}")
+    done
+  fi
+fi
 export BOTSTRAP_AI_TOOLS="$(
-  gum choose --no-limit --header "AI agent CLIs" \
+  gum choose --no-limit --header "AI agent CLIs" "${_ai_gum_args[@]}" \
     claude-code openclaw codex gemini ollama none || true
 )"
 export BOTSTRAP_AI_TOOLS="${BOTSTRAP_AI_TOOLS//$'\n'/,}"
 
+_theme_gum_args=()
+if [[ -f "${_theme_env_file}" ]]; then
+  _tv="$(grep -m1 '^theme=' "${_theme_env_file}" 2>/dev/null | sed 's/^theme=//' || true)"
+  [[ -n "${_tv}" ]] && _theme_gum_args=(--selected "${_tv}")
+fi
 export BOTSTRAP_THEME="$(
-  gum choose --header "Theme" \
+  gum choose --header "Theme" "${_theme_gum_args[@]}" \
     catppuccin tokyo-night gruvbox nord rose-pine
 )"
 
+_app_gum_args=()
+if [[ -f "${_opt_sel_file}" ]]; then
+  _ocsv="$(grep -m1 '^optional_apps=' "${_opt_sel_file}" 2>/dev/null | sed 's/^optional_apps=//' || true)"
+  if [[ -n "${_ocsv}" ]]; then
+    IFS=',' read -ra _op <<<"${_ocsv}"
+    for _x in "${_op[@]}"; do
+      _x="${_x//[[:space:]]/}"
+      [[ -n "${_x}" ]] && _app_gum_args+=(--selected "${_x}")
+    done
+  fi
+fi
 export BOTSTRAP_OPTIONAL_APPS="$(
-  gum choose --no-limit --header "Optional apps" \
+  gum choose --no-limit --header "Optional apps" "${_app_gum_args[@]}" \
     1password-cli tailscale ngrok postman none || true
 )"
 export BOTSTRAP_OPTIONAL_APPS="${BOTSTRAP_OPTIONAL_APPS//$'\n'/,}"

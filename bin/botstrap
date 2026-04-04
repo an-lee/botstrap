@@ -1,19 +1,38 @@
 #!/usr/bin/env bash
-# Thin CLI for local Botstrap checkout (update / doctor stubs).
+# Thin CLI for local Botstrap checkout (update / self-update / reconfigure / doctor).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION="$(cat "${ROOT}/version" 2>/dev/null || echo unknown)"
 
 usage() {
-  echo "Usage: botstrap {update|reconfigure|doctor|version}"
+  echo "Usage: botstrap {update|self-update|reconfigure|doctor|version}"
+  echo "       botstrap update [--self|--tools|--all]"
   echo "Run with no arguments for an interactive menu (TTY + gum)."
+}
+
+botstrap_require_git() {
+  if ! command -v git &>/dev/null; then
+    echo "git is required for botstrap self-update / repo update." >&2
+    exit 1
+  fi
+}
+
+botstrap_run_self_update() {
+  botstrap_require_git
+  git -C "${ROOT}" pull --ff-only
+  echo "Updated Botstrap at ${ROOT} to $(git -C "${ROOT}" rev-parse --short HEAD 2>/dev/null || echo unknown)."
+}
+
+botstrap_run_update_tools() {
+  export BOTSTRAP_ROOT="${ROOT}"
+  bash "${ROOT}/install/update-tools.sh"
 }
 
 if [[ -z "${1:-}" ]]; then
   if [[ -t 0 && -t 1 ]] && command -v gum &>/dev/null; then
     gum style --border rounded --padding "1 2" --foreground 212 "Botstrap" "" "Choose an action (or pass a subcommand for scripts)."
-    choice="$(gum choose --header "Action" update reconfigure doctor version quit)" || exit "$?"
+    choice="$(gum choose --header "Action" update self-update reconfigure doctor version quit)" || exit "$?"
     if [[ "${choice}" == "quit" ]]; then
       exit 0
     fi
@@ -26,8 +45,65 @@ fi
 
 case "${1:-}" in
   update)
-    git -C "${ROOT}" pull --ff-only
-    echo "Updated Botstrap at ${ROOT} to $(git -C "${ROOT}" rev-parse --short HEAD 2>/dev/null || echo unknown)."
+    shift
+    do_self=false
+    do_tools=false
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --self)
+          do_self=true
+          ;;
+        --tools)
+          do_tools=true
+          ;;
+        --all)
+          do_self=true
+          do_tools=true
+          ;;
+        *)
+          usage
+          exit 1
+          ;;
+      esac
+      shift
+    done
+    if [[ "${do_self}" == false && "${do_tools}" == false ]]; then
+      if [[ -t 0 && -t 1 ]] && command -v gum &>/dev/null; then
+        uchoice="$(gum choose --header "Update" "Botstrap repo only" "Installed tools only" "Both" "Cancel")" || exit 1
+        case "${uchoice}" in
+          "Botstrap repo only")
+            do_self=true
+            ;;
+          "Installed tools only")
+            do_tools=true
+            ;;
+          "Both")
+            do_self=true
+            do_tools=true
+            ;;
+          "Cancel")
+            exit 0
+            ;;
+          *)
+            usage
+            exit 1
+            ;;
+        esac
+      else
+        botstrap_run_self_update
+        echo "Hint: use botstrap update --tools to upgrade installed tools, botstrap update --all for repo + tools, or botstrap self-update for repo only."
+        exit 0
+      fi
+    fi
+    if [[ "${do_self}" == true ]]; then
+      botstrap_run_self_update
+    fi
+    if [[ "${do_tools}" == true ]]; then
+      botstrap_run_update_tools
+    fi
+    ;;
+  self-update)
+    botstrap_run_self_update
     ;;
   reconfigure)
     export BOTSTRAP_ROOT="${ROOT}"

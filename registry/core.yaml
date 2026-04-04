@@ -8,6 +8,11 @@ tools:
       linux-apt: sudo apt-get install -y zsh
       linux-dnf: sudo dnf install -y zsh
       linux-pacman: sudo pacman -Sy --needed --noconfirm zsh
+    update:
+      darwin: echo zsh present on macOS
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y zsh
+      linux-dnf: sudo dnf upgrade -y zsh
+      linux-pacman: sudo pacman -Sy --needed --noconfirm zsh
     verify: zsh --version
 
   - name: starship
@@ -17,6 +22,10 @@ tools:
       darwin: brew install starship
       linux: curl -fsSL https://starship.rs/install.sh | sh -s -- -y
       windows: winget install --id Starship.Starship -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade starship
+      linux: curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+      windows: winget upgrade --id Starship.Starship -e --accept-package-agreements --accept-source-agreements
     verify: starship --version
 
   - name: zoxide
@@ -28,6 +37,12 @@ tools:
       linux-dnf: sudo dnf install -y zoxide
       linux-pacman: sudo pacman -Sy --needed --noconfirm zoxide
       windows: winget install --id ajeetdsouza.zoxide -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade zoxide
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y zoxide
+      linux-dnf: sudo dnf upgrade -y zoxide
+      linux-pacman: sudo pacman -Sy --needed --noconfirm zoxide
+      windows: winget upgrade --id ajeetdsouza.zoxide -e --accept-package-agreements --accept-source-agreements
     verify: zoxide --version
 
   - name: fzf
@@ -39,6 +54,12 @@ tools:
       linux-dnf: sudo dnf install -y fzf
       linux-pacman: sudo pacman -Sy --needed --noconfirm fzf
       windows: winget install --id junegunn.fzf -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade fzf
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y fzf
+      linux-dnf: sudo dnf upgrade -y fzf
+      linux-pacman: sudo pacman -Sy --needed --noconfirm fzf
+      windows: winget upgrade --id junegunn.fzf -e --accept-package-agreements --accept-source-agreements
     verify: fzf --version
 
   - name: bat
@@ -50,6 +71,12 @@ tools:
       linux-dnf: sudo dnf install -y bat
       linux-pacman: sudo pacman -Sy --needed --noconfirm bat
       windows: winget install --id sharkdp.bat -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade bat
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y bat
+      linux-dnf: sudo dnf upgrade -y bat
+      linux-pacman: sudo pacman -Sy --needed --noconfirm bat
+      windows: winget upgrade --id sharkdp.bat -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "bat --version 2>/dev/null || batcat --version"
     verify_windows: bat --version
 
@@ -62,6 +89,12 @@ tools:
       linux-dnf: sudo dnf install -y eza
       linux-pacman: sudo pacman -Sy --needed --noconfirm eza
       windows: winget install --id eza-community.eza -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade eza
+      linux-apt: sudo apt-get update && (sudo apt-get install --only-upgrade -y eza || sudo apt-get install --only-upgrade -y exa)
+      linux-dnf: sudo dnf upgrade -y eza
+      linux-pacman: sudo pacman -Sy --needed --noconfirm eza
+      windows: winget upgrade --id eza-community.eza -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "eza --version 2>/dev/null || exa --version"
     verify_windows: eza --version
 
@@ -74,6 +107,12 @@ tools:
       linux-dnf: sudo dnf install -y ripgrep
       linux-pacman: sudo pacman -Sy --needed --noconfirm ripgrep
       windows: winget install --id BurntSushi.ripgrep.MSVC -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade ripgrep
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y ripgrep
+      linux-dnf: sudo dnf upgrade -y ripgrep
+      linux-pacman: sudo pacman -Sy --needed --noconfirm ripgrep
+      windows: winget upgrade --id BurntSushi.ripgrep.MSVC -e --accept-package-agreements --accept-source-agreements
     verify: rg --version
 
   - name: fd
@@ -85,6 +124,12 @@ tools:
       linux-dnf: sudo dnf install -y fd-find
       linux-pacman: sudo pacman -Sy --needed --noconfirm fd
       windows: winget install --id sharkdp.fd -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade fd
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y fd-find
+      linux-dnf: sudo dnf upgrade -y fd-find
+      linux-pacman: sudo pacman -Sy --needed --noconfirm fd
+      windows: winget upgrade --id sharkdp.fd -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "fd --version 2>/dev/null || fdfind --version"
     verify_windows: fd --version
 
@@ -95,6 +140,10 @@ tools:
       darwin: brew install mise
       linux: curl -fsSL https://mise.run | sh
       windows: winget install --id jdx.mise -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade mise
+      linux: curl -fsSL https://mise.run | sh
+      windows: winget upgrade --id jdx.mise -e --accept-package-agreements --accept-source-agreements
     verify: bash -c 'export PATH="$HOME/.local/bin:$PATH"; mise --version'
     verify_windows: '$env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"; & mise --version'
     post_install: |
@@ -119,6 +168,12 @@ tools:
       linux-dnf: sudo dnf install -y docker docker-compose
       linux-pacman: sudo pacman -Sy --needed --noconfirm docker docker-compose
       windows: winget install --id Docker.DockerDesktop -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade --cask docker
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y docker.io
+      linux-dnf: sudo dnf upgrade -y docker docker-compose
+      linux-pacman: sudo pacman -Sy --needed --noconfirm docker docker-compose
+      windows: winget upgrade --id Docker.DockerDesktop -e --accept-package-agreements --accept-source-agreements
     verify: docker --version
 
   - name: gh
@@ -130,6 +185,12 @@ tools:
       linux-dnf: sudo dnf install -y 'dnf-command(config-manager)' && sudo dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && sudo dnf install -y gh
       linux-pacman: sudo pacman -Sy --needed --noconfirm github-cli
       windows: winget install --id GitHub.cli -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade gh
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y gh
+      linux-dnf: sudo dnf upgrade -y gh
+      linux-pacman: sudo pacman -Sy --needed --noconfirm github-cli
+      windows: winget upgrade --id GitHub.cli -e --accept-package-agreements --accept-source-agreements
     verify: gh --version
 
   - name: lazygit
@@ -141,6 +202,12 @@ tools:
       linux-dnf: sudo dnf copr enable -y atim/lazygit 2>/dev/null || true; sudo dnf install -y lazygit
       linux-pacman: sudo pacman -Sy --needed --noconfirm lazygit
       windows: winget install --id JesseDuffield.lazygit -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade lazygit
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y lazygit
+      linux-dnf: sudo dnf upgrade -y lazygit
+      linux-pacman: sudo pacman -Sy --needed --noconfirm lazygit
+      windows: winget upgrade --id JesseDuffield.lazygit -e --accept-package-agreements --accept-source-agreements
     verify: lazygit --version
 
   - name: git-delta
@@ -152,6 +219,12 @@ tools:
       linux-dnf: sudo dnf install -y git-delta
       linux-pacman: sudo pacman -Sy --needed --noconfirm git-delta
       windows: winget install --id dandavison.delta -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade git-delta
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y git-delta
+      linux-dnf: sudo dnf upgrade -y git-delta
+      linux-pacman: sudo pacman -Sy --needed --noconfirm git-delta
+      windows: winget upgrade --id dandavison.delta -e --accept-package-agreements --accept-source-agreements
     verify: delta --version
 
   - name: curlie
@@ -163,6 +236,12 @@ tools:
       linux-dnf: sudo dnf install -y httpie
       linux-pacman: sudo pacman -Sy --needed --noconfirm httpie
       windows: winget install --id JakubRoztocil.HTTPie -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade curlie
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y httpie
+      linux-dnf: sudo dnf upgrade -y httpie
+      linux-pacman: sudo pacman -Sy --needed --noconfirm httpie
+      windows: winget upgrade --id JakubRoztocil.HTTPie -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "curlie --version 2>/dev/null || http --version"
     verify_windows: http --version
 
@@ -173,6 +252,11 @@ tools:
       darwin: brew install zellij
       linux-apt: sudo apt-get install -y zellij
       linux-dnf: sudo dnf install -y zellij
+      linux-pacman: sudo pacman -Sy --needed --noconfirm zellij
+    update:
+      darwin: brew upgrade zellij
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y zellij
+      linux-dnf: sudo dnf upgrade -y zellij
       linux-pacman: sudo pacman -Sy --needed --noconfirm zellij
     verify: zellij --version
 
@@ -185,6 +269,12 @@ tools:
       linux-dnf: sudo dnf install -y btop
       linux-pacman: sudo pacman -Sy --needed --noconfirm btop
       windows: winget install --id aristocratos.btop4win -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade btop
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y btop
+      linux-dnf: sudo dnf upgrade -y btop
+      linux-pacman: sudo pacman -Sy --needed --noconfirm btop
+      windows: winget upgrade --id aristocratos.btop4win -e --accept-package-agreements --accept-source-agreements
     verify: btop --version
 
   - name: fastfetch
@@ -196,6 +286,12 @@ tools:
       linux-dnf: sudo dnf install -y fastfetch
       linux-pacman: sudo pacman -Sy --needed --noconfirm fastfetch
       windows: winget install --id fastfetch-cli.fastfetch -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade fastfetch
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y fastfetch
+      linux-dnf: sudo dnf upgrade -y fastfetch
+      linux-pacman: sudo pacman -Sy --needed --noconfirm fastfetch
+      windows: winget upgrade --id fastfetch-cli.fastfetch -e --accept-package-agreements --accept-source-agreements
     verify: fastfetch --version
 
   - name: age
@@ -207,6 +303,12 @@ tools:
       linux-dnf: sudo dnf install -y age
       linux-pacman: sudo pacman -Sy --needed --noconfirm age
       windows: winget install --id FiloSottile.age -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade age
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y age
+      linux-dnf: sudo dnf upgrade -y age
+      linux-pacman: sudo pacman -Sy --needed --noconfirm age
+      windows: winget upgrade --id FiloSottile.age -e --accept-package-agreements --accept-source-agreements
     verify: age --version
 
   - name: sops
@@ -218,6 +320,12 @@ tools:
       linux-dnf: sudo dnf install -y sops
       linux-pacman: sudo pacman -Sy --needed --noconfirm sops
       windows: winget install --id Mozilla.SOPS -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade sops
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y sops
+      linux-dnf: sudo dnf upgrade -y sops
+      linux-pacman: sudo pacman -Sy --needed --noconfirm sops
+      windows: winget upgrade --id Mozilla.SOPS -e --accept-package-agreements --accept-source-agreements
     verify: sops --version
 
   - name: fira-code-nerd-font
@@ -229,5 +337,11 @@ tools:
       linux-dnf: sudo dnf install -y fira-code-fonts || true
       linux-pacman: sudo pacman -Sy --needed --noconfirm ttf-firacode-nerd || true
       windows: winget install --id NerdFonts.FiraCodeNF -e --accept-package-agreements --accept-source-agreements
+    update:
+      darwin: brew upgrade --cask font-fira-code-nerd-font
+      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y fonts-firacode || true
+      linux-dnf: sudo dnf upgrade -y fira-code-fonts || true
+      linux-pacman: sudo pacman -Sy --needed --noconfirm ttf-firacode-nerd || true
+      windows: winget upgrade --id NerdFonts.FiraCodeNF -e --accept-package-agreements --accept-source-agreements
     verify: bash -c "command -v fc-list >/dev/null || exit 0; fc-list | grep -qi fira"
     verify_windows: cmd /c exit 0

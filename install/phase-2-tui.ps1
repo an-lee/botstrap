@@ -12,11 +12,38 @@ if (-not (Get-Command gum -ErrorAction SilentlyContinue)) {
         $parts = @($rawNames -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
         $env:BOTSTRAP_CORE_TOOLS = $parts -join ','
     }
+    $optSelFile = Join-Path $env:USERPROFILE '.config\botstrap\optional-selections.env'
+    $editorEnvFile = Join-Path $env:USERPROFILE '.config\botstrap\editor.env'
+    $themeEnvFile = Join-Path $env:USERPROFILE '.config\botstrap\theme.env'
+    if (-not $env:BOTSTRAP_EDITOR -and (Test-Path -LiteralPath $editorEnvFile)) {
+        $em = @(Get-Content -LiteralPath $editorEnvFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*editor=' } | Select-Object -First 1)
+        if ($em.Count -gt 0) { $env:BOTSTRAP_EDITOR = ($em[0] -replace '^\s*editor=', '').Trim() }
+    }
     if (-not $env:BOTSTRAP_EDITOR) { $env:BOTSTRAP_EDITOR = 'none' }
+    if (-not $env:BOTSTRAP_LANGUAGES -and (Test-Path -LiteralPath $optSelFile)) {
+        $lm = @(Get-Content -LiteralPath $optSelFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*languages=' } | Select-Object -First 1)
+        if ($lm.Count -gt 0) { $env:BOTSTRAP_LANGUAGES = ($lm[0] -replace '^\s*languages=', '').Trim() }
+    }
     if (-not $env:BOTSTRAP_LANGUAGES) { $env:BOTSTRAP_LANGUAGES = '' }
+    if (-not $env:BOTSTRAP_DATABASES -and (Test-Path -LiteralPath $optSelFile)) {
+        $dm = @(Get-Content -LiteralPath $optSelFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*databases=' } | Select-Object -First 1)
+        if ($dm.Count -gt 0) { $env:BOTSTRAP_DATABASES = ($dm[0] -replace '^\s*databases=', '').Trim() }
+    }
     if (-not $env:BOTSTRAP_DATABASES) { $env:BOTSTRAP_DATABASES = '' }
+    if (-not $env:BOTSTRAP_AI_TOOLS -and (Test-Path -LiteralPath $optSelFile)) {
+        $am = @(Get-Content -LiteralPath $optSelFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*ai_tools=' } | Select-Object -First 1)
+        if ($am.Count -gt 0) { $env:BOTSTRAP_AI_TOOLS = ($am[0] -replace '^\s*ai_tools=', '').Trim() }
+    }
     if (-not $env:BOTSTRAP_AI_TOOLS) { $env:BOTSTRAP_AI_TOOLS = '' }
+    if (-not $env:BOTSTRAP_THEME -and (Test-Path -LiteralPath $themeEnvFile)) {
+        $tm = @(Get-Content -LiteralPath $themeEnvFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*theme=' } | Select-Object -First 1)
+        if ($tm.Count -gt 0) { $env:BOTSTRAP_THEME = ($tm[0] -replace '^\s*theme=', '').Trim() }
+    }
     if (-not $env:BOTSTRAP_THEME) { $env:BOTSTRAP_THEME = 'catppuccin' }
+    if (-not $env:BOTSTRAP_OPTIONAL_APPS -and (Test-Path -LiteralPath $optSelFile)) {
+        $om = @(Get-Content -LiteralPath $optSelFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*optional_apps=' } | Select-Object -First 1)
+        if ($om.Count -gt 0) { $env:BOTSTRAP_OPTIONAL_APPS = ($om[0] -replace '^\s*optional_apps=', '').Trim() }
+    }
     if (-not $env:BOTSTRAP_OPTIONAL_APPS) { $env:BOTSTRAP_OPTIONAL_APPS = '' }
     return
 }
@@ -60,11 +87,36 @@ $coreChooseArgs = @(
 $coreLines = @( & gum @coreChooseArgs )
 $env:BOTSTRAP_CORE_TOOLS = ($coreLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ }) -join ','
 
+$optSelFile = Join-Path $env:USERPROFILE '.config\botstrap\optional-selections.env'
+$editorEnvFile = Join-Path $env:USERPROFILE '.config\botstrap\editor.env'
+$themeEnvFile = Join-Path $env:USERPROFILE '.config\botstrap\theme.env'
+
 $ErrorActionPreference = 'Continue'
-$editorChoice = & gum choose --header 'Primary editor' cursor vscode neovim zed none
+$editorGumArgs = @()
+if (Test-Path -LiteralPath $editorEnvFile) {
+    $em = @(Get-Content -LiteralPath $editorEnvFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*editor=' } | Select-Object -First 1)
+    if ($em.Count -gt 0) {
+        $ev = ($em[0] -replace '^\s*editor=', '').Trim()
+        if ($ev) { $editorGumArgs = @('--selected', $ev) }
+    }
+}
+$editorChoice = & gum choose --header 'Primary editor' @editorGumArgs cursor vscode neovim zed none
 $env:BOTSTRAP_EDITOR = "$editorChoice".Trim()
 
-$langLines = @( & gum choose --no-limit --header 'Programming languages (mise)' node python ruby go rust java elixir php none )
+$langGumArgs = @()
+if (Test-Path -LiteralPath $optSelFile) {
+    $lm = @(Get-Content -LiteralPath $optSelFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*languages=' } | Select-Object -First 1)
+    if ($lm.Count -gt 0) {
+        $lcsv = ($lm[0] -replace '^\s*languages=', '').Trim()
+        if ($lcsv) {
+            foreach ($raw in $lcsv.Split(',')) {
+                $x = $raw.Trim()
+                if ($x) { $langGumArgs += @('--selected', $x) }
+            }
+        }
+    }
+}
+$langLines = @( & gum choose --no-limit --header 'Programming languages (mise)' @langGumArgs node python ruby go rust java elixir php none )
 if ($langLines.Count -gt 0) {
     $env:BOTSTRAP_LANGUAGES = ($langLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -ne '' }) -join ','
 }
@@ -72,7 +124,20 @@ else {
     $env:BOTSTRAP_LANGUAGES = ''
 }
 
-$dbLines = @( & gum choose --no-limit --header 'Databases (Docker)' postgresql mysql redis sqlite none )
+$dbGumArgs = @()
+if (Test-Path -LiteralPath $optSelFile) {
+    $dm = @(Get-Content -LiteralPath $optSelFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*databases=' } | Select-Object -First 1)
+    if ($dm.Count -gt 0) {
+        $dcsv = ($dm[0] -replace '^\s*databases=', '').Trim()
+        if ($dcsv) {
+            foreach ($raw in $dcsv.Split(',')) {
+                $x = $raw.Trim()
+                if ($x) { $dbGumArgs += @('--selected', $x) }
+            }
+        }
+    }
+}
+$dbLines = @( & gum choose --no-limit --header 'Databases (Docker)' @dbGumArgs postgresql mysql redis sqlite none )
 if ($dbLines.Count -gt 0) {
     $env:BOTSTRAP_DATABASES = ($dbLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -ne '' }) -join ','
 }
@@ -80,7 +145,20 @@ else {
     $env:BOTSTRAP_DATABASES = ''
 }
 
-$aiLines = @( & gum choose --no-limit --header 'AI agent CLIs' claude-code openclaw codex gemini ollama none )
+$aiGumArgs = @()
+if (Test-Path -LiteralPath $optSelFile) {
+    $am = @(Get-Content -LiteralPath $optSelFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*ai_tools=' } | Select-Object -First 1)
+    if ($am.Count -gt 0) {
+        $acsv = ($am[0] -replace '^\s*ai_tools=', '').Trim()
+        if ($acsv) {
+            foreach ($raw in $acsv.Split(',')) {
+                $x = $raw.Trim()
+                if ($x) { $aiGumArgs += @('--selected', $x) }
+            }
+        }
+    }
+}
+$aiLines = @( & gum choose --no-limit --header 'AI agent CLIs' @aiGumArgs claude-code openclaw codex gemini ollama none )
 if ($aiLines.Count -gt 0) {
     $env:BOTSTRAP_AI_TOOLS = ($aiLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -ne '' }) -join ','
 }
@@ -89,11 +167,32 @@ else {
 }
 
 $ErrorActionPreference = 'Stop'
-$themeChoice = & gum choose --header 'Theme' catppuccin tokyo-night gruvbox nord rose-pine
+$themeGumArgs = @()
+if (Test-Path -LiteralPath $themeEnvFile) {
+    $tm = @(Get-Content -LiteralPath $themeEnvFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*theme=' } | Select-Object -First 1)
+    if ($tm.Count -gt 0) {
+        $tv = ($tm[0] -replace '^\s*theme=', '').Trim()
+        if ($tv) { $themeGumArgs = @('--selected', $tv) }
+    }
+}
+$themeChoice = & gum choose --header 'Theme' @themeGumArgs catppuccin tokyo-night gruvbox nord rose-pine
 $env:BOTSTRAP_THEME = "$themeChoice".Trim()
 
 $ErrorActionPreference = 'Continue'
-$appLines = @( & gum choose --no-limit --header 'Optional apps' 1password-cli tailscale ngrok postman none )
+$appGumArgs = @()
+if (Test-Path -LiteralPath $optSelFile) {
+    $om = @(Get-Content -LiteralPath $optSelFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*optional_apps=' } | Select-Object -First 1)
+    if ($om.Count -gt 0) {
+        $ocsv = ($om[0] -replace '^\s*optional_apps=', '').Trim()
+        if ($ocsv) {
+            foreach ($raw in $ocsv.Split(',')) {
+                $x = $raw.Trim()
+                if ($x) { $appGumArgs += @('--selected', $x) }
+            }
+        }
+    }
+}
+$appLines = @( & gum choose --no-limit --header 'Optional apps' @appGumArgs 1password-cli tailscale ngrok postman none )
 if ($appLines.Count -gt 0) {
     $env:BOTSTRAP_OPTIONAL_APPS = ($appLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -ne '' }) -join ','
 }

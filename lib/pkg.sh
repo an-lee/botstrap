@@ -227,6 +227,139 @@ botstrap_pkg_install_tools_from_csv() {
   done
 }
 
+botstrap_pkg_get_update_snippet() {
+  local tool_name="$1"
+  local registry_file="$2"
+  local key="$3"
+  yq -r ".tools[] | select(.name == \"${tool_name}\") | .update[\"${key}\"] // \"\"" "${registry_file}" 2>/dev/null || true
+}
+
+botstrap_pkg_get_optional_update_snippet_for_key() {
+  local group_id="$1"
+  local item_name="$2"
+  local registry_file="$3"
+  local key="$4"
+  yq -r ".groups[] | select(.id == \"${group_id}\") | .items[] | select(.name == \"${item_name}\") | .update[\"${key}\"] // \"\"" "${registry_file}" 2>/dev/null || true
+}
+
+botstrap_pkg_optional_item_verify_passes() {
+  local group_id="$1"
+  local item_name="$2"
+  local registry_file="$3"
+  local verify_cmd
+  verify_cmd="$(yq -r ".groups[] | select(.id == \"${group_id}\") | .items[] | select(.name == \"${item_name}\") | .verify // \"\"" "${registry_file}" 2>/dev/null || true)"
+  if [[ -z "${verify_cmd}" || "${verify_cmd}" == "null" ]]; then
+    return 1
+  fi
+  bash -c "${verify_cmd}" &>/dev/null
+}
+
+# Run registry update snippet when verify passes (unlike install, does not skip when verify passes).
+botstrap_pkg_update_tool() {
+  local tool_name="$1"
+  local registry_file="${2:-${BOTSTRAP_ROOT}/registry/core.yaml}"
+
+  if ! command -v yq &>/dev/null; then
+    botstrap_log_err "yq is required for registry-driven updates."
+    return 1
+  fi
+
+  local verify_cmd
+  verify_cmd="$(yq -r ".tools[] | select(.name == \"${tool_name}\") | .verify // \"\"" "${registry_file}" 2>/dev/null || true)"
+  if [[ -z "${verify_cmd}" || "${verify_cmd}" == "null" ]]; then
+    botstrap_log_info "Skipping update for ${tool_name} (no verify command)"
+    return 0
+  fi
+  if ! bash -c "${verify_cmd}" &>/dev/null; then
+    botstrap_log_info "Skipping update for ${tool_name} (not installed or verify failed)"
+    return 0
+  fi
+
+  local key snippet=""
+  while IFS= read -r key; do
+    [[ -z "${key}" ]] && continue
+    snippet="$(botstrap_pkg_get_update_snippet "${tool_name}" "${registry_file}" "${key}")"
+    if [[ -n "${snippet}" && "${snippet}" != "null" ]]; then
+      if command -v gum &>/dev/null && [[ -t 1 ]]; then
+        gum spin --show-output --spinner dot --title "  update ${tool_name}..." -- bash -c "${snippet}" || botstrap_log_warn "Update reported failure for ${tool_name}"
+      else
+        botstrap_log_info "Updating ${tool_name} (registry key: ${key})"
+        botstrap_pkg_run_snippet "${snippet}" || botstrap_log_warn "Update reported failure for ${tool_name}"
+      fi
+      return 0
+    fi
+  done < <(botstrap_pkg_resolve_keys)
+
+  botstrap_log_info "No update snippet for '${tool_name}' on this platform (see ${registry_file})."
+  return 0
+}
+
+botstrap_pkg_update_tools_from_csv() {
+  local csv="$1"
+  local reg="$2"
+  [[ -z "${csv}" ]] && return 0
+  local name
+  mapfile -t _botstrap_pkg_up_csv_order < <(yq -r '.tools[].name' "${reg}")
+  for name in "${_botstrap_pkg_up_csv_order[@]}"; do
+    [[ -z "${name}" ]] && continue
+    botstrap_csv_has_item "${name}" "${csv}" || continue
+    botstrap_pkg_update_tool "${name}" "${reg}" || true
+  done
+}
+
+botstrap_pkg_update_optional_item() {
+  local group_id="$1"
+  local item_name="$2"
+  local registry_file="${3:-${BOTSTRAP_ROOT}/registry/optional.yaml}"
+
+  [[ -z "${item_name}" || "${item_name}" == "none" ]] && return 0
+
+  if ! command -v yq &>/dev/null; then
+    botstrap_log_err "yq is required for optional updates."
+    return 1
+  fi
+
+  if ! botstrap_pkg_optional_requires_satisfied "${group_id}" "${item_name}" "${registry_file}"; then
+    return 0
+  fi
+
+  if ! botstrap_pkg_optional_item_verify_passes "${group_id}" "${item_name}" "${registry_file}"; then
+    botstrap_log_info "Skipping optional update ${group_id}/${item_name} (not installed or verify failed)"
+    return 0
+  fi
+
+  local key snippet=""
+  while IFS= read -r key; do
+    [[ -z "${key}" ]] && continue
+    snippet="$(botstrap_pkg_get_optional_update_snippet_for_key "${group_id}" "${item_name}" "${registry_file}" "${key}")"
+    if [[ -n "${snippet}" && "${snippet}" != "null" ]]; then
+      if command -v gum &>/dev/null && [[ -t 1 ]]; then
+        gum spin --show-output --spinner dot --title "  update ${group_id}/${item_name}..." -- bash -c "${snippet}" || botstrap_log_warn "Optional update reported failure for ${group_id}/${item_name}"
+      else
+        botstrap_log_info "Updating optional ${group_id}/${item_name} (registry key: ${key})"
+        botstrap_pkg_run_snippet "${snippet}" || botstrap_log_warn "Optional update reported failure for ${group_id}/${item_name}"
+      fi
+      return 0
+    fi
+  done < <(botstrap_pkg_resolve_keys)
+
+  botstrap_log_info "No optional update snippet for ${group_id}/${item_name} on this platform."
+  return 0
+}
+
+botstrap_pkg_update_optional_csv() {
+  local group_id="$1"
+  local csv="$2"
+  local reg="${3:-${BOTSTRAP_ROOT}/registry/optional.yaml}"
+  local parts item raw
+  IFS=',' read -ra parts <<<"${csv}"
+  for raw in "${parts[@]}"; do
+    item="${raw//[[:space:]]/}"
+    [[ -z "${item}" || "${item}" == "none" ]] && continue
+    botstrap_pkg_update_optional_item "${group_id}" "${item}" "${reg}" || true
+  done
+}
+
 # Core tool names to verify: explicit BOTSTRAP_CORE_TOOLS, else core-tools.env, else all core (legacy).
 botstrap_core_tool_names_for_verify() {
   local core_reg="${BOTSTRAP_ROOT}/registry/core.yaml"

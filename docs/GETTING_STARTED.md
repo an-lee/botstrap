@@ -86,11 +86,12 @@ Phase 3 writes **`~/.config/botstrap/env.sh`** and appends a **botstrap PATH** b
 From the clone (e.g. `~/.botstrap`) you can always use:
 
 ```bash
-./bin/botstrap           # interactive menu (TTY + gum); for automation use explicit subcommands
-./bin/botstrap version   # prints semver from `version` file
-./bin/botstrap update    # git pull --ff-only in the clone
+./bin/botstrap              # interactive menu (TTY + gum); for automation use explicit subcommands
+./bin/botstrap version    # prints semver from `version` file
+./bin/botstrap self-update   # git pull --ff-only (repo only)
+./bin/botstrap update     # interactive: repo / tools / both; non-interactive: repo pull + hint; use --tools / --all for agents
 ./bin/botstrap reconfigure  # Phase 2 + Phase 3 only
-./bin/botstrap doctor    # status lines + Phase 4 verification (prerequisites + selected core; exits 1 on verify failures)
+./bin/botstrap doctor     # status lines + Phase 4 verification (prerequisites + selected core; exits 1 on verify failures)
 ```
 
 On **native Windows** (PowerShell install), Phase 3 appends a **`# botstrap PATH`** block to your PowerShell **profile** (same marker pattern as starship/zoxide): it sets **`$env:BOTSTRAP_ROOT`**, prepends **`bin\`** to **`$env:PATH`**, and defines a **`botstrap`** function that runs **`bin/botstrap.ps1`**. Open a **new** PowerShell session (or **`. $PROFILE`**) to use **`botstrap`** from anywhere. **Git Bash** / **WSL** with **`install.sh`** still use the Bash **`bin/botstrap`** and **`~/.config/botstrap/env.sh`** hook.

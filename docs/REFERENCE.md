@@ -11,10 +11,11 @@ Operational facts: **CLI**, **environment variables**, and **artifacts** Botstra
 | Command | Behavior |
 |---------|----------|
 | `botstrap version` | Prints `botstrap <semver>` from the **`version`** file at repo root, or `unknown` if missing. |
-| `botstrap update` | Runs **`git pull --ff-only`** in the repo root. Does **not** re-run install phases or migration scripts. |
+| `botstrap self-update` | Runs **`git pull --ff-only`** in the repo root (same as repo-only refresh). Requires **`git`**. |
+| `botstrap update` | **Interactive (TTY + `gum`):** **`gum choose`** among **Botstrap repo only**, **Installed tools only**, **Both**, or **Cancel**. **Non-interactive, no flags:** repo-only pull (backward compatible) and prints a one-line hint about **`--tools`**, **`--all`**, and **`self-update`**. **Flags:** **`--self`** — git pull only; **`--tools`** — run **`install/update-tools.sh`** (Bash) or **`install/update-tools.ps1`** (PowerShell) to upgrade **prerequisites**, **selected core**, and **persisted optional** selections per registry **`update`** snippets; **`--all`** — self then tools. Does **not** re-run full Phase 3 except what each **`update`** snippet does. |
 | `botstrap reconfigure` | **Bash:** sets **`BOTSTRAP_ROOT`**, runs **`lib/detect`**, then sources **`install/phase-2-tui.sh`** and **`install/phase-3-configure.sh`** only. **PowerShell:** sets **`BOTSTRAP_ROOT`**, dot-sources **`install/phase-2-tui.ps1`** and **`install/phase-3-configure.ps1`**. |
 | `botstrap doctor` | **Bash:** prints a short **status** header (`BOTSTRAP_ROOT`, semver, optional git head, whether **`~/.config/botstrap/env.sh`** exists), then runs **`install/phase-4-verify.sh`**. **PowerShell:** similar header (profile **`# botstrap PATH`** hook instead of **`env.sh`**), then dot-sources **`install/phase-4-verify.ps1`**. Exits **0** if every verify passes, **1** if **`yq`** is missing or any verify fails. |
-| `botstrap` (no arguments) | If **stdin** and **stdout** are TTYs (**Bash**) or the console is not redirected (**PowerShell**) **and** **`gum`** is on **`PATH`**, shows a **`gum choose`** menu for **`update`**, **`reconfigure`**, **`doctor`**, **`version`**, or **`quit`** (exit **0**). Otherwise prints **usage** and exits **1**. For automation and **AI agents**, pass an explicit subcommand (e.g. **`botstrap doctor`**) instead of relying on the menu. |
+| `botstrap` (no arguments) | If **stdin** and **stdout** are TTYs (**Bash**) or the console is not redirected (**PowerShell**) **and** **`gum`** is on **`PATH`**, shows a **`gum choose`** menu for **`update`**, **`self-update`**, **`reconfigure`**, **`doctor`**, **`version`**, or **`quit`** (exit **0**). Otherwise prints **usage** and exits **1**. For automation and **AI agents**, pass an explicit subcommand (e.g. **`botstrap doctor`**, **`botstrap update --all`**) instead of relying on the menu. |
 | Any other first argument | Prints **usage** and exits with code **1**. |
 
 **Note:** There is **no** `botstrap uninstall` subcommand in the current CLI.
@@ -64,6 +65,7 @@ Unless otherwise noted, paths are under **`$HOME`**.
 | Git user.name / user.email | Set from `BOTSTRAP_GIT_*` when non-empty. |
 | `~/.zshrc`, `~/.bashrc` | Appended **once** (marker-guarded) with contents of `configs/shell/aliases`, `configs/shell/functions`, and `configs/shell/env_path_snippet.bash` when those repo files exist. The PATH snippet sources **`~/.config/botstrap/env.sh`**. |
 | `~/.config/botstrap/core-tools.env` | **`core_tools=`** comma-separated list (persisted Phase 3) for **`botstrap doctor`** / reconfigure default core selection when **`BOTSTRAP_CORE_TOOLS`** is not set in the shell. |
+| `~/.config/botstrap/optional-selections.env` | **`languages=`**, **`databases=`**, **`ai_tools=`**, **`optional_apps=`** (Phase 3) for **`botstrap update --tools`** and TUI **`--selected`** defaults on reconfigure. |
 | `~/.config/botstrap/env.sh` | **Unix Phase 3:** sets **`BOTSTRAP_ROOT`** and prepends **`$BOTSTRAP_ROOT/bin`** to **`PATH`** (duplicate-safe). Regenerated each Phase 3 run. |
 | Editor configs | **cursor:** `~/.cursor/settings.json` from `configs/editor/cursor-settings.json`. **vscode:** `~/.config/Code/User/settings.json` from `configs/editor/vscode.json`. **neovim:** `~/.config/nvim/init.lua` from `configs/editor/neovim/init.lua`. |
 | `~/.config/botstrap/theme.env`, `editor.env` | Small key=value files for theme and editor. |
@@ -76,6 +78,7 @@ Paths use **`%USERPROFILE%`** where relevant.
 | Action | Condition |
 |--------|-----------|
 | **`%USERPROFILE%\.config\botstrap\core-tools.env`** | **`core_tools=`** persisted list (Phase 3) for **`doctor`** / TUI defaults when **`BOTSTRAP_CORE_TOOLS`** is unset. |
+| **`%USERPROFILE%\.config\botstrap\optional-selections.env`** | **`languages=`**, **`databases=`**, **`ai_tools=`**, **`optional_apps=`** for **`update --tools`** and reconfigure TUI defaults. |
 | PowerShell **profile** (`$PROFILE`, or **`Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`** if **`$PROFILE`** is empty) | Appended **once** (marker-guarded) with **`# botstrap PATH`**: sets **`$env:BOTSTRAP_ROOT`** to the checkout, prepends **`$BOTSTRAP_ROOT\bin`** to **`$env:PATH`**, and defines **`function Global:botstrap`** that invokes **`bin\botstrap.ps1`**. Also appends **`# botstrap starship`**, **`# botstrap zoxide`**, and **`# botstrap aliases`** blocks when missing. |
 
 There is **no** **`~/.config/botstrap/env.sh`** on native Windows; the profile block is the shell hook for the **`botstrap`** command.
