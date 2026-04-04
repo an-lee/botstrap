@@ -37,7 +37,7 @@ $ErrorActionPreference = 'Continue'
 $editorChoice = & gum choose --header 'Primary editor' cursor vscode neovim zed none
 $env:BOTSTRAP_EDITOR = "$editorChoice".Trim()
 
-$langLines = @( & gum choose --no-limit --header 'Programming languages (mise)' node python ruby go rust java elixir php none 2>$null )
+$langLines = @( & gum choose --no-limit --header 'Programming languages (mise)' node python ruby go rust java elixir php none )
 if ($langLines.Count -gt 0) {
     $env:BOTSTRAP_LANGUAGES = ($langLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -ne '' }) -join ','
 }
@@ -45,7 +45,7 @@ else {
     $env:BOTSTRAP_LANGUAGES = ''
 }
 
-$dbLines = @( & gum choose --no-limit --header 'Databases (Docker)' postgresql mysql redis sqlite none 2>$null )
+$dbLines = @( & gum choose --no-limit --header 'Databases (Docker)' postgresql mysql redis sqlite none )
 if ($dbLines.Count -gt 0) {
     $env:BOTSTRAP_DATABASES = ($dbLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -ne '' }) -join ','
 }
@@ -53,7 +53,7 @@ else {
     $env:BOTSTRAP_DATABASES = ''
 }
 
-$aiLines = @( & gum choose --no-limit --header 'AI agent CLIs' claude-code openclaw codex gemini ollama none 2>$null )
+$aiLines = @( & gum choose --no-limit --header 'AI agent CLIs' claude-code openclaw codex gemini ollama none )
 if ($aiLines.Count -gt 0) {
     $env:BOTSTRAP_AI_TOOLS = ($aiLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -ne '' }) -join ','
 }
@@ -66,7 +66,7 @@ $themeChoice = & gum choose --header 'Theme' catppuccin tokyo-night gruvbox nord
 $env:BOTSTRAP_THEME = "$themeChoice".Trim()
 
 $ErrorActionPreference = 'Continue'
-$appLines = @( & gum choose --no-limit --header 'Optional apps' 1password-cli tailscale ngrok postman none 2>$null )
+$appLines = @( & gum choose --no-limit --header 'Optional apps' 1password-cli tailscale ngrok postman none )
 if ($appLines.Count -gt 0) {
     $env:BOTSTRAP_OPTIONAL_APPS = ($appLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -ne '' }) -join ','
 }
@@ -75,8 +75,9 @@ else {
 }
 
 $ErrorActionPreference = 'Stop'
-$confirmed = & gum confirm 'Apply these choices and continue?'
-if (-not $confirmed) {
+& gum confirm 'Apply these choices and continue?'
+# gum confirm uses exit code only (no stdout); $? reflects native exit status (works on Windows PowerShell 5.1+).
+if (-not $?) {
     Write-BotstrapWarn 'Aborted at confirmation; exiting.'
     exit 1
 }
