@@ -15,13 +15,17 @@ if (-not $names) {
     exit 1
 }
 
-foreach ($line in @($names -split "`r?`n")) {
-    $tool = $line.Trim()
-    if ([string]::IsNullOrWhiteSpace($tool)) { continue }
+$tools = @($names -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+$total = $tools.Count
+$current = 0
+foreach ($tool in $tools) {
+    $current++
+    Write-BotstrapStep -Current $current -Total $total -Label "Installing $tool" -Activity 'Core tools'
     $ok = Install-BotstrapPackageFromRegistry -ToolName $tool -RegistryPath $coreYaml
     if (-not $ok) {
         Write-BotstrapWarn "Phase 1 reported a problem for ${tool} (continuing)."
     }
 }
+Write-BotstrapProgressComplete -Activity 'Core tools'
 
 Write-BotstrapInfo 'Phase 1 (Windows) complete.'

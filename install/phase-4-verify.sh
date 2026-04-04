@@ -14,9 +14,17 @@ if ! command -v yq &>/dev/null; then
 fi
 
 mapfile -t _tools < <(yq -r '.tools[].name' "${BOTSTRAP_ROOT}/registry/core.yaml")
-_failures=0
+_tools_filtered=()
 for _t in "${_tools[@]}"; do
   [[ -z "${_t}" ]] && continue
+  _tools_filtered+=("${_t}")
+done
+_total="${#_tools_filtered[@]}"
+_current=0
+_failures=0
+for _t in "${_tools_filtered[@]}"; do
+  _current=$((_current + 1))
+  botstrap_log_step "${_current}" "${_total}" "Verifying ${_t}"
   if ! botstrap_pkg_verify "${_t}" "${BOTSTRAP_ROOT}/registry/core.yaml"; then
     botstrap_log_warn "Verify failed: ${_t}"
     _failures=$((_failures + 1))

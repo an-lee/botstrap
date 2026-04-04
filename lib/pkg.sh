@@ -62,8 +62,12 @@ botstrap_pkg_install() {
     [[ -z "${key}" ]] && continue
     snippet="$(botstrap_pkg_get_snippet "${tool_name}" "${registry_file}" "${key}")"
     if [[ -n "${snippet}" && "${snippet}" != "null" ]]; then
-      botstrap_log_info "Installing ${tool_name} (using registry key: ${key})"
-      botstrap_pkg_run_snippet "${snippet}"
+      if command -v gum &>/dev/null && [[ -t 1 ]]; then
+        gum spin --spinner dot --title "  ${tool_name}..." -- bash -c "${snippet}"
+      else
+        botstrap_log_info "Installing ${tool_name} (using registry key: ${key})"
+        botstrap_pkg_run_snippet "${snippet}"
+      fi
       local post
       post="$(yq -r ".tools[] | select(.name == \"${tool_name}\") | .post_install // \"\"" "${registry_file}" 2>/dev/null || true)"
       if [[ -n "${post}" && "${post}" != "null" ]]; then

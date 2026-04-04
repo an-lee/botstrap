@@ -16,14 +16,18 @@ $optionalYaml = Join-Path $env:BOTSTRAP_ROOT 'registry\optional.yaml'
 $toolNames = & yq -r '.tools[].name' $coreYaml 2>$null
 $failures = 0
 
-foreach ($line in @($toolNames -split "`r?`n")) {
-    $t = $line.Trim()
-    if ([string]::IsNullOrWhiteSpace($t)) { continue }
+$coreTools = @($toolNames -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+$coreTotal = $coreTools.Count
+$coreCurrent = 0
+foreach ($t in $coreTools) {
+    $coreCurrent++
+    Write-BotstrapStep -Current $coreCurrent -Total $coreTotal -Label "Verifying $t" -Activity 'Verification'
     if (-not (Test-BotstrapPackageFromRegistry -ToolName $t -RegistryPath $coreYaml)) {
         Write-BotstrapWarn "Verify failed: $t"
         $failures++
     }
 }
+Write-BotstrapProgressComplete -Activity 'Verification'
 
 if (-not $env:BOTSTRAP_THEME) { $env:BOTSTRAP_THEME = 'catppuccin' }
 if (-not $env:BOTSTRAP_EDITOR) { $env:BOTSTRAP_EDITOR = 'none' }

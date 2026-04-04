@@ -14,9 +14,16 @@ if ! command -v yq &>/dev/null; then
 fi
 
 mapfile -t _botstrap_core_tools < <(yq -r '.tools[].name' "${BOTSTRAP_ROOT}/registry/core.yaml")
-
+_botstrap_core_tools_filtered=()
 for _tool in "${_botstrap_core_tools[@]}"; do
   [[ -z "${_tool}" ]] && continue
+  _botstrap_core_tools_filtered+=("${_tool}")
+done
+_total="${#_botstrap_core_tools_filtered[@]}"
+_current=0
+for _tool in "${_botstrap_core_tools_filtered[@]}"; do
+  _current=$((_current + 1))
+  botstrap_log_step "${_current}" "${_total}" "Installing ${_tool}"
   botstrap_pkg_install "${_tool}" "${BOTSTRAP_ROOT}/registry/core.yaml" || botstrap_log_warn "Install reported failure for ${_tool} (continuing)."
 done
 

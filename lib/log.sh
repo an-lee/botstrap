@@ -41,3 +41,26 @@ botstrap_log_err() {
     printf '%s\n' "$*" >&2
   fi
 }
+
+# args: num total label — prominent phase header (gum style if available).
+botstrap_log_phase() {
+  local num="$1"
+  local total="$2"
+  local label="$3"
+  if command -v gum &>/dev/null; then
+    printf '\n'
+    gum style --border rounded --padding "0 2" --border-foreground 212 \
+      "Step ${num}/${total}: ${label}"
+  else
+    if [[ "${BOTSTRAP_LOG_COLOR}" == "1" ]]; then
+      printf '\n\033[1;35m══ Step %s/%s: %s ══\033[0m\n\n' "${num}" "${total}" "${label}"
+    else
+      printf '\n══ Step %s/%s: %s ══\n\n' "${num}" "${total}" "${label}"
+    fi
+  fi
+}
+
+# args: current total label — N-of-M step line.
+botstrap_log_step() {
+  botstrap_log_info "[${1}/${2}] ${3}"
+}
