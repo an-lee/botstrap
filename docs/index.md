@@ -2,6 +2,9 @@
 layout: home
 
 hero:
+  image:
+    src: /logo.svg
+    alt: Botstrap
   text: Bootstrap for developers and AI agents
   tagline: YAML registries, non-interactive installs, agent-friendly layout—macOS, Linux, and Windows.
   actions:

@@ -13,17 +13,32 @@ export default withMermaid(
     cleanUrls: true,
     appearance: 'dark',
 
+    head: [
+      [
+        'link',
+        {
+          rel: 'icon',
+          href: '/logo-mark.svg',
+          type: 'image/svg+xml',
+        },
+      ],
+    ],
+
     transformHead: ({ pageData }) => {
       const rel = pageData.relativePath
       const url =
         rel === 'index.md'
           ? `${siteOrigin}/`
           : `${siteOrigin}/${rel.replace(/\.md$/, '')}`
+      const ogImage = `${siteOrigin}/logo.svg`
       return [
         ['link', { rel: 'canonical', href: url }],
         ['meta', { property: 'og:url', content: url }],
         ['meta', { property: 'og:site_name', content: 'Botstrap' }],
         ['meta', { property: 'og:type', content: 'website' }],
+        ['meta', { property: 'og:image', content: ogImage }],
+        ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+        ['meta', { name: 'twitter:image', content: ogImage }],
       ]
     },
 
@@ -31,6 +46,7 @@ export default withMermaid(
 
     themeConfig: {
       siteTitle: 'Botstrap',
+      logo: { src: '/logo-mark.svg', alt: 'Botstrap' },
       nav: [
         { text: 'Home', link: '/' },
         { text: 'Introduction', link: '/INTRODUCTION' },

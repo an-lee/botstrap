@@ -166,3 +166,79 @@
   font-family: var(--bt-font-mono);
   font-size: 0.875rem;
 }
+
+/* Navbar: logo mark size (title link wraps VPImage + site title) */
+.VPNavBarTitle .logo {
+  margin-right: 0.5rem;
+  height: 1.65rem;
+  width: auto;
+}
+
+/* Home hero with image: wide logo, not the default circular spotlight */
+.VPHome .VPHero.has-image .container {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.VPHome .VPHero.has-image .main {
+  order: 2;
+  width: 100%;
+  max-width: 52rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.VPHome .VPHero.has-image .image {
+  order: 1;
+  margin: 0 0 1.25rem;
+  flex-grow: 0;
+  min-height: 0;
+}
+
+.VPHome .VPHero.has-image .image-container {
+  width: auto;
+  height: auto;
+  transform: none;
+}
+
+.VPHome .VPHero.has-image .image-bg {
+  display: none;
+}
+
+.VPHome .VPHero.has-image .image-src {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  max-width: min(100%, 22rem);
+  max-height: none;
+  width: auto;
+  height: auto;
+}
+
+.VPHome .VPHero.has-image .name,
+.VPHome .VPHero.has-image .text,
+.VPHome .VPHero.has-image .tagline {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.VPHome .VPHero.has-image .actions {
+  justify-content: center;
+}
+
+@media (min-width: 960px) {
+  .VPHome .VPHero.has-image .container {
+    text-align: center;
+  }
+
+  .VPHome .VPHero.has-image .main {
+    max-width: 52rem;
+  }
+
+  .VPHome .VPHero.has-image .actions {
+    justify-content: center;
+  }
+}
