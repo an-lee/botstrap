@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: Botstrap
-  text: Cross-platform developer bootstrap
-  tagline: One entry point on macOS, Linux, and Windows — YAML registry, optional TUI, configs, and verification.
+  text: Cross-platform bootstrap for developers and AI coding agents
+  tagline: One entry point on macOS, Linux, and Windows — YAML registry, optional TUI, configs, and verification — with predictable PATH, non-interactive CLIs by default, and agent scaffolding under configs/.
   actions:
     - theme: brand
       text: Read the docs
@@ -26,8 +26,8 @@ features:
     details: Same flow via boot.sh / boot.ps1 and shared registry concepts on Unix and Windows.
     link: /CROSS_PLATFORM
     linkText: Open
-  - title: AI-friendly layout
-    details: Predictable PATH, non-interactive CLIs by default, and agent scaffolding under configs/.
+  - title: Agent-ready environment
+    details: Stable layout for people and AI coding agents — predictable PATH, non-interactive tools by default, and structured scaffolding under configs/.
     link: /AI_AGENT_FRIENDLINESS
     linkText: Open
 ---

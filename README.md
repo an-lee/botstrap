@@ -1,6 +1,6 @@
 # Botstrap
 
-Cross-platform bootstrap: one entry point on macOS, Linux, and Windows to install a **core** developer toolchain from a **YAML registry**, pick **optional** tools in a **gum** TUI, then apply **configs** and **verify** installs.
+Cross-platform bootstrap for **developers** and **AI coding agents**: one entry point on macOS, Linux, and Windows to install a **core** toolchain from a **YAML registry**, pick **optional** tools in a **gum** TUI, then apply **configs** and **verify** installs — with predictable PATH, non-interactive CLIs by default, and **configs/** scaffolding suited to agents.
 
 ## Quick start (from a published clone)
 

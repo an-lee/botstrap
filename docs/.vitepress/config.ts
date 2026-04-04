@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Botstrap',
   description:
-    'Cross-platform bootstrap: one entry point on macOS, Linux, and Windows to install a core developer toolchain from a YAML registry, optional gum TUI tools, configs, and verification.',
+    'Cross-platform bootstrap for developers and AI coding agents: one entry on macOS, Linux, and Windows — YAML registry, optional gum TUI, configs, verification, and an agent-friendly layout.',
   lang: 'en-US',
   base: '/',
   cleanUrls: true,
@@ -54,7 +54,8 @@ export default defineConfig({
     },
 
     footer: {
-      message: 'Botstrap — cross-platform developer bootstrap.',
+      message:
+        'Botstrap — cross-platform bootstrap for developers and AI coding agents.',
       copyright: `Copyright © ${new Date().getFullYear()} Botstrap contributors`,
     },
   },
