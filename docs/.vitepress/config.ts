@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 
+const siteOrigin = 'https://botstrap.dev'
+
 export default withMermaid(
   defineConfig({
     title: 'Botstrap',
@@ -10,6 +12,20 @@ export default withMermaid(
     base: '/',
     cleanUrls: true,
     appearance: 'dark',
+
+    transformHead: ({ pageData }) => {
+      const rel = pageData.relativePath
+      const url =
+        rel === 'index.md'
+          ? `${siteOrigin}/`
+          : `${siteOrigin}/${rel.replace(/\.md$/, '')}`
+      return [
+        ['link', { rel: 'canonical', href: url }],
+        ['meta', { property: 'og:url', content: url }],
+        ['meta', { property: 'og:site_name', content: 'Botstrap' }],
+        ['meta', { property: 'og:type', content: 'website' }],
+      ]
+    },
 
     mermaid: {},
 

@@ -8,8 +8,8 @@ const copied = ref(false)
 let copyTimer: ReturnType<typeof setTimeout> | undefined
 
 const commands: Record<Platform, string> = {
-  unix: 'curl -fsSL https://botstrap.org/install | bash',
-  windows: 'irm https://botstrap.org/install.ps1 | iex',
+  unix: 'curl -fsSL https://botstrap.dev/install | bash',
+  windows: 'irm https://botstrap.dev/install.ps1 | iex',
 }
 
 const currentCommand = computed(() => commands[platform.value])

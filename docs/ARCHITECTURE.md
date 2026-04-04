@@ -13,8 +13,8 @@ Botstrap is a cross-platform bootstrap that turns a fresh Mac, Linux, or Windows
 
 | Platform | One-liner |
 |----------|-----------|
-| macOS / Linux | `curl -fsSL https://botstrap.org/install \| bash` |
-| Windows | `irm https://botstrap.org/install.ps1 \| iex` |
+| macOS / Linux | `curl -fsSL https://botstrap.dev/install \| bash` |
+| Windows | `irm https://botstrap.dev/install.ps1 \| iex` |
 
 The site may serve scripts by URL or `User-Agent`; explicit `.sh` / `.ps1` URLs are also valid.
 

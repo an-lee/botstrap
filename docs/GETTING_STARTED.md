@@ -28,13 +28,13 @@ Default clone URL is set in **`boot.sh`** / **`boot.ps1`**: `https://github.com/
 **macOS / Linux**
 
 ```bash
-curl -fsSL https://botstrap.org/install | bash
+curl -fsSL https://botstrap.dev/install | bash
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
-irm https://botstrap.org/install.ps1 | iex
+irm https://botstrap.dev/install.ps1 | iex
 ```
 
 The host may serve different scripts per URL or `User-Agent`; use explicit `.sh` / `.ps1` URLs if your environment requires it.

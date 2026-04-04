@@ -6,12 +6,12 @@ Cross-platform bootstrap for **developers** and **AI coding agents**: one entry 
 
 ```bash
 # macOS / Linux (default BOTSTRAP_REPO is https://github.com/botstrap/botstrap.git; override to use a fork)
-curl -fsSL https://botstrap.org/install | bash
+curl -fsSL https://botstrap.dev/install | bash
 ```
 
 ```powershell
 # Windows (PowerShell); default clone URL matches boot.sh — set $env:BOTSTRAP_REPO to use a fork
-irm https://botstrap.org/install.ps1 | iex
+irm https://botstrap.dev/install.ps1 | iex
 ```
 
 For local development, run the orchestrator from this repository:
@@ -42,7 +42,7 @@ export BOTSTRAP_ROOT="$(pwd)"
 
 ## Documentation
 
-- **Site:** [botstrap.org](https://botstrap.org) — browsable docs (VitePress)
+- **Site:** [botstrap.dev](https://botstrap.dev) — browsable docs (VitePress)
 - [Introduction](docs/INTRODUCTION.md) — what Botstrap does, end to end
 - [Getting started](docs/GETTING_STARTED.md) — install, local dev, non-interactive runs
 - [Reference](docs/REFERENCE.md) — CLI, environment variables, artifacts
@@ -53,6 +53,27 @@ export BOTSTRAP_ROOT="$(pwd)"
 - [Cross-platform notes](docs/CROSS_PLATFORM.md)
 - [AI agent friendliness](docs/AI_AGENT_FRIENDLINESS.md) — including automated doc maintenance via the `daily-doc-updater` workflow
 - [Contributing](docs/CONTRIBUTING.md)
+
+## Deployment (Cloudflare Pages)
+
+Production docs and install scripts are served from **https://botstrap.dev** via [Cloudflare Pages](https://developers.cloudflare.com/pages/).
+
+| Setting | Value |
+|--------|--------|
+| Build command | `npm ci && npm run docs:build` |
+| Build output directory | `docs/.vitepress/dist` |
+| Node.js version | 22 |
+
+Connect this repository in the Cloudflare dashboard (**Workers & Pages** → **Create** → **Pages**), then attach the custom domain `botstrap.dev`. Boot scripts are copied into the static output as `/install` and `/install.ps1` on each build (see `scripts/sync-install-assets.mjs`).
+
+Manual deploy after a local build:
+
+```bash
+npm run docs:build
+npx wrangler pages deploy
+```
+
+With [`wrangler.toml`](wrangler.toml) at the repo root, Wrangler uses `pages_build_output_dir` and project `name`; override with `npx wrangler pages deploy docs/.vitepress/dist --project-name=botstrap` if needed.
 
 ## Version
 
