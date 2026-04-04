@@ -42,6 +42,7 @@ export BOTSTRAP_ROOT="$(pwd)"
 
 ## Documentation
 
+- **Site:** [botstrap.org](https://botstrap.org) — browsable docs (VitePress)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Registry specification](docs/REGISTRY_SPEC.md)
 - [Tool selection](docs/TOOL_SELECTION.md)
