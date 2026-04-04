@@ -2,14 +2,10 @@
 layout: home
 
 hero:
-  name: Botstrap
-  text: Cross-platform bootstrap for developers and AI coding agents
-  tagline: One entry point on macOS, Linux, and Windows — YAML registry, optional TUI, configs, and verification — with predictable PATH, non-interactive CLIs by default, and agent scaffolding under configs/.
+  text: Bootstrap for developers and AI agents
+  tagline: YAML registries, non-interactive installs, agent-friendly layout—macOS, Linux, and Windows.
   actions:
     - theme: brand
-      text: Introduction
-      link: /INTRODUCTION
-    - theme: alt
       text: Getting started
       link: /GETTING_STARTED
     - theme: alt

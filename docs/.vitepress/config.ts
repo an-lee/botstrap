@@ -5,7 +5,7 @@ export default withMermaid(
   defineConfig({
     title: 'Botstrap',
     description:
-      'Cross-platform bootstrap for developers and AI agents: YAML registries, phased install (prerequisites, core, TUI, configure, verify), configs/ templates, and a detailed reference for CLI and environment variables.',
+      'Bootstrap for developers and AI agents: YAML registries, phased non-interactive installs, macOS, Linux, and Windows.',
     lang: 'en-US',
     base: '/',
     cleanUrls: true,

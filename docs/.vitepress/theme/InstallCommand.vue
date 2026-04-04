@@ -32,7 +32,7 @@ async function copyCommand() {
 
 <template>
   <div class="install-command">
-    <p class="install-command__label">Run this in your terminal</p>
+    <p class="install-command__label">Install</p>
     <div
       class="install-command__tabs"
       role="tablist"
@@ -73,7 +73,7 @@ async function copyCommand() {
 
 <style scoped>
 .install-command {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   width: 100%;
   max-width: 52rem;
 }
@@ -124,7 +124,7 @@ async function copyCommand() {
   border: 1px solid var(--bt-terminal-border);
   border-radius: 0 0 8px 8px;
   background: var(--bt-terminal-panel);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
 }
 
 .install-command__pre {
