@@ -57,6 +57,7 @@ After **Phase 3** on macOS/Linux, open a **new** shell (or `source ~/.zshrc` / `
 ./bin/botstrap update      # git pull in repo root
 ./bin/botstrap reconfigure # TUI + configure phases
 ./bin/botstrap doctor      # install status + prerequisite and selected-core verify (exits 1 if any verify fails)
+./bin/botstrap uninstall   # remove shell hooks; optional --purge / --remove-checkout (see docs/REFERENCE.md)
 ```
 
 ## Documentation

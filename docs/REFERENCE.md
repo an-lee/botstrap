@@ -6,7 +6,7 @@ Operational facts: **CLI**, **environment variables**, and **artifacts** Botstra
 
 **Unix / Git Bash:** **`bin/botstrap`** (Bash) resolves the repository root as the parent of **`bin/`** and does **not** read `BOTSTRAP_HOME` unless you set **`BOTSTRAP_ROOT`** for subprocesses yourself.
 
-**Native Windows PowerShell:** **`bin/botstrap.ps1`** exposes the same subcommands and runs **`install/phase-2-tui.ps1`**, **`install/phase-3-configure.ps1`**, and **`install/phase-4-verify.ps1`** for **`reconfigure`** / **`doctor`**. It does **not** invoke Bash.
+**Native Windows PowerShell:** **`bin/botstrap.ps1`** exposes the same subcommands and runs **`install/phase-2-tui.ps1`**, **`install/phase-3-configure.ps1`**, **`install/phase-4-verify.ps1`**, and **`install/uninstall.ps1`** for **`reconfigure`**, **`doctor`**, and **`uninstall`**. It does **not** invoke Bash for those phases.
 
 | Command | Behavior |
 |---------|----------|
@@ -15,10 +15,18 @@ Operational facts: **CLI**, **environment variables**, and **artifacts** Botstra
 | `botstrap update` | **Interactive (TTY + `gum`):** **`gum choose`** among **Botstrap repo only**, **Installed tools only**, **Both**, or **Cancel**. **Non-interactive, no flags:** repo-only pull (backward compatible) and prints a one-line hint about **`--tools`**, **`--all`**, and **`self-update`**. **Flags:** **`--self`** — git pull only; **`--tools`** — run **`install/update-tools.sh`** (Bash) or **`install/update-tools.ps1`** (PowerShell) to upgrade **prerequisites**, **selected core**, and **persisted optional** selections per registry **`update`** snippets; **`--all`** — self then tools. Does **not** re-run full Phase 3 except what each **`update`** snippet does. |
 | `botstrap reconfigure` | **Bash:** sets **`BOTSTRAP_ROOT`**, runs **`lib/detect`**, then sources **`install/phase-2-tui.sh`** and **`install/phase-3-configure.sh`** only. **PowerShell:** sets **`BOTSTRAP_ROOT`**, dot-sources **`install/phase-2-tui.ps1`** and **`install/phase-3-configure.ps1`**. |
 | `botstrap doctor` | **Bash:** prints a short **status** header (`BOTSTRAP_ROOT`, semver, optional git head, whether **`~/.config/botstrap/env.sh`** exists), then runs **`install/phase-4-verify.sh`**. **PowerShell:** similar header (profile **`# botstrap PATH`** hook instead of **`env.sh`**), then dot-sources **`install/phase-4-verify.ps1`**. Exits **0** if every verify passes, **1** if **`yq`** is missing or any verify fails. |
-| `botstrap` (no arguments) | If **stdin** and **stdout** are TTYs (**Bash**) or the console is not redirected (**PowerShell**) **and** **`gum`** is on **`PATH`**, shows a **`gum choose`** menu for **`update`**, **`self-update`**, **`reconfigure`**, **`doctor`**, **`version`**, or **`quit`** (exit **0**). Otherwise prints **usage** and exits **1**. For automation and **AI agents**, pass an explicit subcommand (e.g. **`botstrap doctor`**, **`botstrap update --all`**) instead of relying on the menu. |
+| `botstrap uninstall` | Removes **Phase 3 shell integration** only (see **`install/uninstall.sh`** / **`install/uninstall.ps1`**). **Unix:** strips **`# botstrap PATH`**, **`# botstrap aliases`**, and **`# botstrap functions`** blocks from **`~/.zshrc`** and **`~/.bashrc`**, and deletes **`~/.config/botstrap/env.sh`**. **Windows:** removes **`# botstrap PATH`**, **`# botstrap starship`**, **`# botstrap zoxide`**, and **`# botstrap aliases`** regions from the PowerShell profile. **Does not** uninstall packages (Homebrew, apt, winget, mise, etc.) or remove files Botstrap copied elsewhere (e.g. **`~/.config/starship.toml`**, editor settings, **`~/.gitconfig`**). **Exit 1** if the user cancels, a guard refuses **`--remove-checkout`**, or usage is invalid. |
+| `botstrap` (no arguments) | If **stdin** and **stdout** are TTYs (**Bash**) or the console is not redirected (**PowerShell**) **and** **`gum`** is on **`PATH`**, shows a **`gum choose`** menu for **`update`**, **`self-update`**, **`reconfigure`**, **`doctor`**, **`uninstall`**, **`version`**, or **`quit`** (exit **0**). Otherwise prints **usage** and exits **1**. For automation and **AI agents**, pass an explicit subcommand (e.g. **`botstrap doctor`**, **`botstrap update --all`**) instead of relying on the menu. |
 | Any other first argument | Prints **usage** and exits with code **1**. |
 
-**Note:** There is **no** `botstrap uninstall` subcommand in the current CLI.
+**`botstrap uninstall` flags**
+
+| Flag | Behavior |
+|------|----------|
+| *(none)* | **Interactive:** **`gum confirm`** or **`[y/N]`** when the console is a TTY. **Non-interactive:** requires **`--yes`**. |
+| `--yes` | Skip prompts and run the requested uninstall steps. |
+| `--purge` | After hook removal, delete **`~/.config/botstrap`** (Unix) or **`%USERPROFILE%\.config\botstrap`** (Windows). |
+| `--remove-checkout` | After the above, delete the Botstrap repo root (parent of **`bin/`**). **Refused** if the path is not absolute, is **`/`** or **`$HOME`** / **`%USERPROFILE%`**, is a **drive root**, or **`$ROOT/.git`** is missing. |
 
 ## Boot and install environment variables
 

@@ -21,6 +21,7 @@ Useful commands (same semantics on Bash and PowerShell entry points):
 | `botstrap update` | Interactive: choose repo refresh, tool upgrades, or both. Non-interactive: same as **`self-update`**, with a hint to use **`--tools`** / **`--all`**. **`botstrap update --tools`** upgrades packages/images defined in registry **`update`** maps for prerequisites, your selected core tools, and persisted optional selections. |
 | `botstrap reconfigure` | Phase 2 (TUI or defaults) + Phase 3. |
 | `botstrap doctor` | Status lines + verification (see below). |
+| `botstrap uninstall` | Removes Phase 3 **shell hooks** (rc/profile markers and **`env.sh`** on Unix). Optional **`--purge`** clears **`~/.config/botstrap`**; optional **`--remove-checkout`** deletes the clone. Does **not** remove packages or dotfiles Botstrap copied outside that config dir. |
 
 Details: [Reference — `bin/botstrap` CLI](./REFERENCE.md#binbotstrap-cli).
 

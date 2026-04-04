@@ -1,5 +1,5 @@
 #requires -Version 5.1
-# Thin CLI for local Botstrap checkout (update / self-update / reconfigure / doctor) on Windows PowerShell.
+# Thin CLI for local Botstrap checkout (update / self-update / reconfigure / doctor / uninstall) on Windows PowerShell.
 $ErrorActionPreference = 'Stop'
 
 $Root = Split-Path -Parent $PSScriptRoot
@@ -11,8 +11,9 @@ $Version = if (Test-Path -LiteralPath $VersionPath) {
 }
 
 function Show-BotstrapUsage {
-    Write-Host 'Usage: botstrap {update|self-update|reconfigure|doctor|version}'
+    Write-Host 'Usage: botstrap {update|self-update|reconfigure|doctor|uninstall|version}'
     Write-Host '       botstrap update [--self|--tools|--all]'
+    Write-Host '       botstrap uninstall [--yes] [--purge] [--remove-checkout]'
     Write-Host 'Run with no arguments for an interactive menu (console + gum).'
 }
 
@@ -36,7 +37,7 @@ $sub = $null
 if ($args.Count -eq 0) {
     if (-not [Console]::IsInputRedirected -and -not [Console]::IsOutputRedirected -and (Get-Command gum -ErrorAction SilentlyContinue)) {
         & gum style --border rounded --padding '1 2' --foreground 212 'Botstrap' '' 'Choose an action (or pass a subcommand for scripts).'
-        $choice = & gum choose --header 'Action' update self-update reconfigure doctor version quit
+        $choice = & gum choose --header 'Action' update self-update reconfigure doctor uninstall version quit
         if (-not $?) { exit 1 }
         $choice = if ($null -eq $choice) { '' } else { $choice.Trim() }
         if ($choice -eq 'quit') { exit 0 }
@@ -94,6 +95,35 @@ if ($sub -eq 'update') {
     }
     if ($doTools) {
         Invoke-BotstrapUpdateTools
+    }
+    exit 0
+}
+
+if ($sub -eq 'uninstall') {
+    $doYes = $false
+    $doPurge = $false
+    $doRm = $false
+    $i = 1
+    while ($i -lt $args.Count) {
+        switch ($args[$i]) {
+            '--yes' { $doYes = $true }
+            '--purge' { $doPurge = $true }
+            '--remove-checkout' { $doRm = $true }
+            default {
+                Show-BotstrapUsage
+                exit 1
+            }
+        }
+        $i++
+    }
+    $env:BOTSTRAP_ROOT = $Root
+    $uSplat = @{}
+    if ($doYes) { $uSplat['Yes'] = $true }
+    if ($doPurge) { $uSplat['Purge'] = $true }
+    if ($doRm) { $uSplat['RemoveCheckout'] = $true }
+    & (Join-Path $Root 'install\uninstall.ps1') @uSplat
+    if (-not $?) {
+        exit 1
     }
     exit 0
 }

@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# Thin CLI for local Botstrap checkout (update / self-update / reconfigure / doctor).
+# Thin CLI for local Botstrap checkout (update / self-update / reconfigure / doctor / uninstall).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION="$(cat "${ROOT}/version" 2>/dev/null || echo unknown)"
 
 usage() {
-  echo "Usage: botstrap {update|self-update|reconfigure|doctor|version}"
+  echo "Usage: botstrap {update|self-update|reconfigure|doctor|uninstall|version}"
   echo "       botstrap update [--self|--tools|--all]"
+  echo "       botstrap uninstall [--yes] [--purge] [--remove-checkout]"
   echo "Run with no arguments for an interactive menu (TTY + gum)."
 }
 
@@ -32,7 +33,7 @@ botstrap_run_update_tools() {
 if [[ -z "${1:-}" ]]; then
   if [[ -t 0 && -t 1 ]] && command -v gum &>/dev/null; then
     gum style --border rounded --padding "1 2" --foreground 212 "Botstrap" "" "Choose an action (or pass a subcommand for scripts)."
-    choice="$(gum choose --header "Action" update self-update reconfigure doctor version quit)" || exit "$?"
+    choice="$(gum choose --header "Action" update self-update reconfigure doctor uninstall version quit)" || exit "$?"
     if [[ "${choice}" == "quit" ]]; then
       exit 0
     fi
@@ -139,6 +140,30 @@ case "${1:-}" in
       botstrap_log_info "Doctor: shell hook ${HOME}/.config/botstrap/env.sh missing (run Phase 3 or botstrap reconfigure to add PATH)"
     fi
     bash "${ROOT}/install/phase-4-verify.sh"
+    ;;
+  uninstall)
+    shift
+    uflags=()
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --yes)
+          uflags+=(--yes)
+          ;;
+        --purge)
+          uflags+=(--purge)
+          ;;
+        --remove-checkout)
+          uflags+=(--remove-checkout)
+          ;;
+        *)
+          usage
+          exit 1
+          ;;
+      esac
+      shift
+    done
+    export BOTSTRAP_ROOT="${ROOT}"
+    bash "${ROOT}/install/uninstall.sh" "${uflags[@]}"
     ;;
   version)
     echo "botstrap ${VERSION}"
