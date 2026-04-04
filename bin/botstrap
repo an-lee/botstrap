@@ -35,6 +35,18 @@ case "${1:-}" in
     # shellcheck source=lib/pkg.sh
     source "${ROOT}/lib/pkg.sh"
     botstrap_detect
+    botstrap_log_info "Doctor: BOTSTRAP_ROOT=${ROOT}"
+    botstrap_log_info "Doctor: version=${VERSION}"
+    if [[ -d "${ROOT}/.git" ]]; then
+      botstrap_log_info "Doctor: git_head=$(git -C "${ROOT}" rev-parse --short HEAD 2>/dev/null || echo unknown)"
+    else
+      botstrap_log_info "Doctor: git_head=(not a git checkout)"
+    fi
+    if [[ -f "${HOME}/.config/botstrap/env.sh" ]]; then
+      botstrap_log_info "Doctor: shell hook ${HOME}/.config/botstrap/env.sh present"
+    else
+      botstrap_log_info "Doctor: shell hook ${HOME}/.config/botstrap/env.sh missing (run Phase 3 or botstrap reconfigure to add PATH)"
+    fi
     bash "${ROOT}/install/phase-4-verify.sh"
     ;;
   version)

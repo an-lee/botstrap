@@ -26,3 +26,6 @@ done
 botstrap_log_info "Verification finished with ${_failures} failure(s)."
 botstrap_log_info "Version file: $(cat "${BOTSTRAP_ROOT}/version" 2>/dev/null || echo unknown)"
 botstrap_log_info "Re-run TUI choices: bash ${BOTSTRAP_ROOT}/install/phase-2-tui.sh && bash ${BOTSTRAP_ROOT}/install/phase-3-configure.sh"
+if [[ "${_failures}" -gt 0 ]]; then
+  exit 1
+fi

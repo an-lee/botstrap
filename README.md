@@ -37,11 +37,13 @@ export BOTSTRAP_ROOT="$(pwd)"
 
 ## CLI (this checkout)
 
+After **Phase 3** on macOS/Linux, open a **new** shell (or `source ~/.zshrc` / `~/.bashrc`): **`botstrap`** is on your `PATH` via `~/.config/botstrap/env.sh`. Until then, or on Windows without that hook, use the script path:
+
 ```bash
 ./bin/botstrap version
 ./bin/botstrap update      # git pull in repo root
 ./bin/botstrap reconfigure # TUI + configure phases
-./bin/botstrap doctor      # run core verify steps
+./bin/botstrap doctor      # install status + core verify (exits 1 if any verify fails)
 ```
 
 ## Documentation

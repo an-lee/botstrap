@@ -78,14 +78,18 @@ If **gum** is missing, **`phase-2-tui.ps1`** sets only **`BOTSTRAP_EDITOR`** and
 
 ## After install: `bin/botstrap`
 
-From the clone (e.g. `~/.botstrap`):
+Phase 3 writes **`~/.config/botstrap/env.sh`** and appends a **botstrap PATH** block to **`~/.zshrc`** and **`~/.bashrc`**. After a **new** login shell (or sourcing your rc file), you can run **`botstrap`** from anywhere.
+
+From the clone (e.g. `~/.botstrap`) you can always use:
 
 ```bash
 ./bin/botstrap version   # prints semver from `version` file
 ./bin/botstrap update    # git pull --ff-only in the clone
 ./bin/botstrap reconfigure  # Phase 2 + Phase 3 only
-./bin/botstrap doctor    # Phase 4 verification only
+./bin/botstrap doctor    # status lines + Phase 4 core verification (exits 1 on verify failures)
 ```
+
+On **native Windows** (PowerShell install), the Bash CLI is not added to your user `PATH` automatically; use **Git Bash** / **WSL** and `install.sh` for the same hook, or invoke `bin/botstrap` with Bash explicitly.
 
 Details: [Reference](./REFERENCE.md).
 

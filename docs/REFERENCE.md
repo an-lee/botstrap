@@ -11,7 +11,7 @@ The script lives at **`bin/botstrap`** (Bash). It resolves the repository root a
 | `botstrap version` | Prints `botstrap <semver>` from the **`version`** file at repo root, or `unknown` if missing. |
 | `botstrap update` | Runs **`git pull --ff-only`** in the repo root. Does **not** re-run install phases or migration scripts. |
 | `botstrap reconfigure` | Sets **`BOTSTRAP_ROOT`** to the repo root, runs **`lib/detect`**, then sources **`install/phase-2-tui.sh`** and **`install/phase-3-configure.sh`** only. |
-| `botstrap doctor` | Sets **`BOTSTRAP_ROOT`**, loads detect + log + **`lib/pkg`**, runs **`install/phase-4-verify.sh`** (core registry verification). |
+| `botstrap doctor` | Prints a short **status** header (`BOTSTRAP_ROOT`, semver, optional git head, whether **`~/.config/botstrap/env.sh`** exists), then runs **`install/phase-4-verify.sh`** (core registry verification). Exits **0** if every verify passes, **1** if **`yq`** is missing or any verify fails. |
 
 Any other first argument prints usage and exits with code 1.
 
@@ -59,7 +59,8 @@ Unless otherwise noted, paths are under **`$HOME`**.
 | `~/.config/starship.toml` | Overwritten from `configs/shell/prompt.toml` when that file exists in the repo. |
 | `~/.gitignore_global` | Copied from `configs/git/gitignore_global`; `core.excludesfile` set globally. |
 | Git user.name / user.email | Set from `BOTSTRAP_GIT_*` when non-empty. |
-| `~/.zshrc`, `~/.bashrc` | Appended **once** (marker-guarded) with contents of `configs/shell/aliases` and `configs/shell/functions` when those repo files exist. |
+| `~/.zshrc`, `~/.bashrc` | Appended **once** (marker-guarded) with contents of `configs/shell/aliases`, `configs/shell/functions`, and `configs/shell/env_path_snippet.bash` when those repo files exist. The PATH snippet sources **`~/.config/botstrap/env.sh`**. |
+| `~/.config/botstrap/env.sh` | **Unix Phase 3:** sets **`BOTSTRAP_ROOT`** and prepends **`$BOTSTRAP_ROOT/bin`** to **`PATH`** (duplicate-safe). Regenerated each Phase 3 run. |
 | Editor configs | **cursor:** `~/.cursor/settings.json` from `configs/editor/cursor-settings.json`. **vscode:** `~/.config/Code/User/settings.json` from `configs/editor/vscode.json`. **neovim:** `~/.config/nvim/init.lua` from `configs/editor/neovim/init.lua`. |
 | `~/.config/botstrap/theme.env`, `editor.env` | Small key=value files for theme and editor. |
 | `~/.config/botstrap/agent/*.sample` | Copies of `configs/agent/AGENTS.md`, `cursorrules`, `claude-config.json` as **`.sample`** files (not live agent config unless you copy them). |
@@ -69,6 +70,7 @@ Unless otherwise noted, paths are under **`$HOME`**.
 - Reads every **`name`** in **`registry/core.yaml`** with **yq**.
 - Runs each tool’s **`verify`** command via **`botstrap_pkg_verify`**.
 - Warns per failure, prints total failure count, prints **`version`** file contents, and suggests re-running Phase 2 + Phase 3 manually if needed.
+- Exits **1** if **`yq`** is missing or if **any** verify fails (so **`botstrap doctor`** and the end of **`install.sh`** reflect failure).
 
 ## Related
 
