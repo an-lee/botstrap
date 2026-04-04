@@ -22,8 +22,17 @@ fi
 
 gum style --border rounded --padding "1 2" --foreground 212 "Botstrap" "" "Cross-platform developer bootstrap."
 
-export BOTSTRAP_GIT_NAME="${BOTSTRAP_GIT_NAME:-$(gum input --placeholder 'Git user name' --value "${GIT_AUTHOR_NAME:-}")}"
-export BOTSTRAP_GIT_EMAIL="${BOTSTRAP_GIT_EMAIL:-$(gum input --placeholder 'Git email' --value "${GIT_AUTHOR_EMAIL:-}")}"
+_git_name_args=()
+if [[ -n "${GIT_AUTHOR_NAME:-}" ]]; then
+  _git_name_args=(--value "${GIT_AUTHOR_NAME}")
+fi
+export BOTSTRAP_GIT_NAME="${BOTSTRAP_GIT_NAME:-$(gum input --placeholder 'Git user name' "${_git_name_args[@]}")}"
+
+_git_email_args=()
+if [[ -n "${GIT_AUTHOR_EMAIL:-}" ]]; then
+  _git_email_args=(--value "${GIT_AUTHOR_EMAIL}")
+fi
+export BOTSTRAP_GIT_EMAIL="${BOTSTRAP_GIT_EMAIL:-$(gum input --placeholder 'Git email' "${_git_email_args[@]}")}"
 
 export BOTSTRAP_EDITOR="$(
   gum choose --header "Primary editor" \

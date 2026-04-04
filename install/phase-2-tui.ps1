@@ -25,10 +25,12 @@ $gitEmailDefault = $env:GIT_AUTHOR_EMAIL
 if (-not $gitEmailDefault) { $gitEmailDefault = '' }
 
 if (-not $env:BOTSTRAP_GIT_NAME) {
-    $env:BOTSTRAP_GIT_NAME = & gum input --placeholder 'Git user name' --value $gitNameDefault
+    $nameArgs = if ($gitNameDefault) { @('--value', $gitNameDefault) } else { @() }
+    $env:BOTSTRAP_GIT_NAME = & gum input --placeholder 'Git user name' @nameArgs
 }
 if (-not $env:BOTSTRAP_GIT_EMAIL) {
-    $env:BOTSTRAP_GIT_EMAIL = & gum input --placeholder 'Git email' --value $gitEmailDefault
+    $emailArgs = if ($gitEmailDefault) { @('--value', $gitEmailDefault) } else { @() }
+    $env:BOTSTRAP_GIT_EMAIL = & gum input --placeholder 'Git email' @emailArgs
 }
 
 $ErrorActionPreference = 'Continue'

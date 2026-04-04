@@ -49,11 +49,27 @@ function Invoke-BotstrapYq {
         Write-BotstrapErr 'yq is required for registry-driven operations. Re-run Phase 0.'
         return $null
     }
-    $out = & yq -r $Expression $FilePath 2>$null
-    if ($LASTEXITCODE -ne 0 -and $null -eq $out) {
-        return $null
+    $stderrFile = [System.IO.Path]::GetTempFileName()
+    try {
+        $out = & yq -r $Expression $FilePath 2>$stderrFile
+        if ($LASTEXITCODE -ne 0) {
+            $errText = ''
+            if (Test-Path -LiteralPath $stderrFile) {
+                $errText = (Get-Content -LiteralPath $stderrFile -Raw -ErrorAction SilentlyContinue).Trim()
+            }
+            if ($errText) {
+                Write-BotstrapWarn "yq failed (exit $LASTEXITCODE): $errText"
+            }
+            else {
+                Write-BotstrapWarn "yq failed (exit $LASTEXITCODE) with no stderr captured."
+            }
+            return $null
+        }
+        return $out
     }
-    return $out
+    finally {
+        Remove-Item -LiteralPath $stderrFile -Force -ErrorAction SilentlyContinue
+    }
 }
 
 function Invoke-BotstrapPowerShellSnippet {
