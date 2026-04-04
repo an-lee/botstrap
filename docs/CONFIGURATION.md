@@ -60,7 +60,7 @@ Phase 3 also writes:
 
 ## Optional tools and themes
 
-Selections from Phase 2 trigger installs from **`registry/optional.yaml`** during Phase 3 (via **`lib/pkg`**), not only file copies from `configs/`. Theme bundles may live under **`themes/`** in the repo; wiring depends on optional registry entries and scripts—see [Registry specification](./REGISTRY_SPEC.md) and [Architecture](./ARCHITECTURE.md).
+Phase 3 installs **selected core** from **`registry/core.yaml`** and selections from **`registry/optional.yaml`** (via **`lib/pkg`**), not only file copies from `configs/`. Theme bundles may live under **`themes/`** in the repo; wiring depends on optional registry entries and scripts—see [Registry specification](./REGISTRY_SPEC.md) and [Architecture](./ARCHITECTURE.md).
 
 ## Related
 
