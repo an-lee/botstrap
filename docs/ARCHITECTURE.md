@@ -21,7 +21,7 @@ The site may serve scripts by URL or `User-Agent`; explicit `.sh` / `.ps1` URLs 
 **Boot scripts** (`boot.sh`, `boot.ps1`) do **not** run install phases themselves. They:
 
 1. **Ensure Git** is available: Unix boot sources **`install/boot-prereqs-git.sh`** (from the same tree or fetched from raw GitHub when `BOTSTRAP_REPO` is GitHub-shaped) and runs **`botstrap_ensure_git_curl`**; Windows boot uses **winget** when possible. If git cannot be installed, exit with instructions (see [Getting started](./GETTING_STARTED.md)).
-2. Clone **`BOTSTRAP_REPO`** into **`BOTSTRAP_HOME`** when that path is not already a Git checkout. Defaults: repo `https://github.com/botstrap/botstrap.git`, home `~/.botstrap` (Unix) or `%USERPROFILE%\.botstrap` (Windows).
+2. Clone **`BOTSTRAP_REPO`** into **`BOTSTRAP_HOME`** when that path is not already a Git checkout. Defaults: repo `https://github.com/an-lee/botstrap.git`, home `~/.botstrap` (Unix) or `%USERPROFILE%\.botstrap` (Windows).
 3. **Exec** `install.sh` (Unix) or `install.ps1` (Windows) from that checkout.
 
 **Orchestrators** (`install.sh`, `install.ps1`) load **`lib/detect`** (or equivalent), then run phases in order.

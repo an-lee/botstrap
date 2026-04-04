@@ -36,7 +36,7 @@ function Install-BotstrapGitIfNeeded {
 }
 
 $BotstrapHome = if ($env:BOTSTRAP_HOME) { $env:BOTSTRAP_HOME } else { Join-Path $env:USERPROFILE ".botstrap" }
-$BotstrapRepo = if ($env:BOTSTRAP_REPO) { $env:BOTSTRAP_REPO } else { "https://github.com/botstrap/botstrap.git" }
+$BotstrapRepo = if ($env:BOTSTRAP_REPO) { $env:BOTSTRAP_REPO } else { "https://github.com/an-lee/botstrap.git" }
 
 Install-BotstrapGitIfNeeded
 

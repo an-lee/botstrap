@@ -18,7 +18,7 @@
 - CLI at `bin/botstrap` supports: `version`, `update` (git pull only), `reconfigure` (Phase 2+3), `doctor` (Phase 4, exits 1 on failure)
 - Phase 3 writes `~/.config/botstrap/env.sh` and appends PATH block to `.zshrc`/`.bashrc`; `botstrap` is on PATH after a new shell
 - Registry files: `registry/core.yaml` (always installed) and `registry/optional.yaml` (TUI-selected)
-- Git remote: `github.com/an-lee/botstrap`; default `BOTSTRAP_REPO` in boot scripts: `https://github.com/botstrap/botstrap.git`
+- Git remote: `github.com/an-lee/botstrap`; default `BOTSTRAP_REPO` in boot scripts: `https://github.com/an-lee/botstrap.git`
 - Boot scripts auto-install git when missing: Unix via `install/boot-prereqs-git.sh`, Windows via winget
 - Windows Phase 0b applies OS developer tuning from `configs/os/windows.yaml` (Developer Mode, long paths, execution policy, etc.)
 - VitePress theme uses Tokyo Night–inspired custom CSS variables in `docs/.vitepress/theme/custom.css`

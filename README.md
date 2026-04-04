@@ -9,7 +9,7 @@ Cross-platform bootstrap for **developers** and **AI coding agents**: one entry 
 ## Quick start (from a published clone)
 
 ```bash
-# macOS / Linux (default BOTSTRAP_REPO is https://github.com/botstrap/botstrap.git; override to use a fork)
+# macOS / Linux (default BOTSTRAP_REPO is https://github.com/an-lee/botstrap.git; override to use a fork)
 curl -fsSL https://botstrap.dev/install | bash
 ```
 

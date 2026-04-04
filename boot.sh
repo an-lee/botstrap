@@ -3,7 +3,7 @@
 set -euo pipefail
 
 BOTSTRAP_HOME="${BOTSTRAP_HOME:-${HOME}/.botstrap}"
-BOTSTRAP_REPO="${BOTSTRAP_REPO:-https://github.com/botstrap/botstrap.git}"
+BOTSTRAP_REPO="${BOTSTRAP_REPO:-https://github.com/an-lee/botstrap.git}"
 
 # Map BOTSTRAP_REPO to raw.githubusercontent.com base (HEAD). Used to fetch
 # install/boot-prereqs-git.sh when git is missing. Non-GitHub remotes: set

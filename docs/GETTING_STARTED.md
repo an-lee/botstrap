@@ -29,7 +29,7 @@ This guide covers **how to run Botstrap**, **prerequisites**, **local developmen
 
 ## Install from the web (recommended)
 
-Default clone URL is set in **`boot.sh`** / **`boot.ps1`**: `https://github.com/botstrap/botstrap.git`. To use a **fork** or mirror, set **`BOTSTRAP_REPO`** before running boot. To change the install directory, set **`BOTSTRAP_HOME`** (default: `~/.botstrap` or `%USERPROFILE%\.botstrap`).
+Default clone URL is set in **`boot.sh`** / **`boot.ps1`**: `https://github.com/an-lee/botstrap.git`. To use a **fork** or mirror, set **`BOTSTRAP_REPO`** before running boot. To change the install directory, set **`BOTSTRAP_HOME`** (default: `~/.botstrap` or `%USERPROFILE%\.botstrap`).
 
 **macOS / Linux**
 
