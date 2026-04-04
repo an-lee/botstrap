@@ -33,6 +33,11 @@ Write-BotstrapInfo 'Phase 3 (Windows): selected core tools from registry'
 Install-BotstrapToolsFromCsv -Csv $env:BOTSTRAP_CORE_TOOLS -RegistryPath $coreYaml
 Refresh-BotstrapPath
 
+if (Test-BotstrapCsvHasItem -Needle 'zellij' -Csv $env:BOTSTRAP_CORE_TOOLS) {
+    . (Join-Path $root 'install\modules\zellij.ps1')
+    Initialize-BotstrapZellijWindowsConfig
+}
+
 $optionalReg = Join-Path $root 'registry\optional.yaml'
 
 Write-BotstrapInfo 'Phase 3 (Windows): optional installs from registry'
