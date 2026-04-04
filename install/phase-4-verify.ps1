@@ -3,31 +3,45 @@ $ErrorActionPreference = 'Continue'
 . (Join-Path $env:BOTSTRAP_ROOT 'lib\log.ps1')
 . (Join-Path $env:BOTSTRAP_ROOT 'lib\pkg.ps1')
 
-Write-BotstrapInfo 'Phase 4 (Windows): verify core and optional tools'
+Write-BotstrapInfo 'Phase 4 (Windows): verify prerequisites, selected core, and optional tools'
 
 if (-not (Get-Command yq -ErrorAction SilentlyContinue)) {
     Write-BotstrapErr 'yq missing; cannot verify registry.'
     exit 1
 }
 
+$prereqYaml = Join-Path $env:BOTSTRAP_ROOT 'registry\prerequisites.yaml'
 $coreYaml = Join-Path $env:BOTSTRAP_ROOT 'registry\core.yaml'
 $optionalYaml = Join-Path $env:BOTSTRAP_ROOT 'registry\optional.yaml'
 
-$toolNames = & yq -r '.tools[].name' $coreYaml 2>$null
 $failures = 0
 
-$coreTools = @($toolNames -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+$preNames = & yq -r '.tools[].name' $prereqYaml 2>$null
+$preTools = @($preNames -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+$preTotal = $preTools.Count
+$preCurrent = 0
+foreach ($t in $preTools) {
+    $preCurrent++
+    Write-BotstrapStep -Current $preCurrent -Total $preTotal -Label "Verifying prerequisite $t" -Activity 'Prerequisites'
+    if (-not (Test-BotstrapPackageFromRegistry -ToolName $t -RegistryPath $prereqYaml)) {
+        Write-BotstrapWarn "Verify failed: $t"
+        $failures++
+    }
+}
+Write-BotstrapProgressComplete -Activity 'Prerequisites'
+
+$coreTools = @(Get-BotstrapCoreToolNamesForVerify)
 $coreTotal = $coreTools.Count
 $coreCurrent = 0
 foreach ($t in $coreTools) {
     $coreCurrent++
-    Write-BotstrapStep -Current $coreCurrent -Total $coreTotal -Label "Verifying $t" -Activity 'Verification'
+    Write-BotstrapStep -Current $coreCurrent -Total $coreTotal -Label "Verifying core $t" -Activity 'Core'
     if (-not (Test-BotstrapPackageFromRegistry -ToolName $t -RegistryPath $coreYaml)) {
         Write-BotstrapWarn "Verify failed: $t"
         $failures++
     }
 }
-Write-BotstrapProgressComplete -Activity 'Verification'
+Write-BotstrapProgressComplete -Activity 'Core'
 
 if (-not $env:BOTSTRAP_THEME) { $env:BOTSTRAP_THEME = 'catppuccin' }
 if (-not $env:BOTSTRAP_EDITOR) { $env:BOTSTRAP_EDITOR = 'none' }

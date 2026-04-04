@@ -53,7 +53,7 @@ botstrap_pkg_install() {
   local registry_file="${2:-${BOTSTRAP_ROOT}/registry/core.yaml}"
 
   if ! command -v yq &>/dev/null; then
-    botstrap_log_err "yq is required for registry-driven installs. Install yq (mikefarah/yq) and re-run Phase 1."
+    botstrap_log_err "yq is required for registry-driven installs. Install yq (mikefarah/yq) and re-run Phase 0."
     return 1
   fi
 
@@ -197,5 +197,58 @@ botstrap_pkg_install_optional_csv() {
     item="${raw//[[:space:]]/}"
     [[ -z "${item}" || "${item}" == "none" ]] && continue
     botstrap_pkg_install_optional_item "${group_id}" "${item}" "${reg}" || true
+  done
+}
+
+botstrap_csv_has_item() {
+  local needle="$1"
+  local csv="$2"
+  [[ -z "${csv}" ]] && return 1
+  local IFS=',' parts raw
+  read -ra parts <<<"${csv}"
+  for raw in "${parts[@]}"; do
+    raw="${raw//[[:space:]]/}"
+    [[ "${raw}" == "${needle}" ]] && return 0
+  done
+  return 1
+}
+
+# Install tools listed in csv (comma-separated names) in registry file order.
+botstrap_pkg_install_tools_from_csv() {
+  local csv="$1"
+  local reg="$2"
+  [[ -z "${csv}" ]] && return 0
+  local name
+  mapfile -t _botstrap_pkg_csv_order < <(yq -r '.tools[].name' "${reg}")
+  for name in "${_botstrap_pkg_csv_order[@]}"; do
+    [[ -z "${name}" ]] && continue
+    botstrap_csv_has_item "${name}" "${csv}" || continue
+    botstrap_pkg_install "${name}" "${reg}" || botstrap_log_warn "Install reported failure for ${name} (continuing)."
+  done
+}
+
+# Core tool names to verify: explicit BOTSTRAP_CORE_TOOLS, else core-tools.env, else all core (legacy).
+botstrap_core_tool_names_for_verify() {
+  local core_reg="${BOTSTRAP_ROOT}/registry/core.yaml"
+  local raw mode="legacy"
+  if [[ -n "${BOTSTRAP_CORE_TOOLS+x}" ]]; then
+    mode="env"
+    raw="${BOTSTRAP_CORE_TOOLS-}"
+  else
+    local cf="${HOME}/.config/botstrap/core-tools.env"
+    if [[ -f "${cf}" ]] && grep -q '^core_tools=' "${cf}"; then
+      mode="file"
+      raw="$(grep -m1 '^core_tools=' "${cf}" | sed 's/^core_tools=//')"
+    fi
+  fi
+  if [[ "${mode}" == "legacy" ]]; then
+    yq -r '.tools[].name' "${core_reg}"
+    return
+  fi
+  mapfile -t _botstrap_cv_order < <(yq -r '.tools[].name' "${core_reg}")
+  local n
+  for n in "${_botstrap_cv_order[@]}"; do
+    [[ -z "${n}" ]] && continue
+    botstrap_csv_has_item "${n}" "${raw}" && printf '%s\n' "${n}"
   done
 }

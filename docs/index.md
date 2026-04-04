@@ -21,7 +21,7 @@ features:
     link: /REGISTRY_SPEC
     linkText: Open
   - title: Phased install
-    details: Prerequisites, core install, optional gum TUI, configuration, then verification.
+    details: Prerequisites, gum TUI (core + optional), apply installs and configs, then verification.
     link: /ARCHITECTURE
     linkText: Open
   - title: Cross-platform
@@ -37,12 +37,11 @@ features:
 ## What Botstrap does
 
 1. **Boot** — Clone the repo to `~/.botstrap` (or `%USERPROFILE%\.botstrap`), then run the orchestrator (`install.sh` / `install.ps1`). Override clone URL with `BOTSTRAP_REPO`.
-2. **Phase 0** — Install prerequisites: Unix installs `git`, `curl`, `jq`, `yq`, `gum` where possible; Windows requires **winget** and installs `git`, `yq`, `jq`, and `gum` when missing.
+2. **Phase 0** — Install **`registry/prerequisites.yaml`** tools: Unix installs `git`, `curl`, `jq`, `yq`, `gum` where possible; Windows requires **winget** and installs the same set when missing.
 3. **Phase 0b** — Windows-only optional OS tuning from `configs/os/windows.yaml`.
-4. **Phase 1** — Non-interactive install of every tool in `registry/core.yaml`.
-5. **Phase 2** — Gum TUI choices (safe defaults when gum is missing or in CI; same behavior on Windows PowerShell).
-6. **Phase 3** — Copy `configs/` templates and install optional registry selections.
-7. **Phase 4** — Verify core tools and print a summary (optional selections on Windows depend on environment; see [After install](/AFTER_INSTALL)).
+4. **Phase 2** — Gum TUI: **core** multi-select from **`registry/core.yaml`** (all selected by default), then optional groups (safe defaults when gum is missing or in CI; same behavior on Windows PowerShell).
+5. **Phase 3** — Persist **`core-tools.env`**, install **selected core** and **optional** registry rows, copy **`configs/`** templates.
+6. **Phase 4** — Verify prerequisites, **selected** core, and print a summary (optional selections on Windows depend on environment; see [After install](/AFTER_INSTALL)).
 
 Read the full narrative in [Introduction](/INTRODUCTION). After setup, use [After install](/AFTER_INSTALL) for the installed stack and [Defaults & customization](/DEFAULTS_AND_CUSTOMIZATION) for defaults and changes. For commands, variables, and template paths, see [Reference](/REFERENCE) and [Configuration file map](/CONFIGURATION).
 

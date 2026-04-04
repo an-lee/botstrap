@@ -1,0 +1,66 @@
+schema_version: 1
+tools:
+  - name: git
+    description: "Distributed version control"
+    category: git
+    install:
+      darwin: brew install git
+      linux-apt: sudo apt-get update && sudo apt-get install -y git
+      linux-dnf: sudo dnf install -y git
+      linux-pacman: sudo pacman -Sy --needed --noconfirm git
+      windows: winget install --id Git.Git -e --accept-package-agreements --accept-source-agreements
+    verify: git --version
+
+  - name: curl
+    description: "HTTP client"
+    category: network
+    install:
+      darwin: brew install curl
+      linux-apt: sudo apt-get install -y curl
+      linux-dnf: sudo dnf install -y curl
+      linux-pacman: sudo pacman -Sy --needed --noconfirm curl
+      windows: winget install --id cURL.cURL -e --accept-package-agreements --accept-source-agreements
+    verify: curl --version
+
+  - name: jq
+    description: "JSON processor"
+    category: data
+    install:
+      darwin: brew install jq
+      linux-apt: sudo apt-get install -y jq
+      linux-dnf: sudo dnf install -y jq
+      linux-pacman: sudo pacman -Sy --needed --noconfirm jq
+      windows: winget install --id jqlang.jq -e --accept-package-agreements --accept-source-agreements
+    verify: jq --version
+
+  - name: yq
+    description: "YAML processor (mikefarah/yq)"
+    category: data
+    install:
+      darwin: brew install yq
+      linux: |
+        YQ_VER=v4.44.3
+        ARCH=$(uname -m)
+        ASSET=yq_linux_amd64
+        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then ASSET=yq_linux_arm64; fi
+        sudo curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VER}/${ASSET}" -o /usr/local/bin/yq
+        sudo chmod +x /usr/local/bin/yq
+      windows: winget install --id MikeFarah.yq -e --accept-package-agreements --accept-source-agreements
+    verify: yq --version
+
+  - name: gum
+    description: "Charmbracelet TUI primitives"
+    category: tui
+    install:
+      darwin: brew install gum
+      linux: |
+        GUM_VER=0.14.5
+        ARCH=$(uname -m)
+        DEB_ARCH=amd64
+        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then DEB_ARCH=arm64; fi
+        TMP=$(mktemp -d)
+        curl -fsSL "https://github.com/charmbracelet/gum/releases/download/v${GUM_VER}/gum_${GUM_VER}_Linux_${DEB_ARCH}.tar.gz" | tar -xz -C "$TMP"
+        sudo install -m 0755 "$TMP/gum" /usr/local/bin/gum
+        rm -rf "$TMP"
+      windows: winget install --id charmbracelet.gum -e --accept-package-agreements --accept-source-agreements
+    verify: gum --version

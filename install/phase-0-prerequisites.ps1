@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $env:BOTSTRAP_ROOT 'lib\log.ps1')
 . (Join-Path $env:BOTSTRAP_ROOT 'install\boot-prereqs-git.ps1')
 
-Write-BotstrapInfo 'Phase 0 (Windows): ensure winget, Git, yq, jq, and gum'
+Write-BotstrapInfo 'Phase 0 (Windows): ensure winget, Git, yq, then registry prerequisites'
 
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
     Write-BotstrapErr 'winget is required. Install App Installer from the Microsoft Store or update Windows, then re-run.'
@@ -63,17 +63,46 @@ function Install-BotstrapWingetToolIfMissing {
     }
 }
 
+# yq must exist before reading registry/prerequisites.yaml for the remaining tools.
 Install-BotstrapWingetToolIfMissing -Id 'MikeFarah.yq' -TestCommand 'yq' -PresentIsOk { Test-BotstrapYqIsMikefarah }
-Install-BotstrapWingetToolIfMissing -Id 'jqlang.jq' -TestCommand 'jq'
-Install-BotstrapWingetToolIfMissing -Id 'charmbracelet.gum' -TestCommand 'gum'
 
 if (-not (Get-Command yq -ErrorAction SilentlyContinue)) {
-    Write-BotstrapErr 'yq is required for Phase 1. Install MikeFarah.yq and re-run.'
+    Write-BotstrapErr 'yq is required. Install MikeFarah.yq and re-run.'
     exit 1
 }
 if (-not (Test-BotstrapYqIsMikefarah)) {
-    Write-BotstrapErr 'Mike Farah yq is required for Phase 1 (registry YAML). Remove other yq implementations from PATH or run winget install MikeFarah.yq --force, then re-run.'
+    Write-BotstrapErr 'Mike Farah yq is required for registry YAML. Remove other yq implementations from PATH or run winget install MikeFarah.yq --force, then re-run.'
     exit 1
+}
+
+$ErrorActionPreference = 'Stop'
+. (Join-Path $env:BOTSTRAP_ROOT 'lib\pkg.ps1')
+
+$prereqReg = Join-Path $env:BOTSTRAP_ROOT 'registry\prerequisites.yaml'
+$names = & yq -r '.tools[].name' $prereqReg 2>$null
+if (-not $names) {
+    Write-BotstrapErr "Could not read tools from $prereqReg"
+    exit 1
+}
+
+$tools = @($names -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+$total = $tools.Count
+$current = 0
+foreach ($tool in $tools) {
+    $current++
+    Write-BotstrapStep -Current $current -Total $total -Label "Prerequisite $tool" -Activity 'Prerequisites'
+    $ok = Install-BotstrapPackageFromRegistry -ToolName $tool -RegistryPath $prereqReg
+    if (-not $ok) {
+        Write-BotstrapWarn "Phase 0 reported a problem for ${tool} (continuing)."
+    }
+}
+Write-BotstrapProgressComplete -Activity 'Prerequisites'
+
+if (-not (Get-Command jq -ErrorAction SilentlyContinue)) {
+    Write-BotstrapWarn 'jq not installed; some scripts may skip JSON helpers.'
+}
+if (-not (Get-Command gum -ErrorAction SilentlyContinue)) {
+    Write-BotstrapWarn 'gum missing; Phase 2 TUI will be limited.'
 }
 
 Write-BotstrapInfo 'Phase 0 (Windows) complete.'

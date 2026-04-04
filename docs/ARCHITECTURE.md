@@ -6,7 +6,7 @@ Botstrap is a cross-platform bootstrap that turns a fresh Mac, Linux, or Windows
 
 - **One command** on each platform that runs the same **logical** flow (implementation details differ; see [Cross-platform notes](./CROSS_PLATFORM.md)).
 - **Registry-driven** tool definitions (YAML) instead of hardcoded install lists in orchestration code.
-- **Phased install**: prerequisites, non-interactive core, interactive TUI (where supported), configuration, verification.
+- **Phased install**: prerequisites, interactive TUI (core + optional choices where supported), apply installs and dotfiles, verification.
 - **AI-first defaults**: predictable PATH, non-interactive core installs, structured agent scaffolding under `configs/agent/`.
 
 ## Entry points and boot sequence
@@ -38,7 +38,7 @@ botstrap/
   install/                    # Phases and per-tool modules
   configs/                    # Templates for shell, git, editor, agent; OS tuning YAML
   themes/                     # Theme bundles (terminal, prompt, editor)
-  registry/                   # core.yaml, optional.yaml
+  registry/                   # prerequisites.yaml, core.yaml, optional.yaml
   docs/                       # User and contributor documentation
   version                     # Semver string for reporting and `botstrap version`
 ```
@@ -55,20 +55,18 @@ flowchart TD
     D --> E[Detect OS / Arch / Shell]
     E --> F[Phase 0: Prerequisites]
     F --> F0["Phase 0b: OS tune Windows only"]
-    F0 --> G[Phase 1: Core tools]
-    G --> H[Phase 2: TUI choices]
-    H --> I[Phase 3: Configure]
+    F0 --> H[Phase 2: TUI choices]
+    H --> I[Phase 3: Apply installs and configure]
     I --> J[Phase 4: Verify + summary]
 ```
 
 | Phase | Script | Purpose |
 |-------|--------|---------|
-| 0 | `install/phase-0-prerequisites.sh` / `.ps1` | **git**, **curl**, **jq**, **yq**, **gum** (and equivalents) so registry parsing, TUI, and installs can run. Unix git/curl install logic lives in **`install/boot-prereqs-git.sh`** (sourced here and by boot when needed). **yq** is required for Phase 1 and Phase 4 on Unix. |
+| 0 | `install/phase-0-prerequisites.sh` / `.ps1` | Installs tools listed in **`registry/prerequisites.yaml`** (**git**, **curl**, **jq**, **yq**, **gum**) via `lib/pkg` after a minimal **yq** bootstrap (Unix: inline binary; Windows: **Mike Farah** `yq` via winget before registry reads). Unix git/curl logic lives in **`install/boot-prereqs-git.sh`**. |
 | 0b | `install/phase-0b-os-tune.ps1` | **Windows only:** developer-oriented OS settings from `configs/os/windows.yaml` via `install/modules/os-tune-windows.ps1`. |
-| 1 | `install/phase-1-core.sh` / `.ps1` | Non-interactive install of every tool in `registry/core.yaml` via `lib/pkg` + registry (per-tool `install/modules/*` when needed). |
-| 2 | `install/phase-2-tui.sh` / `.ps1` | Interactive **gum** flows when gum is available; otherwise safe defaults and no prompts (Unix and Windows). |
-| 3 | `install/phase-3-configure.sh` / `.ps1` | Dotfiles and templates from `configs/`; installs **optional** registry selections. See [Configuration file map](./CONFIGURATION.md) and [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md). |
-| 4 | `install/phase-4-verify.sh` / `.ps1` | **Unix:** verify **core** only. **Windows:** verify core and optional rows when `BOTSTRAP_*` are set. See [Reference](./REFERENCE.md#phase-4-verification). |
+| 2 | `install/phase-2-tui.sh` / `.ps1` | Interactive **gum** flows when gum is available: **core** multi-select (all selected by default; choices from **`registry/core.yaml`**), then optional groups; otherwise non-interactive defaults (**all** core names unless **`BOTSTRAP_CORE_TOOLS`** is preset). |
+| 3 | `install/phase-3-configure.sh` / `.ps1` | Persists **`core_tools=`** to **`~/.config/botstrap/core-tools.env`**; installs **selected core** from **`registry/core.yaml`**, then **optional** from **`registry/optional.yaml`**, then dotfiles from **`configs/`**. See [Configuration file map](./CONFIGURATION.md) and [Defaults & customization](./DEFAULTS_AND_CUSTOMIZATION.md). |
+| 4 | `install/phase-4-verify.sh` / `.ps1` | Verifies every tool in **`registry/prerequisites.yaml`**, then **selected** core (from **`BOTSTRAP_CORE_TOOLS`**, else **`core-tools.env`**, else all **`core.yaml`** names for legacy installs). **Windows** also verifies optional TUI rows when **`BOTSTRAP_*`** are set. See [Reference](./REFERENCE.md#phase-4-verification). |
 
 Optional per-tool scripts under `install/modules/` hold logic that is too complex for inline YAML (extra guards, post-steps). Simple tools can be YAML-only.
 
@@ -76,8 +74,9 @@ Optional per-tool scripts under `install/modules/` hold logic that is too comple
 
 `lib/pkg.sh` (and `lib/pkg.ps1` on Windows) provide:
 
-- **`botstrap_pkg_install`** — resolve a tool in `registry/core.yaml`, pick the install snippet for the current OS/distro, and execute it.
+- **`botstrap_pkg_install`** / **`Install-BotstrapPackageFromRegistry`** — resolve a tool in a registry YAML (`registry/core.yaml`, `registry/prerequisites.yaml`, etc.), pick the install snippet for the current OS/distro, and execute it.
 - **`botstrap_pkg_verify`** — run the tool’s `verify` command from the registry.
+- **`botstrap_pkg_install_tools_from_csv`** / **`Install-BotstrapToolsFromCsv`** — install a comma-separated subset of tool names in **registry file order**.
 - Optional-group helpers used by Phase 3 to install selected **`registry/optional.yaml`** items.
 
 Orchestrators treat the registry as the source of truth; modules supplement where needed.
@@ -88,15 +87,16 @@ On **macOS/Linux**, when **gum** is available, the TUI uses [Charmbracelet Gum](
 
 1. Welcome banner.
 2. Git identity (`gum input`).
-3. Editor (single select).
-4. Programming languages (multi select).
-5. Databases (multi select; Docker-first in registry).
-6. AI agent CLIs (multi select).
-7. Theme (single select).
-8. Optional apps (multi select).
-9. Confirm summary (`gum confirm`).
+3. Core tools (`gum choose --no-limit`, every **`registry/core.yaml`** name; all pre-selected by default, or seeded from **`~/.config/botstrap/core-tools.env`** on reconfigure).
+4. Editor (single select).
+5. Programming languages (multi select).
+6. Databases (multi select; Docker-first in registry).
+7. AI agent CLIs (multi select).
+8. Theme (single select).
+9. Optional apps (multi select).
+10. Confirm summary (`gum confirm`).
 
-Selections are exported as **`BOTSTRAP_*`** environment variables for **Phase 3** (optional installs from `registry/optional.yaml` and file copies from `configs/`). Exact names are documented in [Reference](./REFERENCE.md) and in the header of `install/phase-2-tui.sh`.
+Selections are exported as **`BOTSTRAP_*`** environment variables for **Phase 3** (**`BOTSTRAP_CORE_TOOLS`**, optional installs from `registry/optional.yaml`, and file copies from `configs/`). Exact names are documented in [Reference](./REFERENCE.md) and in the header of `install/phase-2-tui.sh`.
 
 ## `bin/botstrap` CLI
 
@@ -107,7 +107,7 @@ The checkout-local CLI implements:
 | `botstrap version` | Print semver from the `version` file. |
 | `botstrap update` | **`git pull --ff-only`** in the repository root. Does **not** automatically re-run install phases. |
 | `botstrap reconfigure` | Re-run Phase 2 and Phase 3 only (same repo root as `bin/`). |
-| `botstrap doctor` | Run Phase 4 verification (`install/phase-4-verify.sh`) for core tools. |
+| `botstrap doctor` | Run Phase 4 verification (`install/phase-4-verify.sh` / `.ps1`): prerequisites, selected core, and (Windows) optional rows. |
 
 There is **no** `uninstall` subcommand in the current implementation.
 

@@ -1,1 +1,1 @@
-# Optional hooks for yq. Default install comes from registry/core.yaml.
+# Optional hooks for yq. Default install comes from registry/prerequisites.yaml.

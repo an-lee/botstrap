@@ -22,16 +22,16 @@ Useful commands (same semantics on Bash and PowerShell entry points):
 
 Details: [Reference — `bin/botstrap` CLI](./REFERENCE.md#binbotstrap-cli).
 
-## Core stack (always targeted by Phase 1)
+## Prerequisites and core stack
 
-The **authoritative list** of core tools is **[`registry/core.yaml`](https://github.com/an-lee/botstrap/blob/main/registry/core.yaml)** in your checkout. Phase 1 installs each row for your OS; Phase 4 runs each tool’s **`verify`** command from that file.
+The **prerequisite** set is **[`registry/prerequisites.yaml`](https://github.com/an-lee/botstrap/blob/main/registry/prerequisites.yaml)** (Phase 0). The **selectable core** list is **[`registry/core.yaml`](https://github.com/an-lee/botstrap/blob/main/registry/core.yaml)**; Phase 3 installs the subset you chose in the TUI (default: all), persisted as **`core_tools=`** in **`~/.config/botstrap/core-tools.env`**.
 
 Rationale for why each tool exists: [Tool selection](./TOOL_SELECTION.md).
 
 **`botstrap doctor` verification:**
 
-- **Unix:** Runs **`install/phase-4-verify.sh`**, which verifies **core tools only** (reads **`registry/core.yaml`**). It does **not** re-verify optional TUI selections.
-- **Windows:** Runs **`install/phase-4-verify.ps1`**, which verifies core **and** optional groups **when `BOTSTRAP_*` variables are set** (as during install). In a **fresh** PowerShell session, **`BOTSTRAP_LANGUAGES`**, **`BOTSTRAP_DATABASES`**, etc. may be unset, so optional checks may not run the same way as at the end of install.
+- **Unix:** Runs **`install/phase-4-verify.sh`**, which verifies **prerequisites**, then **selected** core (see [Reference](./REFERENCE.md#phase-4-verification)). It does **not** re-verify optional TUI selections.
+- **Windows:** Runs **`install/phase-4-verify.ps1`**, which verifies prerequisites, selected core, **and** optional groups **when `BOTSTRAP_*` variables are set** (as during install). In a **fresh** PowerShell session, **`BOTSTRAP_LANGUAGES`**, **`BOTSTRAP_DATABASES`**, etc. may be unset, so optional checks may not run the same way as at the end of install.
 
 To confirm optional pieces manually, use **`command -v`**, **`mise ls`**, **`docker image ls`**, or the **`verify`** snippets in **`registry/optional.yaml`**.
 
@@ -41,6 +41,7 @@ Interactive choices (when **gum** is available) map to groups in **[`registry/op
 
 **What is persisted on disk:**
 
+- **`~/.config/botstrap/core-tools.env`** — `core_tools=<comma-separated names>` from **`registry/core.yaml`** (Windows: same path under **`%USERPROFILE%\.config\botstrap\`**).
 - **`~/.config/botstrap/theme.env`** — `theme=<value>` (Windows: under **`%USERPROFILE%\.config\botstrap\`**).
 - **`~/.config/botstrap/editor.env`** — `editor=<value>`.
 

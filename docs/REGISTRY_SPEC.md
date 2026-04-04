@@ -1,8 +1,9 @@
 # Registry specification
 
-Botstrap defines installable tools in YAML. There are two files:
+Botstrap defines installable tools in YAML. There are three files:
 
-- **`registry/core.yaml`** — Installed automatically in Phase 1 (non-interactive, opinionated baseline).
+- **`registry/prerequisites.yaml`** — Installed in **Phase 0** only (non-interactive): **git**, **curl**, **jq**, **yq**, **gum** so registry parsing, TUI, and later installs can run. Same per-tool schema as **`core.yaml`**; passed to **`botstrap_pkg_install`** / **`Install-BotstrapPackageFromRegistry`** with this path.
+- **`registry/core.yaml`** — Presented in **Phase 2** (TUI) as a multi-select list (all selected by default); installed after confirm in **Phase 3** for the subset stored in **`BOTSTRAP_CORE_TOOLS`** / **`~/.config/botstrap/core-tools.env`**.
 - **`registry/optional.yaml`** — Presented in Phase 2 (TUI); users choose editors, languages, databases, AI CLIs, themes, and optional apps.
 
 ## General rules
@@ -12,7 +13,11 @@ Botstrap defines installable tools in YAML. There are two files:
 - **Names**: Tool `name` fields use lowercase letters, digits, and hyphens (`kebab-case`). They must be unique within their file.
 - **Shell install snippets** (Unix): Multi-line scalar blocks are run with `bash` (e.g. `bash -c` or equivalent). Use non-interactive flags (`-y`, `--yes`) everywhere.
 - **PowerShell snippets** (Windows): Use non-interactive `winget`, `scoop`, or documented silent installers.
-- **Order**: In `core.yaml`, `tools` is an ordered list; Phase 1 should respect order so dependencies (e.g. `yq` before registry-driven loops) can be enforced in the orchestrator when needed.
+- **Order**: In each `tools` list, order is significant: Phase 0 / Phase 3 install in YAML order (e.g. dependency-friendly ordering within **`prerequisites.yaml`** and **`core.yaml`**).
+
+## `registry/prerequisites.yaml` schema
+
+Same as **`registry/core.yaml`** below: top-level **`schema_version`**, **`tools`** list, and the same fields on each tool (**`name`**, **`description`**, **`category`**, **`install`**, **`verify`**, optional **`verify_windows`**, **`post_install`**, **`post_install_windows`**, **`configure`**). Only **`prerequisites.yaml`** and **`core.yaml`** use this shape; **`optional.yaml`** uses **`groups`**.
 
 ## `registry/core.yaml` schema
 
@@ -118,4 +123,4 @@ tools:
     verify: example-cli --version
 ```
 
-See `registry/core.yaml` and `registry/optional.yaml` for the live manifests.
+See `registry/prerequisites.yaml`, `registry/core.yaml`, and `registry/optional.yaml` for the live manifests.

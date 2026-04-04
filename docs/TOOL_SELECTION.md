@@ -1,8 +1,12 @@
 # Tool selection rationale
 
-This document explains why Botstrap includes each **core** tool (always installed in Phase 1) and how **optional** groups are scoped. The goal is a baseline that works well for humans and for AI agents driving a terminal. For how optional items are installed after the TUI, see [Introduction](./INTRODUCTION.md) and [Registry specification](./REGISTRY_SPEC.md).
+This document explains why Botstrap includes each **prerequisite** and **core** tool and how **optional** groups are scoped. The goal is a baseline that works well for humans and for AI agents driving a terminal. **Core** rows are TUI-selectable (default all); **prerequisites** are Phase 0 only. For how items are installed after the TUI, see [Introduction](./INTRODUCTION.md) and [Registry specification](./REGISTRY_SPEC.md).
 
-## Core tools (Phase 1)
+## Prerequisites (Phase 0)
+
+Git, curl, jq, yq, and gum are defined in **`registry/prerequisites.yaml`** so the registry package layer and gum TUI can run. They are not part of the **core** multi-select.
+
+## Core tools (Phase 2 → Phase 3)
 
 ### Shell and navigation
 
@@ -94,7 +98,7 @@ Optional items are grouped so users can tailor the machine without breaking the 
 
 ## Changing the set
 
-- Add or adjust **core** tools in `registry/core.yaml` and update Phase 1 ordering if dependencies change.
+- Add or adjust **prerequisite** tools in `registry/prerequisites.yaml` or **core** tools in `registry/core.yaml` and preserve YAML order if dependencies matter.
 - Add **optional** entries in `registry/optional.yaml` and wire new TUI group logic if you add a new group `id`.
 
 See `docs/CONTRIBUTING.md` for the contribution workflow.

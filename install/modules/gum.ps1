@@ -1,1 +1,1 @@
-# Optional hooks for gum. Default install comes from registry/core.yaml.
+# Optional hooks for gum. Default install comes from registry/prerequisites.yaml.

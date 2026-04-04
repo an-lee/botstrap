@@ -6,7 +6,7 @@ Botstrap is designed so **coding agents** (Cursor, Claude Code, Codex, and simil
 
 ### Non-interactive by default
 
-Core Phase 1 installs use package managers and flags that do not prompt (`-y`, `--yes`, `--accept-package-agreements` on Windows where applicable). Agents cannot answer graphical or surprise prompts; failing fast with a clear error is preferable to hanging on stdin.
+Registry-driven installs use package managers and flags that do not prompt (`-y`, `--yes`, `--accept-package-agreements` on Windows where applicable). Agents cannot answer graphical or surprise prompts; failing fast with a clear error is preferable to hanging on stdin.
 
 ### Structured, discoverable layout
 

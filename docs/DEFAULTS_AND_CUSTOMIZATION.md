@@ -54,7 +54,7 @@ Export **`BOTSTRAP_*`** variables before the orchestrator or before sourcing Pha
 
 ### 5. Fork or extend the registry
 
-Add or change tools in **`registry/core.yaml`** or **`registry/optional.yaml`**. Schema and conventions: [Registry specification](./REGISTRY_SPEC.md).
+Add or change tools in **`registry/prerequisites.yaml`**, **`registry/core.yaml`**, or **`registry/optional.yaml`**. Schema and conventions: [Registry specification](./REGISTRY_SPEC.md).
 
 ### Windows-only OS tuning
 

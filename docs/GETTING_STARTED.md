@@ -10,22 +10,22 @@ This guide covers **how to run Botstrap**, **prerequisites**, **local developmen
   - **macOS / Linux (`boot.sh`):** loads `install/boot-prereqs-git.sh` from a **local checkout** (if you run `boot.sh` from disk) or fetches it over **HTTPS** when `BOTSTRAP_REPO` is a **GitHub** `https://github.com/...` or `git@github.com:...` URL (needs **curl** for that fetch). It then runs the same git/curl install logic as Phase 0 (Homebrew, apt, dnf, or pacman; **sudo** where needed). For **non-GitHub** remotes, set **`BOTSTRAP_BOOT_PREREQS_URL`** to the raw URL of `install/boot-prereqs-git.sh`, or install **git** yourself first.
   - **Windows (`boot.ps1`):** if **winget** is available, installs **Git.Git**; otherwise install Git for Windows manually.
 - If git still cannot be installed, boot exits with instructions.
-- **Network access** to clone the repository and to download packages or release binaries during Phase 0 and Phase 1.
+- **Network access** to clone the repository and to download packages or release binaries during Phase 0 and later phases.
 
 ### After clone (Unix orchestrator)
 
 - **Bash** (the project uses `#!/usr/bin/env bash` with `set -euo pipefail`; use Bash 4+ where possible).
 - **sudo** (or equivalent) on Linux/macOS when Phase 0 or package installs need it.
-- Phase 0 installs **jq**, **yq**, and **gum** when possible; **yq** is **required** for Phase 1 and Phase 4.
+- Phase 0 installs **jq**, **yq**, and **gum** when possible (from **`registry/prerequisites.yaml`**); **yq** is **required** for registry-driven installs and Phase 4.
 
 ### Windows
 
 - **PowerShell** (scripts use `#requires -Version 5.1`; PowerShell 7+ is recommended for testing).
 - **Git for Windows** (boot and Phase 0 try **winget** first when git is missing).
-- Phase 0 requires **winget** (App Installer) and installs **yq**, **jq**, and **gum** when missing. **yq** is required for Phase 1 and Phase 4 on Windows, same as Unix.
+- Phase 0 requires **winget** (App Installer) and installs **yq**, **jq**, and **gum** when missing. **yq** is required for registry-driven installs and Phase 4 on Windows, same as Unix.
 - **Administrator rights are not required** to run the install; it completes without elevation.
 - For **full OS tuning** (Developer Mode and long paths in Phase 0b), run from an **elevated PowerShell** ("Run as Administrator") if you want those applied automatically. If not elevated, those two items are skipped with a warning; you can enable them manually in Settings or re-run elevated. See [Cross-platform notes](./CROSS_PLATFORM.md).
-- Native **`install.ps1`** runs the full gum TUI (when **gum** is on `PATH`), registry-driven core and optional installs, PowerShell profile hooks, and verification.
+- Native **`install.ps1`** runs the full gum TUI (when **gum** is on `PATH`), registry-driven prerequisite, selected core, and optional installs, PowerShell profile hooks, and verification.
 
 ## Install from the web (recommended)
 
@@ -70,14 +70,14 @@ $env:BOTSTRAP_ROOT = (Get-Location).Path
 In **`install/phase-2-tui.sh`**, if **`gum`** is not on `PATH`, the script:
 
 - Logs a warning.
-- Exports **default** `BOTSTRAP_*` variables (empty or sensible defaults, e.g. `BOTSTRAP_EDITOR=none`, `BOTSTRAP_THEME=catppuccin`).
+- Exports **default** `BOTSTRAP_*` variables (empty or sensible defaults, e.g. **`BOTSTRAP_CORE_TOOLS`** = all names from **`registry/core.yaml`** unless preset, `BOTSTRAP_EDITOR=none`, `BOTSTRAP_THEME=catppuccin`).
 - **Exits 0** immediately so Phase 3 and Phase 4 still run.
 
 So a headless run completes without hanging on prompts, but you will not get interactive choices unless gum is available.
 
 ### Windows Phase 2
 
-If **gum** is missing, **`phase-2-tui.ps1`** exports the same safe defaults as Unix (e.g. **`BOTSTRAP_EDITOR=none`**, **`BOTSTRAP_THEME=catppuccin`**, empty optional lists) and returns so Phase 3 and Phase 4 still run. If **gum** is present, the script runs the same interactive prompts as **`phase-2-tui.sh`** (editor, languages, databases, AI tools, theme, optional apps).
+If **gum** is missing, **`phase-2-tui.ps1`** exports the same safe defaults as Unix (including **`BOTSTRAP_CORE_TOOLS`** = all **`core.yaml`** names unless preset, **`BOTSTRAP_EDITOR=none`**, **`BOTSTRAP_THEME=catppuccin`**, empty optional lists) and returns so Phase 3 and Phase 4 still run. If **gum** is present, the script runs the same interactive prompts as **`phase-2-tui.sh`** (core tools, editor, languages, databases, AI tools, theme, optional apps).
 
 ## After install: `bin/botstrap`
 
@@ -89,7 +89,7 @@ From the clone (e.g. `~/.botstrap`) you can always use:
 ./bin/botstrap version   # prints semver from `version` file
 ./bin/botstrap update    # git pull --ff-only in the clone
 ./bin/botstrap reconfigure  # Phase 2 + Phase 3 only
-./bin/botstrap doctor    # status lines + Phase 4 core verification (exits 1 on verify failures)
+./bin/botstrap doctor    # status lines + Phase 4 verification (prerequisites + selected core; exits 1 on verify failures)
 ```
 
 On **native Windows** (PowerShell install), Phase 3 appends a **`# botstrap PATH`** block to your PowerShell **profile** (same marker pattern as starship/zoxide): it sets **`$env:BOTSTRAP_ROOT`**, prepends **`bin\`** to **`$env:PATH`**, and defines a **`botstrap`** function that runs **`bin/botstrap.ps1`**. Open a **new** PowerShell session (or **`. $PROFILE`**) to use **`botstrap`** from anywhere. **Git Bash** / **WSL** with **`install.sh`** still use the Bash **`bin/botstrap`** and **`~/.config/botstrap/env.sh`** hook.

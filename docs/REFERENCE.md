@@ -36,6 +36,7 @@ Set by **`install/phase-2-tui.sh`** (or defaults when gum is missing). Group ids
 |----------|---------|
 | `BOTSTRAP_GIT_NAME` | Global Git `user.name` (Phase 3). |
 | `BOTSTRAP_GIT_EMAIL` | Global Git `user.email` (Phase 3). |
+| `BOTSTRAP_CORE_TOOLS` | Comma-separated tool **`name`** values from **`registry/core.yaml`** to install in Phase 3 (registry order). Set by the TUI (default: all names) or non-interactive defaults; may be preset for automation. |
 | `BOTSTRAP_EDITOR` | One of: `cursor`, `vscode`, `neovim`, `zed`, `none`. |
 | `BOTSTRAP_LANGUAGES` | Comma-separated mise-related choices: `node`, `python`, `ruby`, `go`, `rust`, `java`, `elixir`, `php`, `none`, … |
 | `BOTSTRAP_DATABASES` | Comma-separated: `postgresql`, `mysql`, `redis`, `sqlite`, `none`, … |
@@ -43,7 +44,7 @@ Set by **`install/phase-2-tui.sh`** (or defaults when gum is missing). Group ids
 | `BOTSTRAP_THEME` | One of: `catppuccin`, `tokyo-night`, `gruvbox`, `nord`, `rose-pine`. |
 | `BOTSTRAP_OPTIONAL_APPS` | Comma-separated: `1password-cli`, `tailscale`, `ngrok`, `postman`, `none`, … |
 
-Phase 3 passes these into **`lib/pkg`** helpers to install matching rows in **`registry/optional.yaml`**.
+Phase 3 installs **core** via **`BOTSTRAP_CORE_TOOLS`** and **`registry/core.yaml`**, then passes the remaining variables into **`lib/pkg`** helpers for **`registry/optional.yaml`**.
 
 ## Windows OS tuning variables
 
@@ -62,6 +63,7 @@ Unless otherwise noted, paths are under **`$HOME`**.
 | `~/.gitignore_global` | Copied from `configs/git/gitignore_global`; `core.excludesfile` set globally. |
 | Git user.name / user.email | Set from `BOTSTRAP_GIT_*` when non-empty. |
 | `~/.zshrc`, `~/.bashrc` | Appended **once** (marker-guarded) with contents of `configs/shell/aliases`, `configs/shell/functions`, and `configs/shell/env_path_snippet.bash` when those repo files exist. The PATH snippet sources **`~/.config/botstrap/env.sh`**. |
+| `~/.config/botstrap/core-tools.env` | **`core_tools=`** comma-separated list (persisted Phase 3) for **`botstrap doctor`** / reconfigure default core selection when **`BOTSTRAP_CORE_TOOLS`** is not set in the shell. |
 | `~/.config/botstrap/env.sh` | **Unix Phase 3:** sets **`BOTSTRAP_ROOT`** and prepends **`$BOTSTRAP_ROOT/bin`** to **`PATH`** (duplicate-safe). Regenerated each Phase 3 run. |
 | Editor configs | **cursor:** `~/.cursor/settings.json` from `configs/editor/cursor-settings.json`. **vscode:** `~/.config/Code/User/settings.json` from `configs/editor/vscode.json`. **neovim:** `~/.config/nvim/init.lua` from `configs/editor/neovim/init.lua`. |
 | `~/.config/botstrap/theme.env`, `editor.env` | Small key=value files for theme and editor. |
@@ -73,14 +75,15 @@ Paths use **`%USERPROFILE%`** where relevant.
 
 | Action | Condition |
 |--------|-----------|
+| **`%USERPROFILE%\.config\botstrap\core-tools.env`** | **`core_tools=`** persisted list (Phase 3) for **`doctor`** / TUI defaults when **`BOTSTRAP_CORE_TOOLS`** is unset. |
 | PowerShell **profile** (`$PROFILE`, or **`Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`** if **`$PROFILE`** is empty) | Appended **once** (marker-guarded) with **`# botstrap PATH`**: sets **`$env:BOTSTRAP_ROOT`** to the checkout, prepends **`$BOTSTRAP_ROOT\bin`** to **`$env:PATH`**, and defines **`function Global:botstrap`** that invokes **`bin\botstrap.ps1`**. Also appends **`# botstrap starship`**, **`# botstrap zoxide`**, and **`# botstrap aliases`** blocks when missing. |
 
 There is **no** **`~/.config/botstrap/env.sh`** on native Windows; the profile block is the shell hook for the **`botstrap`** command.
 
 ## Phase 4 verification
 
-- **Unix (`install/phase-4-verify.sh`):** Reads every **`name`** in **`registry/core.yaml`** with **yq**, runs each **`verify`** via **`botstrap_pkg_verify`**, warns per failure, prints counts and **`version`**, suggests re-running Phase 2 + 3. Exits **1** if **`yq`** is missing or any core verify fails. **Optional** TUI selections are **not** verified here.
-- **Windows (`install/phase-4-verify.ps1`):** Verifies **core** the same way, then verifies **optional** groups when **`BOTSTRAP_*`** variables are set (see [After install](./AFTER_INSTALL.md)).
+- **Unix (`install/phase-4-verify.sh`):** Verifies every tool in **`registry/prerequisites.yaml`**, then **selected** core: if **`BOTSTRAP_CORE_TOOLS`** is set in the environment (including empty), uses that; else if **`~/.config/botstrap/core-tools.env`** contains **`core_tools=`**, uses its value; else verifies **all** names in **`registry/core.yaml`** (legacy installs without persistence). Warns per failure; exits **1** if **`yq`** is missing or any run verify fails. **Optional** TUI selections are **not** verified on Unix.
+- **Windows (`install/phase-4-verify.ps1`):** Same **prerequisites** + **selected core** resolution via **`Get-BotstrapCoreToolNamesForVerify`**, then verifies **optional** groups when **`BOTSTRAP_*`** variables are set (see [After install](./AFTER_INSTALL.md)).
 
 ## Related
 

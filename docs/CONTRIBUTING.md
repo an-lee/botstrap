@@ -5,7 +5,7 @@ Thank you for helping improve Botstrap. This project aims to stay **transparent*
 ## Before you start
 
 - Read `docs/INTRODUCTION.md` and `docs/ARCHITECTURE.md` for the overall flow.
-- Read `docs/REGISTRY_SPEC.md` before editing `registry/core.yaml` or `registry/optional.yaml`.
+- Read `docs/REGISTRY_SPEC.md` before editing `registry/prerequisites.yaml`, `registry/core.yaml`, or `registry/optional.yaml`.
 - See `docs/REFERENCE.md` for CLI and environment variable naming when changing phases.
 - Prefer YAML registry changes over new orchestration logic when a tool installs cleanly from package managers.
 
@@ -19,13 +19,13 @@ Thank you for helping improve Botstrap. This project aims to stay **transparent*
    # Optional: dry-run or step through install/phase-0-prerequisites.sh etc.
    ```
 
-3. Ensure **bash 4+**; **git** and **curl** are required for many tests but Phase 0 can install them on supported macOS/Linux. **yq** is required once Phase 1 has run or if you test `lib/pkg.sh` against the registry.
+3. Ensure **bash 4+**; **git** and **curl** are required for many tests but Phase 0 can install them on supported macOS/Linux. **yq** is required after Phase 0 or if you test `lib/pkg.sh` against the registry.
 
 ## Adding a tool
 
 ### Core (always installed)
 
-1. Add an entry to `registry/core.yaml` with `name`, `description`, `category`, `install` keys per OS, and `verify`.
+1. Add an entry to `registry/core.yaml` (or `registry/prerequisites.yaml` if it belongs in Phase 0) with `name`, `description`, `category`, `install` keys per OS, and `verify`.
 2. If install cannot be expressed safely in YAML, add `install/modules/<name>.sh` (and `.ps1` on Windows) and call it from the phase script or from `post_install`.
 3. Update `docs/TOOL_SELECTION.md` with a one-line rationale.
 

@@ -4,7 +4,7 @@
   <img src="docs/public/logo.svg" alt="Botstrap" width="300" />
 </p>
 
-Cross-platform bootstrap for **developers** and **AI coding agents**: one entry point on macOS, Linux, and Windows to install a **core** toolchain from a **YAML registry**, pick **optional** tools in a **gum** TUI, then apply **configs** and **verify** installs — with predictable PATH, non-interactive CLIs by default, and **configs/** scaffolding suited to agents.
+Cross-platform bootstrap for **developers** and **AI coding agents**: one entry point on macOS, Linux, and Windows to install **prerequisite** CLI tooling, pick **core** and **optional** tools in a **gum** TUI (core defaults to all selected), then apply **configs** and **verify** installs — with predictable PATH, non-interactive CLIs by default, and **configs/** scaffolding suited to agents.
 
 ## Quick start (from a published clone)
 
@@ -39,9 +39,10 @@ $env:BOTSTRAP_ROOT = (Get-Location).Path
 ## Layout
 
 - `boot.sh` / `boot.ps1` — clone `~/.botstrap` and start `install.*`
-- `install.sh` / `install.ps1` — phases 0–4
+- `install.sh` / `install.ps1` — phases 0, 0b (Windows), 2–4
 - `lib/` — `detect`, `log`, `pkg` (registry-driven installs on Unix)
-- `registry/core.yaml` — always-installed tools
+- `registry/prerequisites.yaml` — Phase 0 tools (git, curl, jq, yq, gum)
+- `registry/core.yaml` — TUI multi-select core stack (installed after confirm)
 - `registry/optional.yaml` — TUI selections (editor, languages, databases, AI CLIs, themes, apps)
 - `configs/` — shell, git, editor, and agent templates
 - `docs/` — architecture, registry spec, contributing
@@ -54,7 +55,7 @@ After **Phase 3** on macOS/Linux, open a **new** shell (or `source ~/.zshrc` / `
 ./bin/botstrap version
 ./bin/botstrap update      # git pull in repo root
 ./bin/botstrap reconfigure # TUI + configure phases
-./bin/botstrap doctor      # install status + core verify (exits 1 if any verify fails)
+./bin/botstrap doctor      # install status + prerequisite and selected-core verify (exits 1 if any verify fails)
 ```
 
 ## Documentation

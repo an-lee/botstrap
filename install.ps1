@@ -19,12 +19,11 @@ if ($BotstrapOS -eq 'windows') {
 }
 
 $phaseSteps = @(
-    @{ Rel = 'install\phase-0-prerequisites.ps1'; Num = 1; Total = 6; Label = 'Prerequisites - git, curl, jq, yq, gum' }
-    @{ Rel = 'install\phase-0b-os-tune.ps1'; Num = 2; Total = 6; Label = 'OS developer tuning' }
-    @{ Rel = 'install\phase-1-core.ps1'; Num = 3; Total = 6; Label = 'Core tools' }
-    @{ Rel = 'install\phase-2-tui.ps1'; Num = 4; Total = 6; Label = 'Configuration' }
-    @{ Rel = 'install\phase-3-configure.ps1'; Num = 5; Total = 6; Label = 'Optional installs' }
-    @{ Rel = 'install\phase-4-verify.ps1'; Num = 6; Total = 6; Label = 'Verification' }
+    @{ Rel = 'install\phase-0-prerequisites.ps1'; Num = 1; Total = 5; Label = 'Prerequisites - git, curl, jq, yq, gum' }
+    @{ Rel = 'install\phase-0b-os-tune.ps1'; Num = 2; Total = 5; Label = 'OS developer tuning' }
+    @{ Rel = 'install\phase-2-tui.ps1'; Num = 3; Total = 5; Label = 'Interactive configuration' }
+    @{ Rel = 'install\phase-3-configure.ps1'; Num = 4; Total = 5; Label = 'Apply installs and dotfiles' }
+    @{ Rel = 'install\phase-4-verify.ps1'; Num = 5; Total = 5; Label = 'Verification' }
 )
 
 foreach ($step in $phaseSteps) {

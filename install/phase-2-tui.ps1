@@ -6,6 +6,12 @@ if (-not (Get-Command gum -ErrorAction SilentlyContinue)) {
     Write-BotstrapWarn 'gum not found; using non-interactive defaults.'
     $env:BOTSTRAP_GIT_NAME = $env:BOTSTRAP_GIT_NAME
     $env:BOTSTRAP_GIT_EMAIL = $env:BOTSTRAP_GIT_EMAIL
+    if (-not $env:BOTSTRAP_CORE_TOOLS) {
+        $coreYaml = Join-Path $env:BOTSTRAP_ROOT 'registry\core.yaml'
+        $rawNames = & yq -r '.tools[].name' $coreYaml 2>$null
+        $parts = @($rawNames -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+        $env:BOTSTRAP_CORE_TOOLS = $parts -join ','
+    }
     if (-not $env:BOTSTRAP_EDITOR) { $env:BOTSTRAP_EDITOR = 'none' }
     if (-not $env:BOTSTRAP_LANGUAGES) { $env:BOTSTRAP_LANGUAGES = '' }
     if (-not $env:BOTSTRAP_DATABASES) { $env:BOTSTRAP_DATABASES = '' }
@@ -32,6 +38,27 @@ if (-not $env:BOTSTRAP_GIT_EMAIL) {
     $emailArgs = if ($gitEmailDefault) { @('--value', $gitEmailDefault) } else { @() }
     $env:BOTSTRAP_GIT_EMAIL = & gum input --placeholder 'Git email' @emailArgs
 }
+
+$ErrorActionPreference = 'Stop'
+$coreYaml = Join-Path $env:BOTSTRAP_ROOT 'registry\core.yaml'
+$coreNames = @(& yq -r '.tools[].name' $coreYaml 2>$null | ForEach-Object { "$_".Trim() } | Where-Object { $_ })
+$selectedFlag = '*'
+$coreEnvFile = Join-Path $env:USERPROFILE '.config\botstrap\core-tools.env'
+if (Test-Path -LiteralPath $coreEnvFile) {
+    $match = @(Get-Content -LiteralPath $coreEnvFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*core_tools=' } | Select-Object -First 1)
+    if ($match.Count -gt 0) {
+        $v = ($match[0] -replace '^\s*core_tools=', '').Trim()
+        if ($v) { $selectedFlag = $v }
+    }
+}
+$ErrorActionPreference = 'Continue'
+$coreChooseArgs = @(
+    'choose', '--no-limit', '--ordered',
+    '--header', 'Core tools (registry/core.yaml)',
+    '--selected', $selectedFlag
+) + $coreNames
+$coreLines = @( & gum @coreChooseArgs )
+$env:BOTSTRAP_CORE_TOOLS = ($coreLines | ForEach-Object { "$_".Trim() } | Where-Object { $_ }) -join ','
 
 $ErrorActionPreference = 'Continue'
 $editorChoice = & gum choose --header 'Primary editor' cursor vscode neovim zed none

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Phase 0: git, curl, jq, yq, gum — minimum to run registry + TUI.
+# Phase 0: git, curl, jq, yq, gum — minimum to run registry + TUI (from registry/prerequisites.yaml).
+# yq is bootstrapped inline first because registry-driven installs require yq to read YAML.
 set -euo pipefail
 
 : "${BOTSTRAP_ROOT:?BOTSTRAP_ROOT must be set}"
@@ -13,7 +14,7 @@ botstrap_detect
 # shellcheck source=install/boot-prereqs-git.sh
 source "${BOTSTRAP_ROOT}/install/boot-prereqs-git.sh"
 
-botstrap_install_yq() {
+botstrap_bootstrap_yq_for_registry() {
   command -v yq &>/dev/null && return 0
   local yq_ver="v4.44.3"
   local arch="${BOTSTRAP_UNAME_M}"
@@ -35,60 +36,37 @@ botstrap_install_yq() {
       sudo chmod +x /usr/local/bin/yq
       ;;
     *)
+      botstrap_log_err "Cannot bootstrap yq for OS=${BOTSTRAP_OS}"
       return 1
       ;;
   esac
 }
 
-botstrap_install_jq() {
-  command -v jq &>/dev/null && return 0
-  case "${BOTSTRAP_OS}" in
-    darwin)
-      brew install jq
-      ;;
-    linux)
-      case "${BOTSTRAP_PKG}" in
-        apt) sudo apt-get install -y jq ;;
-        dnf) sudo dnf install -y jq ;;
-        pacman) sudo pacman -Sy --noconfirm jq ;;
-        *) return 1 ;;
-      esac
-      ;;
-    *) return 1 ;;
-  esac
-}
-
-botstrap_install_gum() {
-  command -v gum &>/dev/null && return 0
-  local gum_ver="0.14.5"
-  case "${BOTSTRAP_OS}" in
-    darwin)
-      brew install gum
-      ;;
-    linux)
-      local arch="${BOTSTRAP_UNAME_M}"
-      local deb_arch="amd64"
-      [[ "${arch}" == "aarch64" || "${arch}" == "arm64" ]] && deb_arch="arm64"
-      local url="https://github.com/charmbracelet/gum/releases/download/v${gum_ver}/gum_${gum_ver}_Linux_${deb_arch}.tar.gz"
-      local tmp
-      tmp="$(mktemp -d)"
-      curl -fsSL "${url}" | tar -xz -C "${tmp}"
-      sudo install -m 0755 "${tmp}/gum" /usr/local/bin/gum
-      rm -rf "${tmp}"
-      ;;
-    *)
-      botstrap_log_warn "Install gum manually for OS=${BOTSTRAP_OS}"
-      return 0
-      ;;
-  esac
-}
-
 botstrap_ensure_git_curl
-botstrap_install_jq || botstrap_log_warn "jq not installed; some scripts may skip JSON helpers."
-botstrap_install_yq || {
-  botstrap_log_err "yq install failed"
+botstrap_bootstrap_yq_for_registry || {
+  botstrap_log_err "yq bootstrap failed"
   exit 1
 }
-botstrap_install_gum || botstrap_log_warn "gum missing; Phase 2 TUI will be limited."
+
+# shellcheck source=lib/pkg.sh
+source "${BOTSTRAP_ROOT}/lib/pkg.sh"
+
+_prereq_reg="${BOTSTRAP_ROOT}/registry/prerequisites.yaml"
+mapfile -t _botstrap_prereq_tools < <(yq -r '.tools[].name' "${_prereq_reg}")
+_total="${#_botstrap_prereq_tools[@]}"
+_current=0
+for _tool in "${_botstrap_prereq_tools[@]}"; do
+  [[ -z "${_tool}" ]] && continue
+  _current=$((_current + 1))
+  botstrap_log_step "${_current}" "${_total}" "Prerequisite ${_tool}"
+  botstrap_pkg_install "${_tool}" "${_prereq_reg}" || botstrap_log_warn "Install reported failure for ${_tool} (continuing)."
+done
+
+if ! command -v jq &>/dev/null; then
+  botstrap_log_warn "jq not installed; some scripts may skip JSON helpers."
+fi
+if ! command -v gum &>/dev/null; then
+  botstrap_log_warn "gum missing; Phase 2 TUI will be limited."
+fi
 
 botstrap_log_info "Phase 0 complete."

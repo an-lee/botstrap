@@ -483,3 +483,69 @@ function Test-BotstrapOptionalItemVerify {
         return $false
     }
 }
+
+function Test-BotstrapCsvHasItem {
+    param(
+        [Parameter(Mandatory)][string]$Needle,
+        [AllowEmptyString()][string]$Csv
+    )
+    if ([string]::IsNullOrWhiteSpace($Csv)) {
+        return $false
+    }
+    foreach ($raw in $Csv.Split(',')) {
+        if ($raw.Trim() -eq $Needle) {
+            return $true
+        }
+    }
+    return $false
+}
+
+function Install-BotstrapToolsFromCsv {
+    param(
+        [Parameter(Mandatory)][string]$Csv,
+        [Parameter(Mandatory)][string]$RegistryPath
+    )
+    if ([string]::IsNullOrWhiteSpace($Csv)) {
+        return
+    }
+    $ordered = @(& yq -r '.tools[].name' $RegistryPath 2>$null | ForEach-Object { "$_".Trim() } | Where-Object { $_ })
+    foreach ($name in $ordered) {
+        if (-not (Test-BotstrapCsvHasItem -Needle $name -Csv $Csv)) {
+            continue
+        }
+        $ok = Install-BotstrapPackageFromRegistry -ToolName $name -RegistryPath $RegistryPath
+        if (-not $ok) {
+            Write-BotstrapWarn "Install reported failure for ${name} (continuing)."
+        }
+    }
+}
+
+function Get-BotstrapCoreToolNamesForVerify {
+    $coreReg = Join-Path $env:BOTSTRAP_ROOT 'registry\core.yaml'
+    $ordered = @(& yq -r '.tools[].name' $coreReg 2>$null | ForEach-Object { "$_".Trim() } | Where-Object { $_ })
+    $procCsv = [Environment]::GetEnvironmentVariable('BOTSTRAP_CORE_TOOLS', 'Process')
+    if ($null -ne $procCsv) {
+        $result = [System.Collections.Generic.List[string]]::new()
+        foreach ($n in $ordered) {
+            if (Test-BotstrapCsvHasItem -Needle $n -Csv $procCsv) {
+                [void]$result.Add($n)
+            }
+        }
+        return ,$result.ToArray()
+    }
+    $cf = Join-Path $env:USERPROFILE '.config\botstrap\core-tools.env'
+    if (Test-Path -LiteralPath $cf) {
+        $match = @(Get-Content -LiteralPath $cf -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*core_tools=' } | Select-Object -First 1)
+        if ($match.Count -gt 0) {
+            $csv = ($match[0] -replace '^\s*core_tools=', '').Trim()
+            $result = [System.Collections.Generic.List[string]]::new()
+            foreach ($n in $ordered) {
+                if (Test-BotstrapCsvHasItem -Needle $n -Csv $csv) {
+                    [void]$result.Add($n)
+                }
+            }
+            return ,$result.ToArray()
+        }
+    }
+    return ,$ordered
+}

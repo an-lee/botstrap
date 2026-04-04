@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Main Unix orchestrator: prerequisites, core tools, TUI, configure, verify.
+# Main Unix orchestrator: prerequisites, TUI (core + optional choices), apply installs, verify.
 set -euo pipefail
 
 export BOTSTRAP_ROOT
@@ -19,7 +19,7 @@ botstrap_detect
 botstrap_sudo_init
 botstrap_log_info "Detected OS=${BOTSTRAP_OS} distro=${BOTSTRAP_DISTRO} pkg=${BOTSTRAP_PKG} arch=${BOTSTRAP_UNAME_M}"
 
-botstrap_log_phase 1 5 "Prerequisites - git, curl, jq, yq, gum"
+botstrap_log_phase 1 4 "Prerequisites - git, curl, jq, yq, gum"
 # shellcheck source=install/phase-0-prerequisites.sh
 source "${BOTSTRAP_ROOT}/install/phase-0-prerequisites.sh"
 if [[ "${BOTSTRAP_OS}" == darwin ]]; then
@@ -31,16 +31,13 @@ if [[ "${BOTSTRAP_OS}" == darwin ]]; then
     eval "$(/usr/local/bin/brew shellenv)"
   fi
 fi
-botstrap_log_phase 2 5 "Core tools"
-# shellcheck source=install/phase-1-core.sh
-source "${BOTSTRAP_ROOT}/install/phase-1-core.sh"
-botstrap_log_phase 3 5 "Configuration"
+botstrap_log_phase 2 4 "Interactive configuration"
 # shellcheck source=install/phase-2-tui.sh
 source "${BOTSTRAP_ROOT}/install/phase-2-tui.sh"
-botstrap_log_phase 4 5 "Optional installs"
+botstrap_log_phase 3 4 "Apply installs and dotfiles"
 # shellcheck source=install/phase-3-configure.sh
 source "${BOTSTRAP_ROOT}/install/phase-3-configure.sh"
-botstrap_log_phase 5 5 "Verification"
+botstrap_log_phase 4 4 "Verification"
 # shellcheck source=install/phase-4-verify.sh
 source "${BOTSTRAP_ROOT}/install/phase-4-verify.sh"
 

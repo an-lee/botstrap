@@ -2,7 +2,7 @@
 
 Botstrap targets **macOS**, **Linux** (multiple families), and **Windows**. The same phases run everywhere; only detection, package commands, and paths differ.
 
-**Windows vs WSL:** Native **`install.ps1`** runs the same **phase sequence** as macOS/Linux: Phase 0 bootstraps **winget**, **Git**, **yq**, **jq**, and **gum**; **`lib/pkg.ps1`** applies **`registry/core.yaml`** and **`registry/optional.yaml`** via **yq** and **winget** (with **`verify_windows`** / **`post_install_windows`** where needed). **WSL + `install.sh`** remains a good choice if your daily workflow is Linux-only; use native PowerShell when you want host Windows tools (Docker Desktop, npm CLIs, GitHub CLI) without a Linux layer.
+**Windows vs WSL:** Native **`install.ps1`** runs the same **phase sequence** as macOS/Linux: Phase 0 installs **`registry/prerequisites.yaml`** (via **winget** where applicable); Phase 3 applies **selected** **`registry/core.yaml`** and **`registry/optional.yaml`** via **`lib/pkg.ps1`**, **yq**, and **winget** (with **`verify_windows`** / **`post_install_windows`** where needed). **WSL + `install.sh`** remains a good choice if your daily workflow is Linux-only; use native PowerShell when you want host Windows tools (Docker Desktop, npm CLIs, GitHub CLI) without a Linux layer.
 
 ## Entry points
 

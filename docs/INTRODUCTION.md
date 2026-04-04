@@ -1,6 +1,6 @@
 # Introduction
 
-Botstrap is a **cross-platform bootstrap**: one entry point on macOS, Linux, and Windows that clones a single Git repository into a fixed home on your machine, then runs a **phased installer** driven by YAML registries. It installs a **core** toolchain for everyone, lets you pick **optional** tools through a terminal UI (where supported), writes **configuration templates** into your home directory, and **verifies** that core tools work.
+Botstrap is a **cross-platform bootstrap**: one entry point on macOS, Linux, and Windows that clones a single Git repository into a fixed home on your machine, then runs a **phased installer** driven by YAML registries. It installs **prerequisite** CLI tooling for everyone, lets you pick **core** and **optional** tools through a terminal UI (where supported), writes **configuration templates** into your home directory, and **verifies** prerequisites and your selected **core** set.
 
 This page explains **what Botstrap does end to end**, in plain language. For install commands, see [Getting started](./GETTING_STARTED.md). For flags and file paths, see [Reference](./REFERENCE.md).
 
@@ -28,31 +28,27 @@ Then the boot script runs **`install.sh`** (Unix) or **`install.ps1`** (Windows)
 
 ### 2. Phase 0: prerequisites
 
-Ensures the rest of the pipeline can run: **git**, **curl**, **jq**, **yq**, and **gum** (Unix: `install/boot-prereqs-git.sh` plus this phase install or download them where possible). Without **yq**, later phases cannot read the registry. If **gum** cannot be installed, Phase 2 falls back to **non-interactive defaults** on Unix; on Windows, Phase 2 is limited—see [Getting started](./GETTING_STARTED.md).
+Ensures the rest of the pipeline can run: installs **`registry/prerequisites.yaml`** (**git**, **curl**, **jq**, **yq**, **gum**) via the registry package layer after a minimal **yq** bootstrap on Unix (Unix: `install/boot-prereqs-git.sh` for git/curl, then `lib/pkg.sh`). Without **yq**, later phases cannot read the registry. If **gum** cannot be installed, Phase 2 falls back to **non-interactive defaults** on Unix; on Windows, Phase 2 is limited—see [Getting started](./GETTING_STARTED.md).
 
 ### 3. Phase 0b (Windows only)
 
 Optional **OS tuning** (developer mode hints, long paths, execution policy, etc.) driven by `configs/os/windows.yaml`. Steps can require elevation or manual follow-up; the installer does not always stop on failure. See [Cross-platform notes](./CROSS_PLATFORM.md).
 
-### 4. Phase 1: core tools
+### 4. Phase 2: choices (TUI)
 
-Reads **`registry/core.yaml`** in order and installs each tool using **`lib/pkg.sh`** or **`lib/pkg.ps1`**, which pick the right snippet for your OS (Homebrew, apt, dnf, pacman, winget, etc.). Complex tools may call scripts under **`install/modules/`**. Installs aim to be **non-interactive** (`-y`, silent flags).
+On **macOS/Linux**, if **gum** is available, an interactive flow asks for Git identity, **core** tools (multi-select from **`registry/core.yaml`**, all selected by default), editor, languages, databases, AI CLIs, theme, and optional apps. Answers are exported as **`BOTSTRAP_*`** environment variables (see [Reference](./REFERENCE.md)).
 
-### 5. Phase 2: choices (TUI)
+If **gum** is missing on Unix, the script exports **safe defaults** (including **`BOTSTRAP_CORE_TOOLS`** = all **`core.yaml`** names unless preset) and skips the interactive UI so automated runs do not hang.
 
-On **macOS/Linux**, if **gum** is available, an interactive flow asks for Git identity, editor, languages, databases, AI CLIs, theme, and optional apps. Answers are exported as **`BOTSTRAP_*`** environment variables (see [Reference](./REFERENCE.md)).
+On **native Windows**, Phase 2 matches Unix when **gum** is installed: the same prompts; without gum, the same non-interactive defaults apply.
 
-If **gum** is missing on Unix, the script exports **safe defaults** and skips the interactive UI so automated runs do not hang.
+### 5. Phase 3: configure
 
-On **native Windows**, Phase 2 matches Unix when **gum** is installed: full TUI for editor, languages, databases, AI tools, theme, and optional apps; without gum, the same non-interactive defaults apply.
+Persists **`core_tools=`** to **`~/.config/botstrap/core-tools.env`**, installs **selected core** from **`registry/core.yaml`** in registry order, then installs **optional** registry entries from Phase 2, then applies **`configs/`** templates (see [Configuration file map](./CONFIGURATION.md)). This phase may copy files to `~/.config`, append blocks to **`~/.zshrc`** and **`~/.bashrc`**, set global Git name/email, and place **sample** agent files under `~/.config/botstrap/agent/`.
 
-### 6. Phase 3: configure
+### 6. Phase 4: verify
 
-Applies **`configs/`** templates and installs **optional** registry entries selected in Phase 2 (editors, languages, databases, etc.—see [Configuration file map](./CONFIGURATION.md)). This phase may copy files to `~/.config`, append blocks to **`~/.zshrc`** and **`~/.bashrc`**, set global Git name/email, and place **sample** agent files under `~/.config/botstrap/agent/`.
-
-### 7. Phase 4: verify
-
-Runs **`verify`** commands from **`registry/core.yaml`** for each core tool and prints a short summary (pass/fail counts and hints to re-run TUI + configure). This phase requires **yq** on PATH.
+Runs **`verify`** for every tool in **`registry/prerequisites.yaml`**, then for **selected** core (from **`BOTSTRAP_CORE_TOOLS`**, else **`core-tools.env`**, else all **`registry/core.yaml`** for legacy installs), and prints a short summary. This phase requires **yq** on PATH.
 
 ## Where the project lives on your machine
 

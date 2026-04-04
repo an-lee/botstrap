@@ -1,1 +1,1 @@
-# Optional hooks for curl. Default install comes from registry/core.yaml.
+# Optional hooks for curl. Default install comes from registry/prerequisites.yaml.
