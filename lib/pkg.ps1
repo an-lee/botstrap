@@ -66,7 +66,8 @@ function Invoke-BotstrapYq {
             }
             return $null
         }
-        return $out
+        # yq multi-line output is captured as String[]; casting to [string] joins with spaces and breaks scriptblocks.
+        return (@($out) -join "`n")
     }
     finally {
         Remove-Item -LiteralPath $stderrFile -Force -ErrorAction SilentlyContinue
