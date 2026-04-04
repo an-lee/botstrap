@@ -18,6 +18,8 @@ curl -fsSL https://botstrap.dev/install | bash
 irm https://botstrap.dev/install.ps1 | iex
 ```
 
+Elevated PowerShell ("Run as Administrator") is optional but recommended so Phase 0b can apply Developer Mode and long paths automatically; without it, the install still runs and those steps are skipped with a warning.
+
 For local development, run the orchestrator from this repository:
 
 **macOS / Linux**

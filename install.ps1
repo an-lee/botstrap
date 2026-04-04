@@ -11,6 +11,13 @@ Set-Location $env:BOTSTRAP_ROOT
 Get-BotstrapEnvironment
 Write-BotstrapInfo "Detected OS=$BotstrapOS distro=$BotstrapDistro pkg=$BotstrapPkg"
 
+if ($BotstrapOS -eq 'windows') {
+    $pr = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
+    if (-not $pr.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        Write-BotstrapWarn 'Not running as Administrator. OS tuning steps that require elevation (developer_mode, long_paths) will be skipped. Re-run from an elevated PowerShell for full effect.'
+    }
+}
+
 $phaseSteps = @(
     @{ Rel = 'install\phase-0-prerequisites.ps1'; Num = 1; Total = 6; Label = 'Prerequisites - git, curl, jq, yq, gum' }
     @{ Rel = 'install\phase-0b-os-tune.ps1'; Num = 2; Total = 6; Label = 'OS developer tuning' }

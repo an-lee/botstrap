@@ -23,7 +23,9 @@ This guide covers **how to run Botstrap**, **prerequisites**, **local developmen
 - **PowerShell** (scripts use `#requires -Version 5.1`; PowerShell 7+ is recommended for testing).
 - **Git for Windows** (boot and Phase 0 try **winget** first when git is missing).
 - Phase 0 requires **winget** (App Installer) and installs **yq**, **jq**, and **gum** when missing. **yq** is required for Phase 1 and Phase 4 on Windows, same as Unix.
-- Native **`install.ps1`** runs the full gum TUI (when **gum** is on `PATH`), registry-driven core and optional installs, PowerShell profile hooks, and verification. See [Cross-platform notes](./CROSS_PLATFORM.md).
+- **Administrator rights are not required** to run the install; it completes without elevation.
+- For **full OS tuning** (Developer Mode and long paths in Phase 0b), run from an **elevated PowerShell** ("Run as Administrator") if you want those applied automatically. If not elevated, those two items are skipped with a warning; you can enable them manually in Settings or re-run elevated. See [Cross-platform notes](./CROSS_PLATFORM.md).
+- Native **`install.ps1`** runs the full gum TUI (when **gum** is on `PATH`), registry-driven core and optional installs, PowerShell profile hooks, and verification.
 
 ## Install from the web (recommended)
 
