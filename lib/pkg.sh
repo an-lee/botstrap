@@ -57,13 +57,23 @@ botstrap_pkg_install() {
     return 1
   fi
 
+  # Skip if tool already satisfies its verify command
+  local verify_cmd
+  verify_cmd="$(yq -r ".tools[] | select(.name == \"${tool_name}\") | .verify // \"\"" "${registry_file}" 2>/dev/null || true)"
+  if [[ -n "${verify_cmd}" && "${verify_cmd}" != "null" ]]; then
+    if bash -c "${verify_cmd}" &>/dev/null; then
+      botstrap_log_info "Skipping ${tool_name} (already installed)"
+      return 0
+    fi
+  fi
+
   local key snippet=""
   while IFS= read -r key; do
     [[ -z "${key}" ]] && continue
     snippet="$(botstrap_pkg_get_snippet "${tool_name}" "${registry_file}" "${key}")"
     if [[ -n "${snippet}" && "${snippet}" != "null" ]]; then
       if command -v gum &>/dev/null && [[ -t 1 ]]; then
-        gum spin --spinner dot --title "  ${tool_name}..." -- bash -c "${snippet}"
+        gum spin --show-output --spinner dot --title "  ${tool_name}..." -- bash -c "${snippet}"
       else
         botstrap_log_info "Installing ${tool_name} (using registry key: ${key})"
         botstrap_pkg_run_snippet "${snippet}"
