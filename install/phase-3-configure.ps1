@@ -2,6 +2,7 @@
 $ErrorActionPreference = 'Stop'
 . (Join-Path $env:BOTSTRAP_ROOT 'lib\log.ps1')
 . (Join-Path $env:BOTSTRAP_ROOT 'lib\pkg.ps1')
+. (Join-Path $env:BOTSTRAP_ROOT 'lib\profile-windows.ps1')
 
 Refresh-BotstrapPath
 
@@ -147,12 +148,6 @@ function Add-BotstrapProfileBlock {
     Add-Content -LiteralPath $ProfilePath -Value "`n$markerLine`n$Block`n" -Encoding utf8
 }
 
-$profilePath = $PROFILE
-if ([string]::IsNullOrWhiteSpace($profilePath)) {
-    $profileDir = Join-Path $env:USERPROFILE 'Documents\WindowsPowerShell'
-    $profilePath = Join-Path $profileDir 'Microsoft.PowerShell_profile.ps1'
-}
-
 $starshipBlock = @'
 if (Get-Command starship -ErrorAction SilentlyContinue) {
   Invoke-Expression (&starship init powershell)
@@ -202,9 +197,13 @@ $botstrapPathBlock = @"
 function Global:botstrap { & (Join-Path `$env:BOTSTRAP_ROOT 'bin\botstrap.ps1') @args }
 "@
 
-Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap PATH' -Block $botstrapPathBlock
-Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap starship' -Block $starshipBlock
-Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap zoxide' -Block $zoxideBlock
-Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap aliases' -Block $aliasesBlock
+$profilePaths = Get-BotstrapWindowsPowerShellProfilePaths
+foreach ($profilePath in $profilePaths) {
+    Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap PATH' -Block $botstrapPathBlock
+    Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap starship' -Block $starshipBlock
+    Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap zoxide' -Block $zoxideBlock
+    Add-BotstrapProfileBlock -ProfilePath $profilePath -Marker 'botstrap aliases' -Block $aliasesBlock
+}
 
-Write-BotstrapInfo "Phase 3 (Windows): config under $configRoot (git, editor=$($env:BOTSTRAP_EDITOR), theme=$($env:BOTSTRAP_THEME)); profile: $profilePath"
+$profilesListed = ($profilePaths -join '; ')
+Write-BotstrapInfo "Phase 3 (Windows): config under $configRoot (git, editor=$($env:BOTSTRAP_EDITOR), theme=$($env:BOTSTRAP_THEME)); profiles: $profilesListed"

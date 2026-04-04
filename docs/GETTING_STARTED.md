@@ -25,7 +25,7 @@ This guide covers **how to run Botstrap**, **prerequisites**, **local developmen
 - Phase 0 requires **winget** (App Installer) and installs **yq**, **jq**, and **gum** when missing. **yq** is required for registry-driven installs and Phase 4 on Windows, same as Unix.
 - **Administrator rights are not required** to run the install; it completes without elevation.
 - For **full OS tuning** (Developer Mode and long paths in Phase 0b), run from an **elevated PowerShell** ("Run as Administrator") if you want those applied automatically. If not elevated, those two items are skipped with a warning; you can enable them manually in Settings or re-run elevated. See [Cross-platform notes](./CROSS_PLATFORM.md).
-- Native **`install.ps1`** runs the full gum TUI (when **gum** is on `PATH`), registry-driven prerequisite, selected core, and optional installs, PowerShell profile hooks, and verification.
+- Native **`install.ps1`** runs the full gum TUI (when **gum** is on `PATH`), registry-driven prerequisite, selected core, and optional installs, PowerShell profile hooks (both **Windows PowerShell 5.1** and **`pwsh`** profile paths, plus the current **`$PROFILE`** when different—see [Reference](./REFERENCE.md)), and verification.
 
 ## Install from the web (recommended)
 
@@ -94,7 +94,7 @@ From the clone (e.g. `~/.botstrap`) you can always use:
 ./bin/botstrap doctor     # status lines + Phase 4 verification (prerequisites + selected core; exits 1 on verify failures)
 ```
 
-On **native Windows** (PowerShell install), Phase 3 appends a **`# botstrap PATH`** block to your PowerShell **profile** (same marker pattern as starship/zoxide): it sets **`$env:BOTSTRAP_ROOT`**, prepends **`bin\`** to **`$env:PATH`**, and defines a **`botstrap`** function that runs **`bin/botstrap.ps1`**. Open a **new** PowerShell session (or **`. $PROFILE`**) to use **`botstrap`** from anywhere. **Git Bash** / **WSL** with **`install.sh`** still use the Bash **`bin/botstrap`** and **`~/.config/botstrap/env.sh`** hook.
+On **native Windows** (PowerShell install), Phase 3 appends the same **`# botstrap PATH`** blocks to **each** standard host profile (Windows PowerShell 5.1 under **`Documents\WindowsPowerShell\`**, PowerShell 7 under **`Documents\PowerShell\`**, and your current **`$PROFILE`** if it is a different path) so **`botstrap`** works in **either** **`powershell.exe`** or **`pwsh`**. Open a **new** session (or dot-source the profile you use) to pick up changes. **Git Bash** / **WSL** with **`install.sh`** still use the Bash **`bin/botstrap`** and **`~/.config/botstrap/env.sh`** hook.
 
 Details: [Reference](./REFERENCE.md).
 

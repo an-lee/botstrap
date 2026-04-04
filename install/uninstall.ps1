@@ -14,18 +14,10 @@ if (-not $env:BOTSTRAP_ROOT) {
 
 $Root = $env:BOTSTRAP_ROOT
 . (Join-Path $Root 'lib\log.ps1')
+. (Join-Path $Root 'lib\profile-windows.ps1')
 
 function Test-BotstrapInteractiveConsole {
     return (-not [Console]::IsInputRedirected -and -not [Console]::IsOutputRedirected)
-}
-
-function Get-BotstrapProfilePathForUninstall {
-    $profilePath = $PROFILE
-    if ([string]::IsNullOrWhiteSpace($profilePath)) {
-        $profileDir = Join-Path $env:USERPROFILE 'Documents\WindowsPowerShell'
-        $profilePath = Join-Path $profileDir 'Microsoft.PowerShell_profile.ps1'
-    }
-    return $profilePath
 }
 
 function Remove-BotstrapProfileBlocks {
@@ -121,8 +113,9 @@ if (-not (Confirm-BotstrapUninstall)) {
     exit 1
 }
 
-$profilePath = Get-BotstrapProfilePathForUninstall
-Remove-BotstrapProfileBlocks -ProfilePath $profilePath
+foreach ($profilePath in (Get-BotstrapWindowsPowerShellProfilePaths)) {
+    Remove-BotstrapProfileBlocks -ProfilePath $profilePath
+}
 
 if ($Purge) {
     $cfg = Join-Path $env:USERPROFILE '.config\botstrap'

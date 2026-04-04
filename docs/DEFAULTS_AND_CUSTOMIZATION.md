@@ -29,7 +29,7 @@ Phase 3 copies or merges from **`configs/`** and runs optional installs from **`
 - **`env.sh`:** Regenerated each Phase 3 run; sets **`BOTSTRAP_ROOT`** and prepends **`$BOTSTRAP_ROOT/bin`** to **`PATH`** (duplicate-safe).
 - **Editor templates:** Copied only when **`BOTSTRAP_EDITOR`** is `cursor`, `vscode`, or `neovim` (see [Configuration file map](./CONFIGURATION.md)).
 - **Agent samples:** `configs/agent/*` → **`~/.config/botstrap/agent/*.sample`** only (not live Cursor/Claude paths unless you copy them).
-- **Windows:** PowerShell profile gets marker-guarded blocks for PATH, starship, zoxide, and aliases as implemented in Phase 3; there is no Unix-style **`env.sh`** on native Windows.
+- **Windows:** Each managed PowerShell profile (Windows PowerShell 5.1, **`pwsh`**, and the current **`$PROFILE`** when different) gets the same marker-guarded blocks for PATH, starship, zoxide, and aliases as implemented in Phase 3; there is no Unix-style **`env.sh`** on native Windows.
 
 Phase 3 also writes **`theme.env`** and **`editor.env`** under **`~/.config/botstrap/`** (or Windows equivalent).
 

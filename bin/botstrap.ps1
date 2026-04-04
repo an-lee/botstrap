@@ -140,6 +140,7 @@ switch ($sub) {
     'doctor' {
         $env:BOTSTRAP_ROOT = $Root
         . (Join-Path $Root 'lib\log.ps1')
+        . (Join-Path $Root 'lib\profile-windows.ps1')
         Write-BotstrapInfo "Doctor: BOTSTRAP_ROOT=$Root"
         Write-BotstrapInfo "Doctor: version=$Version"
         if (Test-Path -LiteralPath (Join-Path $Root '.git')) {
@@ -150,20 +151,33 @@ switch ($sub) {
         else {
             Write-BotstrapInfo 'Doctor: git_head=(not a git checkout)'
         }
-        $profilePath = $PROFILE
-        if ([string]::IsNullOrWhiteSpace($profilePath)) {
-            $profilePath = Join-Path $env:USERPROFILE 'Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1'
+        $profilePaths = Get-BotstrapWindowsPowerShellProfilePaths
+        $hookCount = 0
+        $perProfileStatus = @()
+        foreach ($profilePath in $profilePaths) {
+            $hookHere = $false
+            if (Test-Path -LiteralPath $profilePath) {
+                $raw = Get-Content -LiteralPath $profilePath -Raw -ErrorAction SilentlyContinue
+                if ($raw -and $raw.Contains('# botstrap PATH')) { $hookHere = $true }
+            }
+            if ($hookHere) { $hookCount++ }
+            $status = if ($hookHere) { 'present' } else { 'missing' }
+            $perProfileStatus += [pscustomobject]@{ Path = $profilePath; Ok = $hookHere; Status = $status }
         }
-        $hookPresent = $false
-        if (Test-Path -LiteralPath $profilePath) {
-            $raw = Get-Content -LiteralPath $profilePath -Raw -ErrorAction SilentlyContinue
-            if ($raw -and $raw.Contains('# botstrap PATH')) { $hookPresent = $true }
+        if ($hookCount -eq $profilePaths.Count) {
+            Write-BotstrapInfo "Doctor: PowerShell profile hook present in all $($profilePaths.Count) profile(s)"
         }
-        if ($hookPresent) {
-            Write-BotstrapInfo "Doctor: PowerShell profile hook present ($profilePath)"
+        elseif ($hookCount -eq 0) {
+            Write-BotstrapInfo 'Doctor: PowerShell profile hook missing in all listed profiles (run Phase 3 or botstrap reconfigure)'
+            foreach ($row in $perProfileStatus) {
+                Write-BotstrapInfo "Doctor:   $($row.Status) ($($row.Path))"
+            }
         }
         else {
-            Write-BotstrapInfo 'Doctor: PowerShell profile hook missing (run Phase 3 or botstrap reconfigure to add botstrap command)'
+            Write-BotstrapInfo "Doctor: PowerShell profile hook partial ($hookCount/$($profilePaths.Count); run botstrap reconfigure to sync)"
+            foreach ($row in $perProfileStatus) {
+                Write-BotstrapInfo "Doctor:   $($row.Status) ($($row.Path))"
+            }
         }
         . (Join-Path $Root 'install\phase-4-verify.ps1')
     }
