@@ -108,11 +108,22 @@ function Add-BotstrapProfileBlock {
     if (-not (Test-Path -LiteralPath $ProfilePath)) {
         New-Item -ItemType File -Force -Path $ProfilePath | Out-Null
     }
+    $markerLine = "# $Marker"
     $existing = Get-Content -LiteralPath $ProfilePath -Raw -ErrorAction SilentlyContinue
-    if ($existing -and $existing.Contains("# $Marker")) {
+    if ($existing -and $existing.Contains($markerLine)) {
+        $escaped = [regex]::Escape($markerLine)
+        $pattern = $escaped + '\r?\n.*?(?=\r?\n# botstrap |\z)'
+        $replacement = "$markerLine`n$Block`n"
+        $newContent = [regex]::Replace(
+            $existing,
+            $pattern,
+            $replacement,
+            [System.Text.RegularExpressions.RegexOptions]::Singleline
+        )
+        Set-Content -LiteralPath $ProfilePath -Value $newContent -Encoding utf8
         return
     }
-    Add-Content -LiteralPath $ProfilePath -Value "`n# $Marker`n$Block`n"
+    Add-Content -LiteralPath $ProfilePath -Value "`n$markerLine`n$Block`n" -Encoding utf8
 }
 
 $profilePath = $PROFILE
@@ -128,9 +139,21 @@ if (Get-Command starship -ErrorAction SilentlyContinue) {
 '@
 
 $zoxideBlock = @'
+$env:MISE_PWSH_CHPWD_WARNING = "0"
 $env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
-  Invoke-Expression (& { (zoxide init powershell | Out-String) })
+  if ($PSVersionTable.PSVersion.Major -ge 7) {
+    Invoke-Expression (& { (zoxide init powershell | Out-String) })
+  } else {
+    function global:__zoxide_z {
+      param([Parameter(ValueFromRemainingArguments = $true)][string[]]$query)
+      if ($query.Count -eq 0) { Set-Location $HOME; return }
+      $result = & zoxide query -- @query 2>$null
+      if ($LASTEXITCODE -eq 0 -and $result) { Set-Location $result }
+    }
+    Set-Alias -Name z -Value __zoxide_z -Scope Global -Force -ErrorAction SilentlyContinue
+    function global:zi { Write-Warning 'zi requires PowerShell 7+' }
+  }
 }
 '@
 
