@@ -46,7 +46,7 @@ export BOTSTRAP_ROOT="$(pwd)"
 - [Registry specification](docs/REGISTRY_SPEC.md)
 - [Tool selection](docs/TOOL_SELECTION.md)
 - [Cross-platform notes](docs/CROSS_PLATFORM.md)
-- [AI agent friendliness](docs/AI_AGENT_FRIENDLINESS.md)
+- [AI agent friendliness](docs/AI_AGENT_FRIENDLINESS.md) — including automated doc maintenance via the `daily-doc-updater` workflow
 - [Contributing](docs/CONTRIBUTING.md)
 
 ## Version
