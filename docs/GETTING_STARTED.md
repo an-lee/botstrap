@@ -86,6 +86,7 @@ Phase 3 writes **`~/.config/botstrap/env.sh`** and appends a **botstrap PATH** b
 From the clone (e.g. `~/.botstrap`) you can always use:
 
 ```bash
+./bin/botstrap           # interactive menu (TTY + gum); for automation use explicit subcommands
 ./bin/botstrap version   # prints semver from `version` file
 ./bin/botstrap update    # git pull --ff-only in the clone
 ./bin/botstrap reconfigure  # Phase 2 + Phase 3 only

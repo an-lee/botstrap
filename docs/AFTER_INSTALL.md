@@ -15,6 +15,7 @@ Useful commands (same semantics on Bash and PowerShell entry points):
 
 | Command | Purpose |
 |---------|---------|
+| `botstrap` | No subcommand: **`gum choose`** menu when the terminal is interactive and **`gum`** is installed; otherwise usage (exit **1**). Prefer explicit subcommands in scripts and for **AI agents**. |
 | `botstrap version` | Semver from the `version` file. |
 | `botstrap update` | `git pull --ff-only` in the checkout only. |
 | `botstrap reconfigure` | Phase 2 (TUI or defaults) + Phase 3. |

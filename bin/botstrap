@@ -7,7 +7,22 @@ VERSION="$(cat "${ROOT}/version" 2>/dev/null || echo unknown)"
 
 usage() {
   echo "Usage: botstrap {update|reconfigure|doctor|version}"
+  echo "Run with no arguments for an interactive menu (TTY + gum)."
 }
+
+if [[ -z "${1:-}" ]]; then
+  if [[ -t 0 && -t 1 ]] && command -v gum &>/dev/null; then
+    gum style --border rounded --padding "1 2" --foreground 212 "Botstrap" "" "Choose an action (or pass a subcommand for scripts)."
+    choice="$(gum choose --header "Action" update reconfigure doctor version quit)" || exit "$?"
+    if [[ "${choice}" == "quit" ]]; then
+      exit 0
+    fi
+    set -- "${choice}"
+  else
+    usage
+    exit 1
+  fi
+fi
 
 case "${1:-}" in
   update)

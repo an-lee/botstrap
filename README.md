@@ -52,6 +52,7 @@ $env:BOTSTRAP_ROOT = (Get-Location).Path
 After **Phase 3** on macOS/Linux, open a **new** shell (or `source ~/.zshrc` / `~/.bashrc`): **`botstrap`** is on your `PATH` via `~/.config/botstrap/env.sh`. Until then, or on Windows without that hook, use the script path:
 
 ```bash
+./bin/botstrap             # interactive menu (TTY + gum); scripts should use explicit subcommands below
 ./bin/botstrap version
 ./bin/botstrap update      # git pull in repo root
 ./bin/botstrap reconfigure # TUI + configure phases

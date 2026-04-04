@@ -14,8 +14,8 @@ Operational facts: **CLI**, **environment variables**, and **artifacts** Botstra
 | `botstrap update` | Runs **`git pull --ff-only`** in the repo root. Does **not** re-run install phases or migration scripts. |
 | `botstrap reconfigure` | **Bash:** sets **`BOTSTRAP_ROOT`**, runs **`lib/detect`**, then sources **`install/phase-2-tui.sh`** and **`install/phase-3-configure.sh`** only. **PowerShell:** sets **`BOTSTRAP_ROOT`**, dot-sources **`install/phase-2-tui.ps1`** and **`install/phase-3-configure.ps1`**. |
 | `botstrap doctor` | **Bash:** prints a short **status** header (`BOTSTRAP_ROOT`, semver, optional git head, whether **`~/.config/botstrap/env.sh`** exists), then runs **`install/phase-4-verify.sh`**. **PowerShell:** similar header (profile **`# botstrap PATH`** hook instead of **`env.sh`**), then dot-sources **`install/phase-4-verify.ps1`**. Exits **0** if every verify passes, **1** if **`yq`** is missing or any verify fails. |
-
-Any other first argument prints usage and exits with code 1.
+| `botstrap` (no arguments) | If **stdin** and **stdout** are TTYs (**Bash**) or the console is not redirected (**PowerShell**) **and** **`gum`** is on **`PATH`**, shows a **`gum choose`** menu for **`update`**, **`reconfigure`**, **`doctor`**, **`version`**, or **`quit`** (exit **0**). Otherwise prints **usage** and exits **1**. For automation and **AI agents**, pass an explicit subcommand (e.g. **`botstrap doctor`**) instead of relying on the menu. |
+| Any other first argument | Prints **usage** and exits with code **1**. |
 
 **Note:** There is **no** `botstrap uninstall` subcommand in the current CLI.
 

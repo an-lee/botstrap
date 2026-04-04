@@ -12,9 +12,28 @@ $Version = if (Test-Path -LiteralPath $VersionPath) {
 
 function Show-BotstrapUsage {
     Write-Host 'Usage: botstrap {update|reconfigure|doctor|version}'
+    Write-Host 'Run with no arguments for an interactive menu (console + gum).'
 }
 
-$sub = $args[0]
+$sub = $null
+if ($args.Count -eq 0) {
+    if (-not [Console]::IsInputRedirected -and -not [Console]::IsOutputRedirected -and (Get-Command gum -ErrorAction SilentlyContinue)) {
+        & gum style --border rounded --padding '1 2' --foreground 212 'Botstrap' '' 'Choose an action (or pass a subcommand for scripts).'
+        $choice = & gum choose --header 'Action' update reconfigure doctor version quit
+        if (-not $?) { exit 1 }
+        $choice = if ($null -eq $choice) { '' } else { $choice.Trim() }
+        if ($choice -eq 'quit') { exit 0 }
+        $sub = $choice
+    }
+    else {
+        Show-BotstrapUsage
+        exit 1
+    }
+}
+else {
+    $sub = $args[0]
+}
+
 switch ($sub) {
     'update' {
         if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
