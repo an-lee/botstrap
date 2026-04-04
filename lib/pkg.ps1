@@ -1,5 +1,6 @@
 #requires -Version 5.1
 # Registry-driven install helpers (Windows). Requires mikefarah/yq on PATH after Phase 0.
+# yq filters use strenv(...) so the expression has no embedded double quotes (Windows PS 5.1 + native argv).
 
 function Test-BotstrapHostWindows {
     if ($PSVersionTable.PSEdition -eq 'Core') {
@@ -72,6 +73,33 @@ function Invoke-BotstrapYq {
     }
 }
 
+function Invoke-BotstrapYqWithEnv {
+    param(
+        [hashtable]$Env = @{},
+        [Parameter(Mandatory)][string]$Expression,
+        [Parameter(Mandatory)][string]$FilePath
+    )
+    $saved = [ordered]@{}
+    foreach ($k in @($Env.Keys)) {
+        $saved[$k] = [System.Environment]::GetEnvironmentVariable($k, 'Process')
+        [System.Environment]::SetEnvironmentVariable($k, [string]$Env[$k], 'Process')
+    }
+    try {
+        return Invoke-BotstrapYq -Expression $Expression -FilePath $FilePath
+    }
+    finally {
+        foreach ($k in @($saved.Keys)) {
+            $prev = $saved[$k]
+            if ($null -eq $prev) {
+                [System.Environment]::SetEnvironmentVariable($k, $null, 'Process')
+            }
+            else {
+                [System.Environment]::SetEnvironmentVariable($k, $prev, 'Process')
+            }
+        }
+    }
+}
+
 function Invoke-BotstrapPowerShellSnippet {
     param(
         [Parameter(Mandatory)][string]$Snippet
@@ -95,9 +123,11 @@ function Get-BotstrapCoreInstallSnippet {
         [Parameter(Mandatory)][string]$Key,
         [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\core.yaml')
     )
-    $escaped = $ToolName.Replace('\', '\\').Replace('"', '\"')
-    $expr = ".tools[] | select(.name == `"$escaped`") | .install[`"${Key}`"] // `"`""
-    $val = Invoke-BotstrapYq -Expression $expr -FilePath $RegistryPath
+    $expr = '.tools[] | select(.name == strenv(BOTSTRAP_YQ_TOOL)) | .install[strenv(BOTSTRAP_YQ_KEY)] // null'
+    $val = Invoke-BotstrapYqWithEnv -Env @{
+        BOTSTRAP_YQ_TOOL = $ToolName
+        BOTSTRAP_YQ_KEY  = $Key
+    } -Expression $expr -FilePath $RegistryPath
     if ($null -eq $val) { return '' }
     $s = [string]$val.Trim()
     if ($s -eq '' -or $s -eq 'null') { return '' }
@@ -124,12 +154,11 @@ function Get-BotstrapCoreVerifySnippet {
         [Parameter(Mandatory)][string]$ToolName,
         [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\core.yaml')
     )
-    $escaped = $ToolName.Replace('\', '\\').Replace('"', '\"')
-    $vw = Invoke-BotstrapYq -Expression ".tools[] | select(.name == `"$escaped`") | .verify_windows // `"`"" -FilePath $RegistryPath
+    $vw = Invoke-BotstrapYqWithEnv -Env @{ BOTSTRAP_YQ_TOOL = $ToolName } -Expression '.tools[] | select(.name == strenv(BOTSTRAP_YQ_TOOL)) | .verify_windows // null' -FilePath $RegistryPath
     if ($null -ne $vw -and [string]$vw -ne '' -and [string]$vw -ne 'null') {
         return [string]$vw
     }
-    $v = Invoke-BotstrapYq -Expression ".tools[] | select(.name == `"$escaped`") | .verify // `"`"" -FilePath $RegistryPath
+    $v = Invoke-BotstrapYqWithEnv -Env @{ BOTSTRAP_YQ_TOOL = $ToolName } -Expression '.tools[] | select(.name == strenv(BOTSTRAP_YQ_TOOL)) | .verify // null' -FilePath $RegistryPath
     if ($null -eq $v) { return '' }
     return (Normalize-BotstrapVerifyForWindows -VerifyCmd ([string]$v))
 }
@@ -177,8 +206,7 @@ function Install-BotstrapPackageFromRegistry {
     Refresh-BotstrapPath
     Add-BotstrapMiseBinsToPath
 
-    $escaped = $ToolName.Replace('\', '\\').Replace('"', '\"')
-    $postWin = Invoke-BotstrapYq -Expression ".tools[] | select(.name == `"$escaped`") | .post_install_windows // `"`"" -FilePath $RegistryPath
+    $postWin = Invoke-BotstrapYqWithEnv -Env @{ BOTSTRAP_YQ_TOOL = $ToolName } -Expression '.tools[] | select(.name == strenv(BOTSTRAP_YQ_TOOL)) | .post_install_windows // null' -FilePath $RegistryPath
     if ($null -ne $postWin -and [string]$postWin.Trim() -ne '' -and [string]$postWin -ne 'null') {
         Write-BotstrapInfo "Running post_install_windows for ${ToolName}"
         try {
@@ -204,9 +232,8 @@ function Test-BotstrapPackageFromRegistry {
     Refresh-BotstrapPath
     Add-BotstrapMiseBinsToPath
 
-    $escaped = $ToolName.Replace('\', '\\').Replace('"', '\"')
-    $hasWinInstall = Invoke-BotstrapYq -Expression ".tools[] | select(.name == `"$escaped`") | .install.windows // `"`"" -FilePath $RegistryPath
-    $hasAllInstall = Invoke-BotstrapYq -Expression ".tools[] | select(.name == `"$escaped`") | .install.all // `"`"" -FilePath $RegistryPath
+    $hasWinInstall = Invoke-BotstrapYqWithEnv -Env @{ BOTSTRAP_YQ_TOOL = $ToolName } -Expression '.tools[] | select(.name == strenv(BOTSTRAP_YQ_TOOL)) | .install.windows // null' -FilePath $RegistryPath
+    $hasAllInstall = Invoke-BotstrapYqWithEnv -Env @{ BOTSTRAP_YQ_TOOL = $ToolName } -Expression '.tools[] | select(.name == strenv(BOTSTRAP_YQ_TOOL)) | .install.all // null' -FilePath $RegistryPath
     if (([string]::IsNullOrWhiteSpace($hasWinInstall) -or $hasWinInstall -eq 'null') -and ([string]::IsNullOrWhiteSpace($hasAllInstall) -or $hasAllInstall -eq 'null')) {
         Write-BotstrapInfo "Verify skipped for '${ToolName}' (not installed on Windows)."
         return $true
@@ -251,10 +278,11 @@ function Test-BotstrapOptionalRequiresSatisfied {
     )
     Refresh-BotstrapPath
     Add-BotstrapMiseBinsToPath
-    $escapedGroup = $GroupId.Replace('\', '\\').Replace('"', '\"')
-    $escapedItem = $ItemName.Replace('\', '\\').Replace('"', '\"')
-    $reqExpr = ".groups[] | select(.id == `"$escapedGroup`") | .items[] | select(.name == `"$escapedItem`") | .requires[]?"
-    $reqsRaw = & yq -r $reqExpr $RegistryPath 2>$null
+    $reqExpr = '.groups[] | select(.id == strenv(BOTSTRAP_YQ_GROUP)) | .items[] | select(.name == strenv(BOTSTRAP_YQ_ITEM)) | .requires[]?'
+    $reqsRaw = Invoke-BotstrapYqWithEnv -Env @{
+        BOTSTRAP_YQ_GROUP = $GroupId
+        BOTSTRAP_YQ_ITEM  = $ItemName
+    } -Expression $reqExpr -FilePath $RegistryPath
     if ([string]::IsNullOrWhiteSpace($reqsRaw)) {
         return $true
     }
@@ -299,10 +327,12 @@ function Get-BotstrapOptionalInstallSnippet {
         [Parameter(Mandatory)][string]$Key,
         [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\optional.yaml')
     )
-    $escapedGroup = $GroupId.Replace('\', '\\').Replace('"', '\"')
-    $escapedItem = $ItemName.Replace('\', '\\').Replace('"', '\"')
-    $expr = ".groups[] | select(.id == `"$escapedGroup`") | .items[] | select(.name == `"$escapedItem`") | .install[`"${Key}`"] // `"`""
-    $val = Invoke-BotstrapYq -Expression $expr -FilePath $RegistryPath
+    $expr = '.groups[] | select(.id == strenv(BOTSTRAP_YQ_GROUP)) | .items[] | select(.name == strenv(BOTSTRAP_YQ_ITEM)) | .install[strenv(BOTSTRAP_YQ_KEY)] // null'
+    $val = Invoke-BotstrapYqWithEnv -Env @{
+        BOTSTRAP_YQ_GROUP = $GroupId
+        BOTSTRAP_YQ_ITEM  = $ItemName
+        BOTSTRAP_YQ_KEY   = $Key
+    } -Expression $expr -FilePath $RegistryPath
     if ($null -eq $val) { return '' }
     $s = [string]$val.Trim()
     if ($s -eq '' -or $s -eq 'null') { return '' }
@@ -315,13 +345,15 @@ function Get-BotstrapOptionalVerifySnippet {
         [Parameter(Mandatory)][string]$ItemName,
         [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\optional.yaml')
     )
-    $escapedGroup = $GroupId.Replace('\', '\\').Replace('"', '\"')
-    $escapedItem = $ItemName.Replace('\', '\\').Replace('"', '\"')
-    $vw = Invoke-BotstrapYq -Expression ".groups[] | select(.id == `"$escapedGroup`") | .items[] | select(.name == `"$escapedItem`") | .verify_windows // `"`"" -FilePath $RegistryPath
+    $envMap = @{
+        BOTSTRAP_YQ_GROUP = $GroupId
+        BOTSTRAP_YQ_ITEM  = $ItemName
+    }
+    $vw = Invoke-BotstrapYqWithEnv -Env $envMap -Expression '.groups[] | select(.id == strenv(BOTSTRAP_YQ_GROUP)) | .items[] | select(.name == strenv(BOTSTRAP_YQ_ITEM)) | .verify_windows // null' -FilePath $RegistryPath
     if ($null -ne $vw -and [string]$vw -ne '' -and [string]$vw -ne 'null') {
         return [string]$vw
     }
-    $v = Invoke-BotstrapYq -Expression ".groups[] | select(.id == `"$escapedGroup`") | .items[] | select(.name == `"$escapedItem`") | .verify // `"`"" -FilePath $RegistryPath
+    $v = Invoke-BotstrapYqWithEnv -Env $envMap -Expression '.groups[] | select(.id == strenv(BOTSTRAP_YQ_GROUP)) | .items[] | select(.name == strenv(BOTSTRAP_YQ_ITEM)) | .verify // null' -FilePath $RegistryPath
     if ($null -eq $v) { return '' }
     return (Normalize-BotstrapVerifyForWindows -VerifyCmd ([string]$v))
 }
@@ -369,9 +401,10 @@ function Install-BotstrapOptionalItem {
     Refresh-BotstrapPath
     Add-BotstrapMiseBinsToPath
 
-    $escapedGroup = $GroupId.Replace('\', '\\').Replace('"', '\"')
-    $escapedItem = $ItemName.Replace('\', '\\').Replace('"', '\"')
-    $postWin = Invoke-BotstrapYq -Expression ".groups[] | select(.id == `"$escapedGroup`") | .items[] | select(.name == `"$escapedItem`") | .post_install_windows // `"`"" -FilePath $RegistryPath
+    $postWin = Invoke-BotstrapYqWithEnv -Env @{
+        BOTSTRAP_YQ_GROUP = $GroupId
+        BOTSTRAP_YQ_ITEM  = $ItemName
+    } -Expression '.groups[] | select(.id == strenv(BOTSTRAP_YQ_GROUP)) | .items[] | select(.name == strenv(BOTSTRAP_YQ_ITEM)) | .post_install_windows // null' -FilePath $RegistryPath
     if ($null -ne $postWin -and [string]$postWin.Trim() -ne '' -and [string]$postWin -ne 'null') {
         try {
             Invoke-BotstrapPowerShellSnippet -Snippet ([string]$postWin)
