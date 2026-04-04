@@ -75,6 +75,8 @@ In **`install/phase-2-tui.sh`**, if **`gum`** is not on `PATH`, the script:
 
 So a headless run completes without hanging on prompts, but you will not get interactive choices unless gum is available.
 
+When gum **is** available, the TUI pre-fills the Git name and email inputs from **`GIT_AUTHOR_NAME`** and **`GIT_AUTHOR_EMAIL`** environment variables if they are set, so existing identities appear as editable defaults rather than blank fields.
+
 ### Windows Phase 2
 
 If **gum** is missing, **`phase-2-tui.ps1`** exports the same safe defaults as Unix (e.g. **`BOTSTRAP_EDITOR=none`**, **`BOTSTRAP_THEME=catppuccin`**, empty optional lists) and returns so Phase 3 and Phase 4 still run. If **gum** is present, the script runs the same interactive prompts as **`phase-2-tui.sh`** (editor, languages, databases, AI tools, theme, optional apps).

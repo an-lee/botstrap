@@ -25,6 +25,7 @@ Any other first argument prints usage and exits with code 1.
 | `BOTSTRAP_REPO` | `boot.sh`, `boot.ps1` | Git remote URL for clone (default: `https://github.com/an-lee/botstrap.git`). |
 | `BOTSTRAP_BOOT_PREREQS_URL` | `boot.sh` | Optional raw HTTPS URL to **`install/boot-prereqs-git.sh`** when **`BOTSTRAP_REPO`** is not GitHub-hosted and git is missing (so boot can still source the prerequisite installer). |
 | `BOTSTRAP_ROOT` | `install.sh`, phases, `bin/botstrap` | Absolute path to the Botstrap checkout containing `registry/`, `install/`, etc. Set automatically by `install.sh`; required when sourcing phases manually. |
+| `BOTSTRAP_LOG_COLOR` | `lib/log.sh` (Unix only) | Set to `0` to disable color output from logging helpers (default: `1`). Useful in CI or non-terminal environments. |
 
 ## Phase 2 selection variables (Unix)
 
