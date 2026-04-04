@@ -5,12 +5,12 @@ Cross-platform bootstrap for **developers** and **AI coding agents**: one entry 
 ## Quick start (from a published clone)
 
 ```bash
-# macOS / Linux (default clone URL; override with BOTSTRAP_REPO)
+# macOS / Linux (default BOTSTRAP_REPO is https://github.com/botstrap/botstrap.git; override to use a fork)
 curl -fsSL https://botstrap.org/install | bash
 ```
 
 ```powershell
-# Windows (PowerShell)
+# Windows (PowerShell); default clone URL matches boot.sh — set $env:BOTSTRAP_REPO to use a fork
 irm https://botstrap.org/install.ps1 | iex
 ```
 
@@ -43,6 +43,10 @@ export BOTSTRAP_ROOT="$(pwd)"
 ## Documentation
 
 - **Site:** [botstrap.org](https://botstrap.org) — browsable docs (VitePress)
+- [Introduction](docs/INTRODUCTION.md) — what Botstrap does, end to end
+- [Getting started](docs/GETTING_STARTED.md) — install, local dev, non-interactive runs
+- [Reference](docs/REFERENCE.md) — CLI, environment variables, artifacts
+- [Configuration](docs/CONFIGURATION.md) — `configs/` templates and where they land
 - [Architecture](docs/ARCHITECTURE.md)
 - [Registry specification](docs/REGISTRY_SPEC.md)
 - [Tool selection](docs/TOOL_SELECTION.md)
@@ -52,4 +56,4 @@ export BOTSTRAP_ROOT="$(pwd)"
 
 ## Version
 
-See the `version` file (semver for migrations and reporting).
+See the `version` file (semver reported by `./bin/botstrap version` and Phase 4 summary).

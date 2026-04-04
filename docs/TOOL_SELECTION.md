@@ -1,6 +1,6 @@
 # Tool selection rationale
 
-This document explains why Botstrap includes each **core** tool (always installed in Phase 1) and how **optional** groups are scoped. The goal is a baseline that works well for humans and for AI agents driving a terminal.
+This document explains why Botstrap includes each **core** tool (always installed in Phase 1) and how **optional** groups are scoped. The goal is a baseline that works well for humans and for AI agents driving a terminal. For how optional items are installed after the TUI, see [Introduction](./INTRODUCTION.md) and [Registry specification](./REGISTRY_SPEC.md).
 
 ## Core tools (Phase 1)
 

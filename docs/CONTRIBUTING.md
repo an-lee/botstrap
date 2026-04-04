@@ -4,8 +4,9 @@ Thank you for helping improve Botstrap. This project aims to stay **transparent*
 
 ## Before you start
 
-- Read `docs/ARCHITECTURE.md` for the overall flow.
+- Read `docs/INTRODUCTION.md` and `docs/ARCHITECTURE.md` for the overall flow.
 - Read `docs/REGISTRY_SPEC.md` before editing `registry/core.yaml` or `registry/optional.yaml`.
+- See `docs/REFERENCE.md` for CLI and environment variable naming when changing phases.
 - Prefer YAML registry changes over new orchestration logic when a tool installs cleanly from package managers.
 
 ## Development setup
@@ -32,7 +33,7 @@ Thank you for helping improve Botstrap. This project aims to stay **transparent*
 
 1. Add an item under the appropriate `groups` entry in `registry/optional.yaml`.
 2. Set `requires` if the tool needs Node, Docker, etc.
-3. Extend `install/phase-2-tui.sh` if you introduce a **new group** (`id`); document the environment variable naming in this file’s header comment.
+3. Extend `install/phase-2-tui.sh` if you introduce a **new group** (`id`); document the environment variable naming in this file’s header comment and update `docs/REFERENCE.md`.
 
 ## Style
 

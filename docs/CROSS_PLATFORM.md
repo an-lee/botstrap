@@ -2,6 +2,8 @@
 
 Botstrap targets **macOS**, **Linux** (multiple families), and **Windows**. The same phases run everywhere; only detection, package commands, and paths differ.
 
+**Windows vs WSL:** Native **`install.ps1`** is **partial** compared to macOS/Linux (Phase 2 TUI and some paths differ). The orchestrator prints a reminder to prefer **WSL** and **`install.sh`** for parity. Treat Windows-native installs as best-effort unless you have validated them for your workflow.
+
 ## Entry points
 
 | Platform | Mechanism | Script |

@@ -93,7 +93,7 @@ Phase 2 should export selections in a stable way, for example:
 - Single-select group with `id` `editor`: `BOTSTRAP_EDITOR=cursor`
 - Multi-select group with `id` `languages`: `BOTSTRAP_LANGUAGES=node,python,go` (comma-separated)
 
-Exact naming is implemented in `install/phase-2-tui.sh`; contributors should document any new group `id` in `docs/CONTRIBUTING.md`.
+Exact naming is implemented in `install/phase-2-tui.sh`; contributors should document any new group `id` in `docs/CONTRIBUTING.md` and `docs/REFERENCE.md`.
 
 ## Validation
 

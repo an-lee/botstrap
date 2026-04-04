@@ -1,6 +1,6 @@
 # AI agent friendliness
 
-Botstrap is designed so **coding agents** (Cursor, Claude Code, Codex, and similar) can drive installation and day-to-day development reliably. This document captures the design principles; see `docs/ARCHITECTURE.md` for where they appear in the system.
+Botstrap is designed so **coding agents** (Cursor, Claude Code, Codex, and similar) can drive installation and day-to-day development reliably. This document captures the design principles; see [Introduction](./INTRODUCTION.md) for the end-to-end story and [Architecture](./ARCHITECTURE.md) for where they appear in the system.
 
 ## Principles
 
@@ -81,4 +81,4 @@ When adding a tool:
 
 1. Prefer registry entries with a clear `verify` command.
 2. Document any required API keys or login steps in tool descriptions so agents know manual steps remain.
-3. Keep post-install hooks idempotent where possible so `botstrap update` can re-run safely.
+3. Keep post-install hooks idempotent where possible so re-running `./install.sh` or `./bin/botstrap reconfigure` after a `git pull` does not break machines.
