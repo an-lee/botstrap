@@ -17,7 +17,7 @@ Install-BotstrapOptionalCsv -GroupId 'languages' -Csv $env:BOTSTRAP_LANGUAGES -R
 Install-BotstrapOptionalCsv -GroupId 'databases' -Csv $env:BOTSTRAP_DATABASES -RegistryPath $optionalReg
 Install-BotstrapOptionalCsv -GroupId 'ai_tools' -Csv $env:BOTSTRAP_AI_TOOLS -RegistryPath $optionalReg
 [void](Install-BotstrapOptionalItem -GroupId 'theme' -ItemName $env:BOTSTRAP_THEME -RegistryPath $optionalReg)
-Install-BotstrapOptionalCsv -GroupId 'optional_apps' -Csv $env:BOTSTRAP_OPTIONAL_APPS -RegistryPath $optionalReg)
+Install-BotstrapOptionalCsv -GroupId 'optional_apps' -Csv $env:BOTSTRAP_OPTIONAL_APPS -RegistryPath $optionalReg
 
 Refresh-BotstrapPath
 
