@@ -1,0 +1,30 @@
+# Windows OS developer tuning — parsed by lib/os-tune-windows.ps1 (subset YAML).
+# Skip items with BOTSTRAP_OS_TUNE_SKIP=comma,separated,ids matching these keys.
+# Opt-in UTF-8 system locale (reboot likely): BOTSTRAP_OS_TUNE_UTF8=1 (still respects skip list).
+
+version: 1
+tuning:
+  developer_mode:
+    default: true
+    requires_admin: true
+    risk: low
+  long_paths:
+    default: true
+    requires_admin: true
+    risk: low
+  app_execution_aliases:
+    default: true
+    requires_admin: false
+    risk: low
+  powershell_execution_policy:
+    default: true
+    requires_admin: false
+    risk: low
+  utf8_system_locale:
+    default: false
+    requires_admin: true
+    risk: medium
+  git_longpaths:
+    default: true
+    requires_admin: false
+    risk: low

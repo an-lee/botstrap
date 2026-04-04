@@ -13,6 +13,7 @@ Write-BotstrapInfo "Detected OS=$BotstrapOS distro=$BotstrapDistro pkg=$Botstrap
 
 $phases = @(
     "install\phase-0-prerequisites.ps1",
+    "install\phase-0b-os-tune.ps1",
     "install\phase-1-core.ps1",
     "install\phase-2-tui.ps1",
     "install\phase-3-configure.ps1",

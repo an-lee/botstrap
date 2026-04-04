@@ -41,7 +41,7 @@ botstrap/
   install.sh / install.ps1    # Orchestrators
   lib/                        # Shared primitives (detect, log, pkg)
   install/                    # Phases and per-tool modules
-  configs/                    # Templates for shell, git, editor, agent
+  configs/                    # Templates for shell, git, editor, agent; OS tuning (e.g. configs/os/windows.yaml)
   themes/                     # Theme bundles (terminal, prompt, editor)
   registry/                   # core.yaml, optional.yaml
   docs/                       # Design and contributor docs
@@ -59,7 +59,8 @@ flowchart TD
     C --> D[Install Prerequisites]
     D --> E[Clone ~/.botstrap]
     E --> F[Phase 0: Prerequisites]
-    F --> G[Phase 1: Core tools]
+    F --> F0["Phase 0b: OS tune (Windows)"]
+    F0 --> G[Phase 1: Core tools]
     G --> H[Phase 2: TUI choices]
     H --> I[Phase 3: Configure]
     I --> J[Phase 4: Verify + summary]
@@ -68,6 +69,7 @@ flowchart TD
 | Phase | Script | Purpose |
 |-------|--------|---------|
 | 0 | `phase-0-prerequisites.sh` / `.ps1` | `git`, `curl`, `gum` (and Windows equivalents) so later steps can run. |
+| 0b | `phase-0b-os-tune.ps1` | **Windows only:** optional developer-oriented OS settings from `configs/os/windows.yaml` (`lib/os-tune-windows.ps1`). |
 | 1 | `phase-1-core.sh` | Non-interactive install of all `registry/core.yaml` tools via `lib/pkg` + registry. |
 | 2 | `phase-2-tui.sh` | Interactive `gum` flows; choices exported as environment variables. |
 | 3 | `phase-3-configure.sh` | Dotfiles, themes, editor and agent templates from `configs/`. |
