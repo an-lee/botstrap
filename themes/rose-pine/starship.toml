@@ -1,0 +1,17 @@
+# Botstrap — Rosé Pine (starship.rs palette)
+format = "$all"
+palette = "rose_pine"
+
+[palettes.rose_pine]
+accent = "#c4a7e7"
+dim = "#6e6a86"
+green = "#9ccfd8"
+red = "#eb6f92"
+
+[character]
+success_symbol = "[➜](bold fg:green) "
+error_symbol = "[➜](bold fg:red) "
+
+[directory]
+truncation_length = 3
+style = "fg:accent"

@@ -1,0 +1,17 @@
+# Botstrap — Nord (starship.rs palette)
+format = "$all"
+palette = "nord"
+
+[palettes.nord]
+accent = "#88c0d0"
+dim = "#4c566a"
+green = "#a3be8c"
+red = "#bf616a"
+
+[character]
+success_symbol = "[➜](bold fg:green) "
+error_symbol = "[➜](bold fg:red) "
+
+[directory]
+truncation_length = 3
+style = "fg:accent"

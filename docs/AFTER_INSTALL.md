@@ -75,7 +75,7 @@ Optional entries install tools such as **`claude`**, **`codex`**, **`openclaw`**
 
 ### Themes
 
-Theme choice is recorded in **`theme.env`**. Assets live under **`themes/`** in the repo (e.g. **catppuccin**, **tokyo-night**); wiring is described in [Architecture](./ARCHITECTURE.md) and the optional registry. Some theme ids are placeholders until extended under **`themes/`**.
+Theme choice is recorded in **`theme.env`**. Phase 3 copies **`themes/<id>/starship.toml`** to your Starship config when present, and merges **`themes/<id>/editor.json`** into Cursor/VS Code settings when you chose that editor. Details: [Configuration file map](./CONFIGURATION.md#themes).
 
 ## Related
 

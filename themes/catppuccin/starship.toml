@@ -1,0 +1,17 @@
+# Botstrap — Catppuccin Mocha (starship.rs palette)
+format = "$all"
+palette = "catppuccin_mocha"
+
+[palettes.catppuccin_mocha]
+accent = "#89b4fa"
+dim = "#6c7086"
+green = "#a6e3a1"
+red = "#f38ba8"
+
+[character]
+success_symbol = "[➜](bold fg:green) "
+error_symbol = "[➜](bold fg:red) "
+
+[directory]
+truncation_length = 3
+style = "fg:accent"

@@ -42,8 +42,13 @@ botstrap_pkg_install_optional_csv "ai_tools" "${BOTSTRAP_AI_TOOLS:-}" "${BOTSTRA
 botstrap_pkg_install_optional_item "theme" "${BOTSTRAP_THEME:-catppuccin}" "${BOTSTRAP_ROOT}/registry/optional.yaml" || true
 botstrap_pkg_install_optional_csv "optional_apps" "${BOTSTRAP_OPTIONAL_APPS:-}" "${BOTSTRAP_ROOT}/registry/optional.yaml"
 
-if [[ -f "${BOTSTRAP_ROOT}/configs/shell/prompt.toml" ]]; then
-  cp -f "${BOTSTRAP_ROOT}/configs/shell/prompt.toml" "${HOME}/.config/starship.toml"
+_theme_id="${BOTSTRAP_THEME:-catppuccin}"
+_theme_starship="${BOTSTRAP_ROOT}/themes/${_theme_id}/starship.toml"
+_prompt_fallback="${BOTSTRAP_ROOT}/configs/shell/prompt.toml"
+if [[ -f "${_theme_starship}" ]]; then
+  cp -f "${_theme_starship}" "${HOME}/.config/starship.toml"
+elif [[ -f "${_prompt_fallback}" ]]; then
+  cp -f "${_prompt_fallback}" "${HOME}/.config/starship.toml"
 fi
 
 if [[ -f "${BOTSTRAP_ROOT}/configs/git/gitignore_global" ]]; then
@@ -104,17 +109,36 @@ if [[ -f "${BOTSTRAP_ROOT}/configs/shell/env_path_snippet.bash" ]]; then
   _append_block "${HOME}/.bashrc" "botstrap PATH" "${BOTSTRAP_ROOT}/configs/shell/env_path_snippet.bash"
 fi
 
+_botstrap_merge_theme_editor_json() {
+  local dest="$1"
+  local overlay="${BOTSTRAP_ROOT}/themes/${_theme_id}/editor.json"
+  [[ -f "${dest}" ]] || return 0
+  [[ -f "${overlay}" ]] || return 0
+  if ! command -v jq &>/dev/null; then
+    return 0
+  fi
+  local tmp
+  tmp="$(mktemp)"
+  if jq -s '.[0] * .[1]' "${dest}" "${overlay}" >"${tmp}" 2>/dev/null; then
+    mv -f "${tmp}" "${dest}"
+  else
+    rm -f "${tmp}"
+  fi
+}
+
 case "${BOTSTRAP_EDITOR:-none}" in
   cursor)
     mkdir -p "${HOME}/.cursor"
     if [[ -f "${BOTSTRAP_ROOT}/configs/editor/cursor-settings.json" ]]; then
       cp -f "${BOTSTRAP_ROOT}/configs/editor/cursor-settings.json" "${HOME}/.cursor/settings.json"
+      _botstrap_merge_theme_editor_json "${HOME}/.cursor/settings.json"
     fi
     ;;
   vscode)
     mkdir -p "${HOME}/.config/Code/User"
     if [[ -f "${BOTSTRAP_ROOT}/configs/editor/vscode.json" ]]; then
       cp -f "${BOTSTRAP_ROOT}/configs/editor/vscode.json" "${HOME}/.config/Code/User/settings.json"
+      _botstrap_merge_theme_editor_json "${HOME}/.config/Code/User/settings.json"
     fi
     ;;
   neovim)

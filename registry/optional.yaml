@@ -266,51 +266,51 @@ groups:
       - name: catppuccin
         description: "Catppuccin palette for terminal and editors"
         install:
-          all: echo "Theme assets live under themes/catppuccin; Phase 3 applies selection."
-          windows: 'Write-Host "Theme assets live under themes/catppuccin; Phase 3 applies selection."'
+          all: echo "Theme catppuccin — Phase 3 copies themes/catppuccin (Starship + optional editor.json merge)."
+          windows: 'Write-Host "Theme catppuccin — Phase 3 copies themes/catppuccin (Starship + optional editor.json merge)."'
         update:
-          all: echo "Theme catppuccin; re-run botstrap reconfigure to refresh assets from the repo."
-          windows: 'Write-Host "Theme catppuccin; re-run botstrap reconfigure to refresh assets from the repo."'
+          all: echo "Theme catppuccin — re-run botstrap reconfigure to refresh theme bundles from the repo."
+          windows: 'Write-Host "Theme catppuccin — re-run botstrap reconfigure to refresh theme bundles from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
       - name: tokyo-night
         description: "Tokyo Night"
         install:
-          all: echo "Theme assets live under themes/tokyo-night; Phase 3 applies selection."
-          windows: 'Write-Host "Theme assets live under themes/tokyo-night; Phase 3 applies selection."'
+          all: echo "Theme tokyo-night — Phase 3 copies themes/tokyo-night (Starship + optional editor.json merge)."
+          windows: 'Write-Host "Theme tokyo-night — Phase 3 copies themes/tokyo-night (Starship + optional editor.json merge)."'
         update:
-          all: echo "Theme tokyo-night; re-run botstrap reconfigure to refresh assets from the repo."
-          windows: 'Write-Host "Theme tokyo-night; re-run botstrap reconfigure to refresh assets from the repo."'
+          all: echo "Theme tokyo-night — re-run botstrap reconfigure to refresh theme bundles from the repo."
+          windows: 'Write-Host "Theme tokyo-night — re-run botstrap reconfigure to refresh theme bundles from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
       - name: gruvbox
         description: "Gruvbox"
         install:
-          all: echo "Theme assets live under themes/gruvbox; Phase 3 applies selection."
-          windows: 'Write-Host "Theme assets live under themes/gruvbox; Phase 3 applies selection."'
+          all: echo "Theme gruvbox — Phase 3 copies themes/gruvbox (Starship + optional editor.json merge)."
+          windows: 'Write-Host "Theme gruvbox — Phase 3 copies themes/gruvbox (Starship + optional editor.json merge)."'
         update:
-          all: echo "Theme gruvbox; re-run botstrap reconfigure to refresh assets from the repo."
-          windows: 'Write-Host "Theme gruvbox; re-run botstrap reconfigure to refresh assets from the repo."'
+          all: echo "Theme gruvbox — re-run botstrap reconfigure to refresh theme bundles from the repo."
+          windows: 'Write-Host "Theme gruvbox — re-run botstrap reconfigure to refresh theme bundles from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
       - name: nord
         description: "Nord"
         install:
-          all: echo "Nord theme; extend themes/ when assets are added."
-          windows: 'Write-Host "Nord theme; extend themes/ when assets are added."'
+          all: echo "Theme nord — Phase 3 copies themes/nord (Starship + optional editor.json merge)."
+          windows: 'Write-Host "Theme nord — Phase 3 copies themes/nord (Starship + optional editor.json merge)."'
         update:
-          all: echo "Theme nord; re-run botstrap reconfigure to refresh assets from the repo."
-          windows: 'Write-Host "Theme nord; re-run botstrap reconfigure to refresh assets from the repo."'
+          all: echo "Theme nord — re-run botstrap reconfigure to refresh theme bundles from the repo."
+          windows: 'Write-Host "Theme nord — re-run botstrap reconfigure to refresh theme bundles from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
       - name: rose-pine
         description: "Rosé Pine"
         install:
-          all: echo "Rosé Pine theme; extend themes/ when assets are added."
-          windows: 'Write-Host "Rosé Pine theme; extend themes/ when assets are added."'
+          all: echo "Theme rose-pine — Phase 3 copies themes/rose-pine (Starship + optional editor.json merge)."
+          windows: 'Write-Host "Theme rose-pine — Phase 3 copies themes/rose-pine (Starship + optional editor.json merge)."'
         update:
-          all: echo "Theme rose-pine; re-run botstrap reconfigure to refresh assets from the repo."
-          windows: 'Write-Host "Theme rose-pine; re-run botstrap reconfigure to refresh assets from the repo."'
+          all: echo "Theme rose-pine — re-run botstrap reconfigure to refresh theme bundles from the repo."
+          windows: 'Write-Host "Theme rose-pine — re-run botstrap reconfigure to refresh theme bundles from the repo."'
         verify: bash -c "exit 0"
         verify_windows: '$true'
 

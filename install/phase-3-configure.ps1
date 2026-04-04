@@ -82,10 +82,42 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
     }
 }
 
+$themeStarship = Join-Path $root "themes\$($env:BOTSTRAP_THEME)\starship.toml"
 $promptTpl = Join-Path $root 'configs\shell\prompt.toml'
 $starshipOut = Join-Path $configBase 'starship.toml'
-if (Test-Path -LiteralPath $promptTpl) {
+if (Test-Path -LiteralPath $themeStarship) {
+    Copy-Item -LiteralPath $themeStarship -Destination $starshipOut -Force
+}
+elseif (Test-Path -LiteralPath $promptTpl) {
     Copy-Item -LiteralPath $promptTpl -Destination $starshipOut -Force
+}
+
+function Merge-BotstrapThemeEditorJson {
+    param(
+        [Parameter(Mandatory)][string]$DestPath,
+        [Parameter(Mandatory)][string]$RepoRoot,
+        [Parameter(Mandatory)][string]$ThemeId
+    )
+    $overlay = Join-Path $RepoRoot "themes\$ThemeId\editor.json"
+    if (-not (Test-Path -LiteralPath $DestPath) -or -not (Test-Path -LiteralPath $overlay)) {
+        return
+    }
+    try {
+        $baseObj = Get-Content -LiteralPath $DestPath -Raw -Encoding utf8 | ConvertFrom-Json
+        $overObj = Get-Content -LiteralPath $overlay -Raw -Encoding utf8 | ConvertFrom-Json
+    }
+    catch {
+        return
+    }
+    $ht = @{}
+    foreach ($p in $baseObj.PSObject.Properties) {
+        $ht[$p.Name] = $p.Value
+    }
+    foreach ($p in $overObj.PSObject.Properties) {
+        $ht[$p.Name] = $p.Value
+    }
+    $json = ConvertTo-Json -InputObject $ht -Depth 20
+    Set-Content -LiteralPath $DestPath -Value $json -Encoding utf8
 }
 
 switch ($env:BOTSTRAP_EDITOR) {
@@ -94,7 +126,9 @@ switch ($env:BOTSTRAP_EDITOR) {
         New-Item -ItemType Directory -Force -Path $cursorDir | Out-Null
         $cs = Join-Path $root 'configs\editor\cursor-settings.json'
         if (Test-Path -LiteralPath $cs) {
-            Copy-Item -LiteralPath $cs -Destination (Join-Path $cursorDir 'settings.json') -Force
+            $cursorSettings = Join-Path $cursorDir 'settings.json'
+            Copy-Item -LiteralPath $cs -Destination $cursorSettings -Force
+            Merge-BotstrapThemeEditorJson -DestPath $cursorSettings -RepoRoot $root -ThemeId $env:BOTSTRAP_THEME
         }
     }
     'vscode' {
@@ -102,7 +136,9 @@ switch ($env:BOTSTRAP_EDITOR) {
         New-Item -ItemType Directory -Force -Path $codeUser | Out-Null
         $vs = Join-Path $root 'configs\editor\vscode.json'
         if (Test-Path -LiteralPath $vs) {
-            Copy-Item -LiteralPath $vs -Destination (Join-Path $codeUser 'settings.json') -Force
+            $vscodeSettings = Join-Path $codeUser 'settings.json'
+            Copy-Item -LiteralPath $vs -Destination $vscodeSettings -Force
+            Merge-BotstrapThemeEditorJson -DestPath $vscodeSettings -RepoRoot $root -ThemeId $env:BOTSTRAP_THEME
         }
     }
     'neovim' {

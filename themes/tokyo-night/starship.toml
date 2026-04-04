@@ -1,0 +1,17 @@
+# Botstrap — Tokyo Night (starship.rs palette)
+format = "$all"
+palette = "tokyo_night"
+
+[palettes.tokyo_night]
+accent = "#7aa2f7"
+dim = "#565f89"
+green = "#9ece6a"
+red = "#f7768e"
+
+[character]
+success_symbol = "[➜](bold fg:green) "
+error_symbol = "[➜](bold fg:red) "
+
+[directory]
+truncation_length = 3
+style = "fg:accent"

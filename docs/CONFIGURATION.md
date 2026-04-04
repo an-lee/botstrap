@@ -17,7 +17,7 @@ Global **`user.name`** and **`user.email`** are set from **`BOTSTRAP_GIT_NAME`**
 
 | Repository file | Destination / effect |
 |-----------------|----------------------|
-| `configs/shell/prompt.toml` | Copied to **`~/.config/starship.toml`** (overwrites when present in repo). |
+| `configs/shell/prompt.toml` | Fallback only: copied to **`~/.config/starship.toml`** when no theme bundle provides **`starship.toml`** (see **`themes/`** below). |
 | `configs/shell/aliases` | Appended once to **`~/.zshrc`** and **`~/.bashrc`** inside a block marked `# botstrap aliases`. |
 | `configs/shell/functions` | Appended once to **`~/.zshrc`** and **`~/.bashrc`** inside a block marked `# botstrap functions`. |
 
@@ -27,8 +27,8 @@ Applied when **`BOTSTRAP_EDITOR`** matches (Unix Phase 3):
 
 | Editor choice | Repository file | Destination |
 |---------------|-----------------|-------------|
-| `cursor` | `configs/editor/cursor-settings.json` | `~/.cursor/settings.json` |
-| `vscode` | `configs/editor/vscode.json` | `~/.config/Code/User/settings.json` |
+| `cursor` | `configs/editor/cursor-settings.json` | `~/.cursor/settings.json` (then shallow-merge keys from **`themes/<BOTSTRAP_THEME>/editor.json`** on Unix when **`jq`** is available; Windows merges via PowerShell) |
+| `vscode` | `configs/editor/vscode.json` | `~/.config/Code/User/settings.json` (same theme merge as Cursor) |
 | `neovim` | `configs/editor/neovim/init.lua` | `~/.config/nvim/init.lua` |
 
 Other editor values skip these copies.
@@ -58,9 +58,20 @@ Phase 3 also writes:
 - **`~/.config/botstrap/theme.env`** — `theme=<value>`
 - **`~/.config/botstrap/editor.env`** — `editor=<value>`
 
+## `themes/`
+
+Phase 3 uses **`BOTSTRAP_THEME`** (from the TUI or env; persisted in **`theme.env`**) to pick a folder **`themes/<id>/`** where **`<id>`** is one of **`catppuccin`**, **`tokyo-night`**, **`gruvbox`**, **`nord`**, **`rose-pine`** (see **`registry/optional.yaml`**).
+
+| File | Effect |
+|------|--------|
+| `themes/<id>/starship.toml` | When present, copied to **`~/.config/starship.toml`** (Windows: **`%USERPROFILE%\.config\starship.toml`**). |
+| `themes/<id>/editor.json` | Optional. When **`BOTSTRAP_EDITOR`** is **`cursor`** or **`vscode`**, its keys are merged on top of the repo editor template after the base copy (shallow object merge). Typical key: **`workbench.colorTheme`** — install the matching color-theme extension in the editor if the theme is not built in. |
+
+If **`themes/<id>/starship.toml`** is missing, Phase 3 falls back to **`configs/shell/prompt.toml`**.
+
 ## Optional tools and themes
 
-Phase 3 installs **selected core** from **`registry/core.yaml`** and selections from **`registry/optional.yaml`** (via **`lib/pkg`**), not only file copies from `configs/`. Theme bundles may live under **`themes/`** in the repo; wiring depends on optional registry entries and scripts—see [Registry specification](./REGISTRY_SPEC.md) and [Architecture](./ARCHITECTURE.md).
+Phase 3 installs **selected core** from **`registry/core.yaml`** and selections from **`registry/optional.yaml`** (via **`lib/pkg`**), not only file copies from **`configs/`**. Theme **registry** rows log selection; **assets** are applied from **`themes/<id>/`** as above. See [Registry specification](./REGISTRY_SPEC.md) and [Architecture](./ARCHITECTURE.md).
 
 ## Related
 
