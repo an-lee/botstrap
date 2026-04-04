@@ -20,9 +20,18 @@ irm https://botstrap.dev/install.ps1 | iex
 
 For local development, run the orchestrator from this repository:
 
+**macOS / Linux**
+
 ```bash
 export BOTSTRAP_ROOT="$(pwd)"
 ./install.sh
+```
+
+**Windows (PowerShell)**
+
+```powershell
+$env:BOTSTRAP_ROOT = (Get-Location).Path
+.\install.ps1
 ```
 
 ## Layout
