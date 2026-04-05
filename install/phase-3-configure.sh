@@ -142,9 +142,13 @@ case "${BOTSTRAP_EDITOR:-none}" in
     fi
     ;;
   neovim)
-    mkdir -p "${HOME}/.config/nvim"
-    if [[ -f "${BOTSTRAP_ROOT}/configs/editor/neovim/init.lua" ]]; then
-      cp -f "${BOTSTRAP_ROOT}/configs/editor/neovim/init.lua" "${HOME}/.config/nvim/init.lua"
+    if [[ -f "${HOME}/.config/nvim/lua/config/lazy.lua" ]]; then
+      botstrap_log_info "LazyVim present; skipping Botstrap minimal init.lua copy."
+    else
+      mkdir -p "${HOME}/.config/nvim"
+      if [[ -f "${BOTSTRAP_ROOT}/configs/editor/neovim/init.lua" ]]; then
+        cp -f "${BOTSTRAP_ROOT}/configs/editor/neovim/init.lua" "${HOME}/.config/nvim/init.lua"
+      fi
     fi
     ;;
   *) ;;

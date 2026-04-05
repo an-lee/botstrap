@@ -75,7 +75,7 @@ Unless otherwise noted, paths are under **`$HOME`**.
 | `~/.config/botstrap/core-tools.env` | **`core_tools=`** comma-separated list (persisted Phase 3) for **`botstrap doctor`** / reconfigure default core selection when **`BOTSTRAP_CORE_TOOLS`** is not set in the shell. |
 | `~/.config/botstrap/optional-selections.env` | **`languages=`**, **`databases=`**, **`ai_tools=`**, **`optional_apps=`** (Phase 3) for **`botstrap update --tools`** and TUI **`--selected`** defaults on reconfigure. |
 | `~/.config/botstrap/env.sh` | **Unix Phase 3:** sets **`BOTSTRAP_ROOT`** and prepends **`$BOTSTRAP_ROOT/bin`** to **`PATH`** (duplicate-safe). Regenerated each Phase 3 run. |
-| Editor configs | **cursor:** `~/.cursor/settings.json` from `configs/editor/cursor-settings.json`. **vscode:** `~/.config/Code/User/settings.json` from `configs/editor/vscode.json`. **neovim:** `~/.config/nvim/init.lua` from `configs/editor/neovim/init.lua`. |
+| Editor configs | **cursor:** `~/.cursor/settings.json` from `configs/editor/cursor-settings.json`. **vscode:** `~/.config/Code/User/settings.json` from `configs/editor/vscode.json`. **neovim:** LazyVim starter under `~/.config/nvim` via `install/modules/lazyvim.sh` after the `neovim` optional install; Phase 3 copies `configs/editor/neovim/init.lua` only if `~/.config/nvim/lua/config/lazy.lua` is missing. |
 | `~/.config/botstrap/theme.env`, `editor.env` | Small key=value files for theme and editor. |
 | `~/.config/botstrap/agent/*.sample` | Copies of `configs/agent/AGENTS.md`, `cursorrules`, `claude-config.json` as **`.sample`** files (not live agent config unless you copy them). |
 
@@ -87,6 +87,7 @@ Paths use **`%USERPROFILE%`** where relevant.
 |--------|-----------|
 | **`%USERPROFILE%\.config\botstrap\core-tools.env`** | **`core_tools=`** persisted list (Phase 3) for **`doctor`** / TUI defaults when **`BOTSTRAP_CORE_TOOLS`** is unset. |
 | **`%USERPROFILE%\.config\botstrap\optional-selections.env`** | **`languages=`**, **`databases=`**, **`ai_tools=`**, **`optional_apps=`** for **`update --tools`** and reconfigure TUI defaults. |
+| Editor configs (**`BOTSTRAP_EDITOR`**) | **cursor** / **vscode:** under **`%USERPROFILE%`** as in [Configuration file map](./CONFIGURATION.md). **neovim:** **`%LOCALAPPDATA%\nvim`** — LazyVim starter from **`install/modules/lazyvim.ps1`** after the **`neovim`** install; minimal **`init.lua`** only when **`lua\config\lazy.lua`** is missing. |
 | PowerShell **profiles** (dual host): **`Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`** (Windows PowerShell 5.1) and **`Documents\PowerShell\Microsoft.PowerShell_profile.ps1`** (**`pwsh`** 7+), plus **`$PROFILE`** when it differs (e.g. VS Code host) | Each file is updated **once** (marker-guarded) with the same blocks: **`# botstrap PATH`** sets **`$env:BOTSTRAP_ROOT`**, prepends **`$BOTSTRAP_ROOT\bin`** to **`$env:PATH`**, and defines **`function Global:botstrap`** invoking **`bin\botstrap.ps1`**. Also **`# botstrap starship`**, **`# botstrap zoxide`**, and **`# botstrap aliases`** when missing. |
 
 There is **no** **`~/.config/botstrap/env.sh`** on native Windows; the profile block is the shell hook for the **`botstrap`** command.

@@ -46,6 +46,11 @@ groups:
           linux-pacman: sudo pacman -Sy --needed --noconfirm neovim
           windows: winget upgrade --id Neovim.Neovim -e --accept-package-agreements --accept-source-agreements
         verify: nvim --version
+        post_install: |
+          bash "${BOTSTRAP_ROOT}/install/modules/lazyvim.sh"
+        post_install_windows: |
+          . (Join-Path $env:BOTSTRAP_ROOT 'install\modules\lazyvim.ps1')
+          Install-BotstrapLazyVim
       - name: zed
         description: "Zed code editor"
         install:

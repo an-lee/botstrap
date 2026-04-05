@@ -142,11 +142,17 @@ switch ($env:BOTSTRAP_EDITOR) {
         }
     }
     'neovim' {
-        $nvim = Join-Path $configBase 'nvim'
-        New-Item -ItemType Directory -Force -Path $nvim | Out-Null
-        $init = Join-Path $root 'configs\editor\neovim\init.lua'
-        if (Test-Path -LiteralPath $init) {
-            Copy-Item -LiteralPath $init -Destination (Join-Path $nvim 'init.lua') -Force
+        $nvimDir = Join-Path $env:LOCALAPPDATA 'nvim'
+        $lazyLua = Join-Path $nvimDir 'lua\config\lazy.lua'
+        if (Test-Path -LiteralPath $lazyLua) {
+            Write-BotstrapInfo 'LazyVim present; skipping Botstrap minimal init.lua copy.'
+        }
+        else {
+            New-Item -ItemType Directory -Force -Path $nvimDir | Out-Null
+            $init = Join-Path $root 'configs\editor\neovim\init.lua'
+            if (Test-Path -LiteralPath $init) {
+                Copy-Item -LiteralPath $init -Destination (Join-Path $nvimDir 'init.lua') -Force
+            }
         }
     }
     default { }

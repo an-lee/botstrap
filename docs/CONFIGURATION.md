@@ -29,7 +29,7 @@ Applied when **`BOTSTRAP_EDITOR`** matches (Unix Phase 3):
 |---------------|-----------------|-------------|
 | `cursor` | `configs/editor/cursor-settings.json` | `~/.cursor/settings.json` (then shallow-merge keys from **`themes/<BOTSTRAP_THEME>/editor.json`** on Unix when **`jq`** is available; Windows merges via PowerShell) |
 | `vscode` | `configs/editor/vscode.json` | `~/.config/Code/User/settings.json` (same theme merge as Cursor) |
-| `neovim` | `configs/editor/neovim/init.lua` | `~/.config/nvim/init.lua` |
+| `neovim` | LazyVim starter ([`LazyVim/starter`](https://github.com/LazyVim/starter)) installed by `install/modules/lazyvim` after the `neovim` optional package; Phase 3 copies `configs/editor/neovim/init.lua` only if `lua/config/lazy.lua` is missing | macOS/Linux: `~/.config/nvim`. Windows: `%LOCALAPPDATA%\nvim` (typically `~/AppData/Local/nvim`). |
 
 Other editor values skip these copies.
 

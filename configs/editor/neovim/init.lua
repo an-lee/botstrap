@@ -1,4 +1,4 @@
--- Minimal starter config; replace with LazyVim or your preferred distribution.
+-- Fallback minimal Neovim config when LazyVim is not present (Botstrap skips copying this if lua/config/lazy.lua exists).
 vim.g.mapleader = " "
 vim.opt.number = true
 vim.opt.relativenumber = true
