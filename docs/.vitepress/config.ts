@@ -1,7 +1,34 @@
+import { execSync } from 'node:child_process'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 
 const siteOrigin = 'https://botstrap.dev'
+
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..')
+
+function resolveDocsCommit(): { short: string; full: string } {
+  const fromEnv =
+    process.env.CF_PAGES_COMMIT_SHA ||
+    process.env.GITHUB_SHA ||
+    process.env.VERCEL_GIT_COMMIT_SHA
+  if (fromEnv) {
+    const full = fromEnv.trim()
+    return { full, short: full.slice(0, 7) }
+  }
+  try {
+    const full = execSync('git rev-parse HEAD', {
+      cwd: repoRoot,
+      encoding: 'utf8',
+    }).trim()
+    return { full, short: full.slice(0, 7) }
+  } catch {
+    return { full: '', short: 'local' }
+  }
+}
+
+const docsCommit = resolveDocsCommit()
 
 export default withMermaid(
   defineConfig({
@@ -43,6 +70,13 @@ export default withMermaid(
     },
 
     mermaid: {},
+
+    vite: {
+      define: {
+        __DOCS_COMMIT_SHORT__: JSON.stringify(docsCommit.short),
+        __DOCS_COMMIT_FULL__: JSON.stringify(docsCommit.full),
+      },
+    },
 
     themeConfig: {
       siteTitle: 'Botstrap',

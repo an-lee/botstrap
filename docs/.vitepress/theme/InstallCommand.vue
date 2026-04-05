@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import DocsSiteVersion from './DocsSiteVersion.vue'
 
 type Platform = 'unix' | 'windows'
 
@@ -68,6 +69,7 @@ async function copyCommand() {
         {{ copied ? 'Copied' : 'Copy' }}
       </button>
     </div>
+    <DocsSiteVersion />
   </div>
 </template>
 
