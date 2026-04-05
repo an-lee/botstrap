@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Registry-driven install helpers (Unix). Requires mikefarah/yq on PATH.
 
+# shellcheck source=lib/bash-compat.sh
+source "${BOTSTRAP_ROOT}/lib/bash-compat.sh"
+
 botstrap_pkg_resolve_keys() {
   local keys=()
   case "${BOTSTRAP_OS}" in
@@ -219,7 +222,8 @@ botstrap_pkg_install_tools_from_csv() {
   local reg="$2"
   [[ -z "${csv}" ]] && return 0
   local name
-  mapfile -t _botstrap_pkg_csv_order < <(yq -r '.tools[].name' "${reg}")
+  _botstrap_pkg_csv_order=()
+  botstrap_read_lines_to_array _botstrap_pkg_csv_order < <(yq -r '.tools[].name' "${reg}")
   for name in "${_botstrap_pkg_csv_order[@]}"; do
     [[ -z "${name}" ]] && continue
     botstrap_csv_has_item "${name}" "${csv}" || continue
@@ -299,7 +303,8 @@ botstrap_pkg_update_tools_from_csv() {
   local reg="$2"
   [[ -z "${csv}" ]] && return 0
   local name
-  mapfile -t _botstrap_pkg_up_csv_order < <(yq -r '.tools[].name' "${reg}")
+  _botstrap_pkg_up_csv_order=()
+  botstrap_read_lines_to_array _botstrap_pkg_up_csv_order < <(yq -r '.tools[].name' "${reg}")
   for name in "${_botstrap_pkg_up_csv_order[@]}"; do
     [[ -z "${name}" ]] && continue
     botstrap_csv_has_item "${name}" "${csv}" || continue
@@ -378,7 +383,8 @@ botstrap_core_tool_names_for_verify() {
     yq -r '.tools[].name' "${core_reg}"
     return
   fi
-  mapfile -t _botstrap_cv_order < <(yq -r '.tools[].name' "${core_reg}")
+  _botstrap_cv_order=()
+  botstrap_read_lines_to_array _botstrap_cv_order < <(yq -r '.tools[].name' "${core_reg}")
   local n
   for n in "${_botstrap_cv_order[@]}"; do
     [[ -z "${n}" ]] && continue

@@ -15,7 +15,8 @@ fi
 
 _failures=0
 _prereq_reg="${BOTSTRAP_ROOT}/registry/prerequisites.yaml"
-mapfile -t _pre_tools < <(yq -r '.tools[].name' "${_prereq_reg}")
+_pre_tools=()
+botstrap_read_lines_to_array _pre_tools < <(yq -r '.tools[].name' "${_prereq_reg}")
 _pre_filtered=()
 for _t in "${_pre_tools[@]}"; do
   [[ -z "${_t}" ]] && continue
@@ -32,7 +33,8 @@ for _t in "${_pre_filtered[@]}"; do
   fi
 done
 
-mapfile -t _core_list < <(botstrap_core_tool_names_for_verify)
+_core_list=()
+botstrap_read_lines_to_array _core_list < <(botstrap_core_tool_names_for_verify)
 _total_core="${#_core_list[@]}"
 _current=0
 for _t in "${_core_list[@]}"; do

@@ -7,6 +7,8 @@ set -euo pipefail
 : "${BOTSTRAP_ROOT:?BOTSTRAP_ROOT must be set}"
 # shellcheck source=lib/log.sh
 source "${BOTSTRAP_ROOT}/lib/log.sh"
+# shellcheck source=lib/bash-compat.sh
+source "${BOTSTRAP_ROOT}/lib/bash-compat.sh"
 
 if ! command -v gum &>/dev/null; then
   botstrap_log_warn "gum not found; exporting safe defaults for non-interactive runs."
@@ -70,7 +72,8 @@ fi
 export BOTSTRAP_GIT_EMAIL="${BOTSTRAP_GIT_EMAIL:-$(gum input --placeholder "${_git_email_placeholder}" "${_git_email_args[@]}")}"
 
 _core_yaml="${BOTSTRAP_ROOT}/registry/core.yaml"
-mapfile -t _core_tool_names < <(yq -r '.tools[].name' "${_core_yaml}")
+_core_tool_names=()
+botstrap_read_lines_to_array _core_tool_names < <(yq -r '.tools[].name' "${_core_yaml}")
 _selected_flag='*'
 _core_env_file="${HOME}/.config/botstrap/core-tools.env"
 if [[ -f "${_core_env_file}" ]]; then

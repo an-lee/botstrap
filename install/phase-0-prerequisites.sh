@@ -52,7 +52,8 @@ botstrap_bootstrap_yq_for_registry || {
 source "${BOTSTRAP_ROOT}/lib/pkg.sh"
 
 _prereq_reg="${BOTSTRAP_ROOT}/registry/prerequisites.yaml"
-mapfile -t _botstrap_prereq_tools < <(yq -r '.tools[].name' "${_prereq_reg}")
+_botstrap_prereq_tools=()
+botstrap_read_lines_to_array _botstrap_prereq_tools < <(yq -r '.tools[].name' "${_prereq_reg}")
 _total="${#_botstrap_prereq_tools[@]}"
 _current=0
 for _tool in "${_botstrap_prereq_tools[@]}"; do
