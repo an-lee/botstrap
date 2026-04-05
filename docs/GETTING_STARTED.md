@@ -14,7 +14,7 @@ This guide covers **how to run Botstrap**, **prerequisites**, **local developmen
 
 ### After clone (Unix orchestrator)
 
-- **Bash** (the project uses `#!/usr/bin/env bash` with `set -euo pipefail`; use Bash 4+ where possible).
+- **Bash** (the project uses `#!/usr/bin/env bash` with `set -euo pipefail`; **Bash 3.2** — the macOS system default — is supported; Bash 4+ recommended when available).
 - **sudo** (or equivalent) on Linux/macOS when Phase 0 or package installs need it.
 - Phase 0 installs **jq**, **yq**, and **gum** when possible (from **`registry/prerequisites.yaml`**); **yq** is **required** for registry-driven installs and Phase 4.
 

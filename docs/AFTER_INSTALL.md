@@ -55,6 +55,10 @@ Interactive choices (when **gum** is available) map to **[`registry/core.yaml`](
 
 Open a **new** terminal or **`source ~/.zshrc`** / **`~/.bashrc`** (Unix) so PATH and Botstrap blocks load. Starship config: **`~/.config/starship.toml`** (from `configs/shell/prompt.toml`). On Windows, Phase 3 adds profile blocks for Starship and zoxide when missing.
 
+### Zellij
+
+When **`zellij`** is in **`core_tools`**, Phase 3 installs it and on **Windows** also writes a `default_shell` line to **`config.kdl`** so new panes launch **PowerShell** (or `pwsh` 7+ when available) instead of `cmd.exe`. The config file location is resolved via `zellij setup --check`; fallback is **`%USERPROFILE%\.config\zellij\config.kdl`**. On Unix no automatic config is written; use `zellij setup --dump-config` to create a starter file.
+
 ### mise (optional languages)
 
 Core install includes **mise**. Optional language rows run **`mise use --global …`** with PATH including **`~/.local/bin`** (Unix) or **`%LOCALAPPDATA%\mise\bin`** and **`%USERPROFILE%\.local\bin`** (Windows). Check **`mise ls`** and **`mise current`**.
