@@ -63,13 +63,15 @@ _git_name_args=()
 if [[ -n "${GIT_AUTHOR_NAME:-}" ]]; then
   _git_name_args=(--value "${GIT_AUTHOR_NAME}")
 fi
-export BOTSTRAP_GIT_NAME="${BOTSTRAP_GIT_NAME:-$(gum input --placeholder "${_git_name_placeholder}" "${_git_name_args[@]}")}"
+# shellcheck disable=SC2086 # bash32-nounset-empty-array: optional gum args
+export BOTSTRAP_GIT_NAME="${BOTSTRAP_GIT_NAME:-$(gum input --placeholder "${_git_name_placeholder}" ${_git_name_args[@]+"${_git_name_args[@]}"})}"
 
 _git_email_args=()
 if [[ -n "${GIT_AUTHOR_EMAIL:-}" ]]; then
   _git_email_args=(--value "${GIT_AUTHOR_EMAIL}")
 fi
-export BOTSTRAP_GIT_EMAIL="${BOTSTRAP_GIT_EMAIL:-$(gum input --placeholder "${_git_email_placeholder}" "${_git_email_args[@]}")}"
+# shellcheck disable=SC2086 # bash32-nounset-empty-array: optional gum args
+export BOTSTRAP_GIT_EMAIL="${BOTSTRAP_GIT_EMAIL:-$(gum input --placeholder "${_git_email_placeholder}" ${_git_email_args[@]+"${_git_email_args[@]}"})}"
 
 _core_yaml="${BOTSTRAP_ROOT}/registry/core.yaml"
 _core_tool_names=()
@@ -84,7 +86,8 @@ if [[ -f "${_core_env_file}" ]]; then
   fi
 fi
 _core_lines="$(
-  gum choose --no-limit --ordered --header "Core tools (registry/core.yaml)" --selected "${_selected_flag}" "${_core_tool_names[@]}" || true
+  # shellcheck disable=SC2086 # bash32-nounset-empty-array: core list may be empty
+  gum choose --no-limit --ordered --header "Core tools (registry/core.yaml)" --selected "${_selected_flag}" ${_core_tool_names[@]+"${_core_tool_names[@]}"} || true
 )"
 export BOTSTRAP_CORE_TOOLS="${_core_lines//$'\n'/,}"
 
@@ -98,7 +101,8 @@ if [[ -f "${_editor_env_file}" ]]; then
   [[ -n "${_edv}" ]] && _editor_gum_args=(--selected "${_edv}")
 fi
 export BOTSTRAP_EDITOR="$(
-  gum choose --header "Primary editor" "${_editor_gum_args[@]}" \
+  # shellcheck disable=SC2086 # bash32-nounset-empty-array: optional gum args
+  gum choose --header "Primary editor" ${_editor_gum_args[@]+"${_editor_gum_args[@]}"} \
     cursor vscode neovim zed none
 )"
 
@@ -114,7 +118,8 @@ if [[ -f "${_opt_sel_file}" ]]; then
   fi
 fi
 export BOTSTRAP_LANGUAGES="$(
-  gum choose --no-limit --header "Programming languages (mise)" "${_lang_gum_args[@]}" \
+  # shellcheck disable=SC2086 # bash32-nounset-empty-array: optional gum args
+  gum choose --no-limit --header "Programming languages (mise)" ${_lang_gum_args[@]+"${_lang_gum_args[@]}"} \
     node python ruby go rust java elixir php none || true
 )"
 export BOTSTRAP_LANGUAGES="${BOTSTRAP_LANGUAGES//$'\n'/,}"
@@ -131,7 +136,8 @@ if [[ -f "${_opt_sel_file}" ]]; then
   fi
 fi
 export BOTSTRAP_DATABASES="$(
-  gum choose --no-limit --header "Databases (Docker)" "${_db_gum_args[@]}" \
+  # shellcheck disable=SC2086 # bash32-nounset-empty-array: optional gum args
+  gum choose --no-limit --header "Databases (Docker)" ${_db_gum_args[@]+"${_db_gum_args[@]}"} \
     postgresql mysql redis sqlite none || true
 )"
 export BOTSTRAP_DATABASES="${BOTSTRAP_DATABASES//$'\n'/,}"
@@ -148,7 +154,8 @@ if [[ -f "${_opt_sel_file}" ]]; then
   fi
 fi
 export BOTSTRAP_AI_TOOLS="$(
-  gum choose --no-limit --header "AI agent CLIs" "${_ai_gum_args[@]}" \
+  # shellcheck disable=SC2086 # bash32-nounset-empty-array: optional gum args
+  gum choose --no-limit --header "AI agent CLIs" ${_ai_gum_args[@]+"${_ai_gum_args[@]}"} \
     claude-code openclaw codex gemini ollama none || true
 )"
 export BOTSTRAP_AI_TOOLS="${BOTSTRAP_AI_TOOLS//$'\n'/,}"
@@ -159,7 +166,8 @@ if [[ -f "${_theme_env_file}" ]]; then
   [[ -n "${_tv}" ]] && _theme_gum_args=(--selected "${_tv}")
 fi
 export BOTSTRAP_THEME="$(
-  gum choose --header "Theme" "${_theme_gum_args[@]}" \
+  # shellcheck disable=SC2086 # bash32-nounset-empty-array: optional gum args
+  gum choose --header "Theme" ${_theme_gum_args[@]+"${_theme_gum_args[@]}"} \
     catppuccin tokyo-night gruvbox nord rose-pine
 )"
 
@@ -175,7 +183,8 @@ if [[ -f "${_opt_sel_file}" ]]; then
   fi
 fi
 export BOTSTRAP_OPTIONAL_APPS="$(
-  gum choose --no-limit --header "Optional apps" "${_app_gum_args[@]}" \
+  # shellcheck disable=SC2086 # bash32-nounset-empty-array: optional gum args
+  gum choose --no-limit --header "Optional apps" ${_app_gum_args[@]+"${_app_gum_args[@]}"} \
     1password-cli tailscale ngrok postman none || true
 )"
 export BOTSTRAP_OPTIONAL_APPS="${BOTSTRAP_OPTIONAL_APPS//$'\n'/,}"
