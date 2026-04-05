@@ -202,6 +202,7 @@ botstrap_pkg_install_optional_csv() {
   local group_id="$1"
   local csv="$2"
   local reg="${3:-${BOTSTRAP_ROOT}/registry/optional.yaml}"
+  [[ -z "${csv}" ]] && return 0
   local parts item raw
   IFS=',' read -ra parts <<<"${csv}"
   for raw in "${parts[@]}"; do
@@ -364,6 +365,7 @@ botstrap_pkg_update_optional_csv() {
   local group_id="$1"
   local csv="$2"
   local reg="${3:-${BOTSTRAP_ROOT}/registry/optional.yaml}"
+  [[ -z "${csv}" ]] && return 0
   local parts item raw
   IFS=',' read -ra parts <<<"${csv}"
   for raw in "${parts[@]}"; do
