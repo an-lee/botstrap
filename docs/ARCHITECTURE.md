@@ -70,6 +70,42 @@ flowchart TD
 
 Optional per-tool scripts under `install/modules/` hold logic that is too complex for inline YAML (extra guards, post-steps). Simple tools can be YAML-only.
 
+## `lib/` primitives
+
+The `lib/` directory contains shared helpers sourced by orchestrators and phases.
+
+| File | Platform | Purpose |
+|------|----------|---------|
+| `lib/detect.sh` / `lib/detect.ps1` | Unix / Windows | Detect OS, architecture, distro, and package manager; export `BOTSTRAP_OS`, `BOTSTRAP_ARCH`, etc. |
+| `lib/log.sh` / `lib/log.ps1` | Unix / Windows | Structured logging helpers used by all phases (see below). |
+| `lib/pkg.sh` / `lib/pkg.ps1` | Unix / Windows | Registry-driven install and verify helpers (see below). |
+| `lib/os-tune-windows.ps1` | Windows only | Applies OS tuning items from `configs/os/windows.yaml`. |
+
+### Logging helpers
+
+**Unix (`lib/log.sh`)** functions:
+
+| Function | Description |
+|----------|-------------|
+| `botstrap_log_info <msg>` | Cyan `[botstrap] …` line. |
+| `botstrap_log_warn <msg>` | Yellow `[botstrap] …` line. |
+| `botstrap_log_err <msg>` | Red `[botstrap] …` line to stderr. |
+| `botstrap_log_phase <num> <total> <label>` | Prominent phase header (gum rounded border when available; bold magenta fallback). |
+| `botstrap_log_step <current> <total> <label>` | `[N/M] label` progress line via `botstrap_log_info`. |
+
+Color output is controlled by **`BOTSTRAP_LOG_COLOR`** (default `1`; set to `0` for plain text in CI or non-terminal environments).
+
+**Windows (`lib/log.ps1`)** equivalents:
+
+| Function | Description |
+|----------|-------------|
+| `Write-BotstrapInfo <msg>` | Cyan `[botstrap] …` line. |
+| `Write-BotstrapWarn <msg>` | Yellow `[botstrap] …` line. |
+| `Write-BotstrapErr <msg>` | Red `[botstrap] …` line. |
+| `Write-BotstrapPhase <num> <total> <label>` | Phase header (gum border or `== Step N/M: … ==` fallback). |
+| `Write-BotstrapStep <current> <total> <label>` | `[N/M] label` line + `Write-Progress` bar. |
+| `Write-BotstrapProgressComplete` | Clears the `Write-Progress` bar. |
+
 ## Registry-driven package layer
 
 `lib/pkg.sh` (and `lib/pkg.ps1` on Windows) provide:
