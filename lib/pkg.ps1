@@ -168,6 +168,23 @@ function Get-BotstrapCoreVerifySnippet {
     return (Normalize-BotstrapVerifyForWindows -VerifyCmd ([string]$v))
 }
 
+function Invoke-BotstrapCorePostInstallWindows {
+    param(
+        [Parameter(Mandatory)][string]$ToolName,
+        [string]$RegistryPath = (Join-Path $env:BOTSTRAP_ROOT 'registry\core.yaml')
+    )
+    $postWin = Invoke-BotstrapYqWithEnv -Env @{ BOTSTRAP_YQ_TOOL = $ToolName } -Expression '.tools[] | select(.name == strenv(BOTSTRAP_YQ_TOOL)) | .post_install_windows // null' -FilePath $RegistryPath
+    if ($null -ne $postWin -and [string]$postWin.Trim() -ne '' -and [string]$postWin -ne 'null') {
+        Write-BotstrapInfo "Running post_install_windows for ${ToolName}"
+        try {
+            Invoke-BotstrapPowerShellSnippet -Snippet ([string]$postWin)
+        }
+        catch {
+            Write-BotstrapWarn "post_install_windows for '${ToolName}': $($_.Exception.Message)"
+        }
+    }
+}
+
 function Install-BotstrapPackageFromRegistry {
     param(
         [Parameter(Mandatory)][string]$ToolName,
@@ -192,6 +209,7 @@ function Install-BotstrapPackageFromRegistry {
             Invoke-BotstrapPowerShellSnippet -Snippet $verifySnippet
             if ($? -and ($null -eq $LASTEXITCODE -or $LASTEXITCODE -eq 0)) {
                 Write-BotstrapInfo "Skipping '${ToolName}' (already installed)"
+                Invoke-BotstrapCorePostInstallWindows -ToolName $ToolName -RegistryPath $RegistryPath
                 return $true
             }
         }
@@ -227,16 +245,7 @@ function Install-BotstrapPackageFromRegistry {
     Refresh-BotstrapPath
     Add-BotstrapMiseBinsToPath
 
-    $postWin = Invoke-BotstrapYqWithEnv -Env @{ BOTSTRAP_YQ_TOOL = $ToolName } -Expression '.tools[] | select(.name == strenv(BOTSTRAP_YQ_TOOL)) | .post_install_windows // null' -FilePath $RegistryPath
-    if ($null -ne $postWin -and [string]$postWin.Trim() -ne '' -and [string]$postWin -ne 'null') {
-        Write-BotstrapInfo "Running post_install_windows for ${ToolName}"
-        try {
-            Invoke-BotstrapPowerShellSnippet -Snippet ([string]$postWin)
-        }
-        catch {
-            Write-BotstrapWarn "post_install_windows for '${ToolName}': $($_.Exception.Message)"
-        }
-    }
+    Invoke-BotstrapCorePostInstallWindows -ToolName $ToolName -RegistryPath $RegistryPath
 
     return $true
 }

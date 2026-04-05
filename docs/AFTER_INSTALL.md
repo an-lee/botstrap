@@ -40,7 +40,7 @@ To confirm optional pieces manually, use **`command -v`**, **`mise ls`**, **`doc
 
 ## Optional stack (Phase 2 → Phase 3)
 
-Interactive choices (when **gum** is available) map to groups in **[`registry/optional.yaml`](https://github.com/an-lee/botstrap/blob/main/registry/optional.yaml)**: editor, languages, databases, AI tools, theme, optional apps.
+Interactive choices (when **gum** is available) map to **[`registry/core.yaml`](https://github.com/an-lee/botstrap/blob/main/registry/core.yaml)** (core tools, including **Neovim** when selected) and groups in **[`registry/optional.yaml`](https://github.com/an-lee/botstrap/blob/main/registry/optional.yaml)**: optional GUI editors (Cursor, VS Code, Zed), languages, databases, AI tools, theme, optional apps.
 
 **What is persisted on disk:**
 
@@ -66,7 +66,7 @@ If you selected databases, Phase 3 pulls images such as **`postgres:16-alpine`**
 ### Editors
 
 - **VS Code:** `code` on PATH after install.
-- **Neovim:** `nvim --version`.
+- **Neovim:** installed when **`neovim`** is in **`core_tools`**; LazyVim bootstrap runs via core **`post_install`**. Check `nvim --version`.
 - **Cursor / Zed:** see optional registry **`verify`** / desktop integration for your OS.
 
 ### AI CLIs

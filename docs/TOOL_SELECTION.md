@@ -83,7 +83,7 @@ Optional items are grouped so users can tailor the machine without breaking the 
 
 | Group | Rationale |
 |-------|-----------|
-| **Editor** | Cursor, VS Code, Neovim, and Zed serve different workflows; one primary editor avoids bloat. |
+| **Editor** | Optional GUI editors: Cursor, VS Code, Zed. **Neovim** (with LazyVim) is a **core** tool in **`registry/core.yaml`** when selected in the core list; the primary editor prompt still includes **`neovim`** so Phase 3 applies matching templates. |
 | **Programming languages** | Runtimes are installed via **mise** when selected, keeping versions explicit and agent-repeatable. |
 | **Databases** | PostgreSQL, MySQL, Redis, SQLite via **Docker** keeps the host clean and matches production-like setups. |
 | **AI agent tools** | Claude Code, OpenClaw, Codex CLI, Gemini CLI, Ollama — users pick what they use; many require Node or native installers per upstream docs. |
@@ -92,7 +92,7 @@ Optional items are grouped so users can tailor the machine without breaking the 
 
 ## What we intentionally avoid in core
 
-- **Heavy IDEs** in core — choice belongs in Phase 2.
+- **Heavy GUI IDEs** in core — Cursor, VS Code, and Zed stay optional. **Neovim** is an exception: it is a small core tool when selected so **`nvim`**, LazyVim bootstrap, **`doctor`**, and **`update --tools`** stay consistent.
 - **Native database daemons** — Docker-first for optional data stores.
 - **Language-specific version managers** beyond mise — mise is the single source of truth for versions.
 

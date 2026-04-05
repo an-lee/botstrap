@@ -4,7 +4,7 @@ Botstrap defines installable tools in YAML. There are three files:
 
 - **`registry/prerequisites.yaml`** — Installed in **Phase 0** only (non-interactive): **git**, **curl**, **jq**, **yq**, **gum** so registry parsing, TUI, and later installs can run. Same per-tool schema as **`core.yaml`**; passed to **`botstrap_pkg_install`** / **`Install-BotstrapPackageFromRegistry`** with this path.
 - **`registry/core.yaml`** — Presented in **Phase 2** (TUI) as a multi-select list (all selected by default); installed after confirm in **Phase 3** for the subset stored in **`BOTSTRAP_CORE_TOOLS`** / **`~/.config/botstrap/core-tools.env`**.
-- **`registry/optional.yaml`** — Presented in Phase 2 (TUI); users choose editors, languages, databases, AI CLIs, themes, and optional apps.
+- **`registry/optional.yaml`** — Presented in Phase 2 (TUI); users choose optional GUI editors (Cursor, VS Code, Zed), languages, databases, AI CLIs, themes, and optional apps. **Neovim** (with LazyVim) lives in **`core.yaml`** when selected as a core tool; Phase 2 still offers **`neovim`** as a **primary editor** choice for Phase 3 templates only.
 
 ## General rules
 
@@ -39,8 +39,8 @@ Each **tool** object:
 | `update` | map | no | Platform-keyed **upgrade** commands (same keys as `install`). Used by `botstrap update --tools` / `install/update-tools.*` only when **`verify` passes** (tool is present). If absent for the resolved platform key, the updater logs and skips that tool. Do not silently fall back to `install`. |
 | `verify` | string | recommended | Single shell command that exits 0 when the tool works (e.g. `mise --version`). Often `bash -c` on Unix. |
 | `verify_windows` | string | no | PowerShell snippet for Windows verification when `verify` is bash-only or needs a different PATH (e.g. `mise`). If absent, the Windows package layer may normalize `verify` (e.g. strip `bash -c`) or fall back to `Get-Command`. |
-| `post_install` | string | no | Bash script run after install on Unix (`lib/pkg.sh`). |
-| `post_install_windows` | string | no | PowerShell script run after install on Windows (`lib/pkg.ps1`). If absent on Windows, `post_install` is not run (Unix bash). |
+| `post_install` | string | no | Bash script on Unix (`lib/pkg.sh`): runs **after a successful install** and **again when install is skipped because `verify` already passes**, so idempotent hooks (e.g. LazyVim starter, mise globals) still apply. |
+| `post_install_windows` | string | no | PowerShell script on Windows (`lib/pkg.ps1`): same timing as `post_install` (after install or after verify-skip). If absent on Windows, `post_install` is not run (Unix bash). |
 | `configure` | string | no | Human-oriented note or machine path mapping, e.g. `configs/shell/prompt.toml -> ~/.config/starship.toml` (Phase 3 interprets this). |
 
 ### `install` map keys (core)

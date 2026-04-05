@@ -27,7 +27,7 @@ Phase 3 copies or merges from **`configs/`** and runs optional installs from **`
 - **Starship:** `configs/shell/prompt.toml` → **`~/.config/starship.toml`** (overwrites when the repo file exists).
 - **Shell rc files:** `aliases` and `functions` are appended **once** inside `# botstrap aliases` / `# botstrap functions` blocks to **`~/.zshrc`** and **`~/.bashrc`** (Unix). The PATH snippet sources **`~/.config/botstrap/env.sh`**.
 - **`env.sh`:** Regenerated each Phase 3 run; sets **`BOTSTRAP_ROOT`** and prepends **`$BOTSTRAP_ROOT/bin`** to **`PATH`** (duplicate-safe).
-- **Editor templates:** Copied only when **`BOTSTRAP_EDITOR`** is `cursor`, `vscode`, or `neovim` (see [Configuration file map](./CONFIGURATION.md)).
+- **Editor templates:** Copied only when **`BOTSTRAP_EDITOR`** is `cursor`, `vscode`, or `neovim` (see [Configuration file map](./CONFIGURATION.md)). **Neovim** and LazyVim are installed via the **core** tool **`neovim`** when it appears in **`BOTSTRAP_CORE_TOOLS`**; the optional Editor group covers Cursor, VS Code, and Zed only.
 - **Agent samples:** `configs/agent/*` → **`~/.config/botstrap/agent/*.sample`** only (not live Cursor/Claude paths unless you copy them).
 - **Windows:** Each managed PowerShell profile (Windows PowerShell 5.1, **`pwsh`**, and the current **`$PROFILE`** when different) gets the same marker-guarded blocks for PATH, starship, zoxide, and aliases as implemented in Phase 3; there is no Unix-style **`env.sh`** on native Windows.
 

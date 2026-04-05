@@ -35,7 +35,11 @@ if [[ -f "${BOTSTRAP_ROOT}/configs/git/gitconfig" && ! -f "${HOME}/.gitconfig" ]
   cp -f "${BOTSTRAP_ROOT}/configs/git/gitconfig" "${HOME}/.gitconfig"
 fi
 
-botstrap_pkg_install_optional_item "editor" "${BOTSTRAP_EDITOR:-none}" "${BOTSTRAP_ROOT}/registry/optional.yaml" || true
+if [[ "${BOTSTRAP_EDITOR:-none}" == "neovim" ]]; then
+  botstrap_log_info "Skipping optional editor/neovim (installed via core tools)."
+else
+  botstrap_pkg_install_optional_item "editor" "${BOTSTRAP_EDITOR:-none}" "${BOTSTRAP_ROOT}/registry/optional.yaml" || true
+fi
 botstrap_pkg_install_optional_csv "languages" "${BOTSTRAP_LANGUAGES:-}" "${BOTSTRAP_ROOT}/registry/optional.yaml"
 botstrap_pkg_install_optional_csv "databases" "${BOTSTRAP_DATABASES:-}" "${BOTSTRAP_ROOT}/registry/optional.yaml"
 botstrap_pkg_install_optional_csv "ai_tools" "${BOTSTRAP_AI_TOOLS:-}" "${BOTSTRAP_ROOT}/registry/optional.yaml"

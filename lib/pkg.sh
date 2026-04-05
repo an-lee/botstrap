@@ -51,6 +51,17 @@ botstrap_pkg_run_snippet() {
   bash -c "${snippet}"
 }
 
+# Run core registry post_install if present (also after verify-skip so idempotent hooks run).
+botstrap_pkg_run_core_post_install() {
+  local tool_name="$1"
+  local registry_file="$2"
+  local post
+  post="$(yq -r ".tools[] | select(.name == \"${tool_name}\") | .post_install // \"\"" "${registry_file}" 2>/dev/null || true)"
+  if [[ -n "${post}" && "${post}" != "null" ]]; then
+    botstrap_pkg_run_snippet "${post}"
+  fi
+}
+
 botstrap_pkg_install() {
   local tool_name="$1"
   local registry_file="${2:-${BOTSTRAP_ROOT}/registry/core.yaml}"
@@ -66,6 +77,7 @@ botstrap_pkg_install() {
   if [[ -n "${verify_cmd}" && "${verify_cmd}" != "null" ]]; then
     if bash -c "${verify_cmd}" &>/dev/null; then
       botstrap_log_info "Skipping ${tool_name} (already installed)"
+      botstrap_pkg_run_core_post_install "${tool_name}" "${registry_file}"
       return 0
     fi
   fi
@@ -81,11 +93,7 @@ botstrap_pkg_install() {
         botstrap_log_info "Installing ${tool_name} (using registry key: ${key})"
         botstrap_pkg_run_snippet "${snippet}"
       fi
-      local post
-      post="$(yq -r ".tools[] | select(.name == \"${tool_name}\") | .post_install // \"\"" "${registry_file}" 2>/dev/null || true)"
-      if [[ -n "${post}" && "${post}" != "null" ]]; then
-        botstrap_pkg_run_snippet "${post}"
-      fi
+      botstrap_pkg_run_core_post_install "${tool_name}" "${registry_file}"
       return 0
     fi
   done < <(botstrap_pkg_resolve_keys)

@@ -41,7 +41,12 @@ if (Test-BotstrapCsvHasItem -Needle 'zellij' -Csv $env:BOTSTRAP_CORE_TOOLS) {
 $optionalReg = Join-Path $root 'registry\optional.yaml'
 
 Write-BotstrapInfo 'Phase 3 (Windows): optional installs from registry'
-[void](Install-BotstrapOptionalItem -GroupId 'editor' -ItemName $env:BOTSTRAP_EDITOR -RegistryPath $optionalReg)
+if ($env:BOTSTRAP_EDITOR -eq 'neovim') {
+    Write-BotstrapInfo 'Skipping optional editor/neovim (installed via core tools).'
+}
+else {
+    [void](Install-BotstrapOptionalItem -GroupId 'editor' -ItemName $env:BOTSTRAP_EDITOR -RegistryPath $optionalReg)
+}
 Install-BotstrapOptionalCsv -GroupId 'languages' -Csv $env:BOTSTRAP_LANGUAGES -RegistryPath $optionalReg
 Install-BotstrapOptionalCsv -GroupId 'databases' -Csv $env:BOTSTRAP_DATABASES -RegistryPath $optionalReg
 Install-BotstrapOptionalCsv -GroupId 'ai_tools' -Csv $env:BOTSTRAP_AI_TOOLS -RegistryPath $optionalReg
