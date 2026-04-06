@@ -25,7 +25,7 @@ Git, curl, jq, yq, and gum are defined in **`registry/prerequisites.yaml`** so t
 
 | Tool | Rationale |
 |------|-----------|
-| **mise** | Single tool for Node, Python, Ruby, Go, and more; replaces nvm/pyenv/rbenv fragmentation and keeps PATH deterministic for agents. |
+| **mise** | Single tool for Node, Python, Ruby, Go, and more; replaces nvm/pyenv/rbenv fragmentation and keeps PATH deterministic for agents. **`uv`** (fast Python package manager) is installed alongside mise automatically. |
 
 ### Containers
 
