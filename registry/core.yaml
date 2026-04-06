@@ -173,12 +173,14 @@ tools:
       if command -v mise >/dev/null 2>&1; then
         mise use --global node@lts || true
         mise use --global python@latest || true
+        curl -LsSf https://astral.sh/uv/install.sh | sh
       fi
     post_install_windows: |
       $env:PATH = "$env:LOCALAPPDATA\mise\bin;$env:USERPROFILE\.local\bin;$env:PATH"
       if (Get-Command mise -ErrorAction SilentlyContinue) {
         & mise use --global node@lts 2>$null
         & mise use --global python@latest 2>$null
+        irm https://astral.sh/uv/install.ps1 | iex
       }
 
   - name: docker
