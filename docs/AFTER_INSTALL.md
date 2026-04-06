@@ -63,6 +63,8 @@ When **`zellij`** is in **`core_tools`**, Phase 3 installs it and on **Windows**
 
 Core install includes **mise**. Optional language rows run **`mise use --global …`** with PATH including **`~/.local/bin`** (Unix) or **`%LOCALAPPDATA%\mise\bin`** and **`%USERPROFILE%\.local\bin`** (Windows). Check **`mise ls`** and **`mise current`**.
 
+**`uv`** (Astral's fast Python package and project manager) is also installed automatically during the **`mise` post_install** step, alongside Node and Python. It is available on PATH after opening a new shell. Verify with **`uv --version`**.
+
 ### Docker database images
 
 If you selected databases, Phase 3 pulls images such as **`postgres:16-alpine`**, **`mysql:8`**, **`redis:7-alpine`**. They are not started automatically. Run containers with **`docker run`** or Compose per [Docker documentation](https://docs.docker.com/).
