@@ -12,6 +12,7 @@ Registry-driven installs use package managers and flags that do not prompt (`-y`
 
 - **Registry (`registry/*.yaml`)** — Tools and commands are data, not hidden in one-off scripts. Agents can read the same manifest humans do.
 - **`configs/agent/`** — Default `AGENTS.md`, Cursor rules templates, and similar files give new repos a consistent starting point for agent instructions.
+- **`CLAUDE.md`** — Root-level guidance file for Claude Code and compatible AI coding agents. Summarises the architecture, key commands, and project conventions so agents can onboard without reading every file.
 
 ### Deterministic runtimes
 

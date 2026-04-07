@@ -8,6 +8,7 @@ Thank you for helping improve Botstrap. This project aims to stay **transparent*
 - Read `docs/REGISTRY_SPEC.md` before editing `registry/prerequisites.yaml`, `registry/core.yaml`, or `registry/optional.yaml`.
 - See `docs/REFERENCE.md` for CLI and environment variable naming when changing phases.
 - Prefer YAML registry changes over new orchestration logic when a tool installs cleanly from package managers.
+- **AI coding agents** (Claude Code, Cursor, Codex, etc.): read `CLAUDE.md` at the repo root for project conventions, key commands, and architecture summary tailored for agent workflows. See also `configs/agent/AGENTS.md` for commit and task-tracking conventions.
 
 ## Development setup
 
