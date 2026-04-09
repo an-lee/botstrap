@@ -104,6 +104,26 @@ _botstrap_env_sh="${HOME}/.config/botstrap/env.sh"
   printf '%s\n' '  *:"${BOTSTRAP_ROOT}/bin":*) ;;'
   printf '%s\n' '  *) export PATH="${BOTSTRAP_ROOT}/bin:${PATH}" ;;'
   printf '%s\n' 'esac'
+  if [[ "${BOTSTRAP_OS}" == linux ]]; then
+    case "${BOTSTRAP_UNAME_M}" in
+      x86_64)
+        printf '%s\n' 'if [[ -x /opt/nvim-linux-x86_64/bin/nvim ]]; then'
+        printf '%s\n' '  case ":${PATH}:" in'
+        printf '%s\n' '    *:/opt/nvim-linux-x86_64/bin:*) ;;'
+        printf '%s\n' '    *) export PATH="/opt/nvim-linux-x86_64/bin:${PATH}" ;;'
+        printf '%s\n' '  esac'
+        printf '%s\n' 'fi'
+        ;;
+      aarch64 | arm64)
+        printf '%s\n' 'if [[ -x /opt/nvim-linux-arm64/bin/nvim ]]; then'
+        printf '%s\n' '  case ":${PATH}:" in'
+        printf '%s\n' '    *:/opt/nvim-linux-arm64/bin:*) ;;'
+        printf '%s\n' '    *) export PATH="/opt/nvim-linux-arm64/bin:${PATH}" ;;'
+        printf '%s\n' '  esac'
+        printf '%s\n' 'fi'
+        ;;
+    esac
+  fi
 } >"${_botstrap_env_sh}"
 
 if [[ -f "${BOTSTRAP_ROOT}/configs/shell/env_path_snippet.bash" ]]; then

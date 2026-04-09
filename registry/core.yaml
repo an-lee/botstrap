@@ -138,17 +138,14 @@ tools:
     category: editor
     install:
       darwin: brew install neovim
-      linux-apt: sudo apt-get install -y neovim
-      linux-dnf: sudo dnf install -y neovim
-      linux-pacman: sudo pacman -Sy --needed --noconfirm neovim
+      linux: bash "${BOTSTRAP_ROOT}/install/modules/neovim-linux.sh"
       windows: winget install --id Neovim.Neovim -e --accept-package-agreements --accept-source-agreements
     update:
       darwin: brew upgrade neovim
-      linux-apt: sudo apt-get update && sudo apt-get install --only-upgrade -y neovim
-      linux-dnf: sudo dnf upgrade -y neovim
-      linux-pacman: sudo pacman -Sy --needed --noconfirm neovim
+      linux: bash "${BOTSTRAP_ROOT}/install/modules/neovim-linux.sh"
       windows: winget upgrade --id Neovim.Neovim -e --accept-package-agreements --accept-source-agreements
-    verify: nvim --version
+    verify: bash "${BOTSTRAP_ROOT}/install/modules/verify-neovim.sh"
+    verify_windows: nvim --version
     post_install: |
       bash "${BOTSTRAP_ROOT}/install/modules/lazyvim.sh"
     post_install_windows: |
