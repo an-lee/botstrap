@@ -72,7 +72,7 @@ If you selected databases, Phase 3 pulls images such as **`postgres:16-alpine`**
 ### Editors
 
 - **VS Code:** `code` on PATH after install.
-- **Neovim:** installed when **`neovim`** is in **`core_tools`**; LazyVim bootstrap runs via core **`post_install`**. Check `nvim --version`.
+- **Neovim:** installed when **`neovim`** is in **`core_tools`**; LazyVim bootstrap runs via core **`post_install`**. On **Linux**, Neovim is downloaded from the official GitHub release tarball and placed under **`/opt/nvim-linux-x86_64/`** (x86_64) or **`/opt/nvim-linux-arm64/`** (arm64); Phase 3 automatically adds the appropriate `/opt/nvim-linux-{arch}/bin` to PATH via **`~/.config/botstrap/env.sh`**, so `nvim` is on PATH in a new shell. Check `nvim --version`.
 - **Cursor / Zed:** see optional registry **`verify`** / desktop integration for your OS.
 
 ### AI CLIs
