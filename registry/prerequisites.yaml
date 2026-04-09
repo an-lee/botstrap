@@ -84,10 +84,10 @@ tools:
       linux: |
         GUM_VER=0.14.5
         ARCH=$(uname -m)
-        DEB_ARCH=amd64
-        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then DEB_ARCH=arm64; fi
+        LINUX_ARCH=x86_64
+        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then LINUX_ARCH=arm64; fi
         TMP=$(mktemp -d)
-        curl -fsSL "https://github.com/charmbracelet/gum/releases/download/v${GUM_VER}/gum_${GUM_VER}_Linux_${DEB_ARCH}.tar.gz" | tar -xz -C "$TMP"
+        curl -fsSL "https://github.com/charmbracelet/gum/releases/download/v${GUM_VER}/gum_${GUM_VER}_Linux_${LINUX_ARCH}.tar.gz" | tar -xz -C "$TMP" --strip-components=1
         sudo install -m 0755 "$TMP/gum" /usr/local/bin/gum
         rm -rf "$TMP"
       windows: winget install --id charmbracelet.gum -e --accept-package-agreements --accept-source-agreements
@@ -96,10 +96,10 @@ tools:
       linux: |
         GUM_VER=0.14.5
         ARCH=$(uname -m)
-        DEB_ARCH=amd64
-        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then DEB_ARCH=arm64; fi
+        LINUX_ARCH=x86_64
+        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then LINUX_ARCH=arm64; fi
         TMP=$(mktemp -d)
-        curl -fsSL "https://github.com/charmbracelet/gum/releases/download/v${GUM_VER}/gum_${GUM_VER}_Linux_${DEB_ARCH}.tar.gz" | tar -xz -C "$TMP"
+        curl -fsSL "https://github.com/charmbracelet/gum/releases/download/v${GUM_VER}/gum_${GUM_VER}_Linux_${LINUX_ARCH}.tar.gz" | tar -xz -C "$TMP" --strip-components=1
         sudo install -m 0755 "$TMP/gum" /usr/local/bin/gum
         rm -rf "$TMP"
       windows: winget upgrade --id charmbracelet.gum -e --accept-package-agreements --accept-source-agreements
